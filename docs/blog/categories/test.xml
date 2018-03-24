@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title><![CDATA[jwage.com]]></title>
-    <link href="https://jwage.github.io/jwage.com/atom.xml" rel="self"/>
+    <link href="https://jwage.github.io/jwage.com/blog/categories/test.xml" rel="self"/>
     <link href="https://jwage.github.io/jwage.com/"/>
     <updated>2018-03-23T21:51:15-04:00</updated>
     <id>https://jwage.github.io/jwage.com/</id>
