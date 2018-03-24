@@ -3,14 +3,14 @@
     <title><![CDATA[jwage.com]]></title>
     <link href="https://jwage.github.io/jwage.com/atom.xml" rel="self"/>
     <link href="https://jwage.github.io/jwage.com/"/>
-    <updated>2018-03-23T22:04:00-04:00</updated>
+    <updated>2018-03-23T22:05:01-04:00</updated>
     <id>https://jwage.github.io/jwage.com/</id>
         <generator uri="http://sculpin.io/">Sculpin</generator>
             <entry>
             <title type="html"><![CDATA[Test Post]]></title>
-            <link href="https://jwage.github.io/jwage.com/post/:id/test-post"/>
+            <link href="https://jwage.github.io/jwage.com/post/2018/03/23/test-post"/>
             <updated>2018-03-23T00:00:00-04:00</updated>
-            <id>https://jwage.github.io/jwage.com/post/:id/test-post</id>
+            <id>https://jwage.github.io/jwage.com/post/2018/03/23/test-post</id>
             <content type="html"><![CDATA[<p>Here is some code!</p>
 
 <pre><code>namespace Foo;
