@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tumblr Code Syntax Highlighting &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="robots" content="index, follow">
+        <link href="https://jwage.github.io/jwage.com/components/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.github.io/jwage.com/css/style.css" rel="stylesheet" type="text/css" />
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <link rel="apple-touch-startup-image" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="shortcut icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="shortcut icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="shortcut icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="shortcut icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="shortcut icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="shortcut icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="shortcut icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="shortcut icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="apple-touch-icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="apple-touch-icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="apple-touch-icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="apple-touch-icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="apple-touch-icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+
+        <link rel="stylesheet" href="https://jwage.github.io/jwage.com/components/highlightjs/styles/github.css" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.github.io/jwage.com/atom.xml" title="jwage.com activity feed" />
+        <style>
+        /** quick fix because bootstrap <pre> has a background-color. */
+        pre code { background-color: inherit; }
+        </style>
+                                    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="https://jwage.github.io/jwage.com/">jwage.com</a>
+                    </div>
+                    <div id="navbar" class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="https://jwage.github.io/jwage.com/articles">Articles</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/about">About</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/blog">Blog</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="mainContent container">
+            <div class="row-fluid">
+                <div class="span8">
+                        <article>
+        <header>
+            <h2>Tumblr Code Syntax Highlighting <small>post</small></h2>
+        </header>
+        <div>
+            <p>Finally got around to adding code syntax highlighting to my tumblr blog. Thanks to this <a href="http://snippets-of-code.tumblr.com/post/6027484416/adding-syntax-highlighting-into-tumblr" target="_blank">post</a> it was really easy!</p>
+
+<p>In your head tag add the following javascript:</p>
+
+<pre><code>&lt;!-- For Syntax Highlighting --&gt;
+&lt;script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" type="text/css" href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css"&gt;&lt;/link&gt;  
+&lt;script src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"&gt;&lt;/script&gt;  
+&lt;script&gt;
+    function styleCode() {
+        if (typeof disableStyleCode != 'undefined') { return; }
+
+        var a = false;
+
+        $('pre').each(function() {
+            if (!$(this).hasClass('prettyprint')) {
+                $(this).addClass('prettyprint');
+                a = true;
+            }
+        });
+
+        if (a) { prettyPrint(); } 
+    }
+
+    $(function() {styleCode();});
+&lt;/script&gt;
+</code></pre>
+
+<p>Then in your add this css:</p>
+
+<pre><code>/* Pretty printing styles. Used with prettify.js. */
+/* Vim sunburst theme by David Leibovic */
+
+pre .str, code .str { color: #65B042; } /* string  - green */
+pre .kwd, code .kwd { color: #E28964; } /* keyword - dark pink */
+pre .com, code .com { color: #AEAEAE; font-style: italic; } /* comment - gray */
+pre .typ, code .typ { color: #89bdff; } /* type - light blue */
+pre .lit, code .lit { color: #3387CC; } /* literal - blue */
+pre .pun, code .pun { color: #fff; } /* punctuation - white */
+pre .pln, code .pln { color: #fff; } /* plaintext - white */
+pre .tag, code .tag { color: #89bdff; } /* html/xml tag    - light blue */
+pre .atn, code .atn { color: #bdb76b; } /* html/xml attribute name  - khaki */
+pre .atv, code .atv { color: #65B042; } /* html/xml attribute value - green */
+pre .dec, code .dec { color: #3387CC; } /* decimal - blue */
+
+pre.prettyprint, code.prettyprint {
+        background-color: #000;
+        -moz-border-radius: 8px;
+        -webkit-border-radius: 8px;
+        -o-border-radius: 8px;
+        -ms-border-radius: 8px;
+        -khtml-border-radius: 8px;
+        border-radius: 8px;
+}
+
+pre.prettyprint {
+        width: 95%;
+        margin: 1em auto;
+        padding: 1em !important;
+        white-space: pre-wrap;
+}
+
+/* Specify class=linenums on a pre to get line numbering */
+ol.linenums { margin-top: 0; margin-bottom: 0; color: #AEAEAE; } /* IE indents via margin-left */
+li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8 { list-style-type: none }
+/* Alternate shading for lines */
+li.L1,li.L3,li.L5,li.L7,li.L9 { }
+
+@media print {
+  pre .str, code .str { color: #060; }
+  pre .kwd, code .kwd { color: #006; font-weight: bold; }
+  pre .com, code .com { color: #600; font-style: italic; }
+  pre .typ, code .typ { color: #404; font-weight: bold; }
+  pre .lit, code .lit { color: #044; }
+  pre .pun, code .pun { color: #440; }
+  pre .pln, code .pln { color: #000; }
+  pre .tag, code .tag { color: #006; font-weight: bold; }
+  pre .atn, code .atn { color: #404; }
+  pre .atv, code .atv { color: #060; }
+}
+</code></pre>
+
+<p>That is it. I didn&rsquo;t think it would be that easy!</p>
+
+<p>You can find more themes <a href="http://google-code-prettify.googlecode.com/svn/trunk/styles/index.html" target="_blank">here</a>.</p>
+
+        </div>
+                
+                    <nav class="article">
+                <ul>
+                                            <li>Next: <a class="next" href="https://jwage.github.io/jwage.com/post/2012/09/15/writing-a-parser-in-php-with-the-help-of-doctrine" title="Writing a parser in PHP with the help of Doctrine"><span class="title">Writing a parser in PHP with the help of Doctrine</span></a></li>
+                                                                <li>Previous: <a class="previous" href="https://jwage.github.io/jwage.com/post/2012/09/10/ruler-a-simple-stateless-production-rules-engine" title="Ruler: A simple stateless production rules engine for PHP 5.3+"><span class="title">Ruler: A simple stateless production rules engine for PHP 5.3+</span></a></li>
+                                    </ul>
+            </nav>
+            </article>
+
+
+
+                </div>
+            </div>
+        </div>
+        <footer class="container">
+            &copy; 2018 jwage.com
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.github.io/jwage.com/components/jquery/jquery.min.js"><\/script>')</script>
+        <script src="https://jwage.github.io/jwage.com/components/bootstrap/js/bootstrap.min.js"></script>
+                
+                <script src="https://jwage.github.io/jwage.com/components/highlightjs/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
+                    </body>
+</html>

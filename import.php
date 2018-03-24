@@ -35,7 +35,7 @@ foreach ($results->posts as $post) {
     $content = str_replace($find, $replace, $content);
 
     $date = date('Y-m-d', $post->timestamp);
-    $fileName = sprintf('%s-%s', $date, $post->slug);
+    $fileName = sprintf('%s-%s.md', $date, $post->slug);
 
     $filePath = sprintf('source/_posts/%s', $fileName);
 

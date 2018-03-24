@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MongoDB PHP MongoDate Tricks &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="robots" content="index, follow">
+        <link href="https://jwage.github.io/jwage.com/components/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.github.io/jwage.com/css/style.css" rel="stylesheet" type="text/css" />
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <link rel="apple-touch-startup-image" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="shortcut icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="shortcut icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="shortcut icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="shortcut icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="shortcut icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="shortcut icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="shortcut icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="shortcut icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="apple-touch-icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="apple-touch-icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="apple-touch-icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="apple-touch-icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="apple-touch-icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+
+        <link rel="stylesheet" href="https://jwage.github.io/jwage.com/components/highlightjs/styles/github.css" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.github.io/jwage.com/atom.xml" title="jwage.com activity feed" />
+        <style>
+        /** quick fix because bootstrap <pre> has a background-color. */
+        pre code { background-color: inherit; }
+        </style>
+                                    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="https://jwage.github.io/jwage.com/">jwage.com</a>
+                    </div>
+                    <div id="navbar" class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="https://jwage.github.io/jwage.com/articles">Articles</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/about">About</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/blog">Blog</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="mainContent container">
+            <div class="row-fluid">
+                <div class="span8">
+                        <article>
+        <header>
+            <h2>MongoDB PHP MongoDate Tricks <small>post</small></h2>
+        </header>
+        <div>
+            <p>Here are a few tricks I&rsquo;ve learned working with MongoDB and PHP.</p>
+
+<p><strong>Create DateTime from MongoId</strong></p>
+
+<p>Because MongoDB identifiers contain the date you can easily create a <code>DateTime</code> instance from them.</p>
+
+<pre><code>public function getDateTimeFromMongoId(MongoId $mongoId)
+{
+    $dateTime = new DateTime('@'.$mongoId-&gt;getTimestamp());
+    $dateTime-&gt;setTimezone(new DateTimeZone(date_default_timezone_get()));
+    return $dateTime;
+}
+</code></pre>
+
+<p>This is useful when you don&rsquo;t want to create an additional field to store the date a document was created. You can also use the _id index that already exists to paginate and filter/sort by date.</p>
+
+<p><strong>Create MongoId with Date in the Past</strong></p>
+
+<p>For the same reason as above, you can create a MongoId instance with a date in the past. This was copied from a <a href="http://stackoverflow.com/questions/14370143/create-mongodb-objectid-from-date-in-the-past-using-php-driver/14380093#14380093" target="_blank">stackoverflow answer</a> by <a href="http://derickrethans.nl/" target="_blank">Derek Rethans</a>.</p>
+
+<pre><code>public createMongoIdFromTimestamp($timestamp)
+{
+    $ts = pack('N', $timestamp);
+    $m = substr(md5(gethostname()), 0, 3);
+    $pid = pack('n', posix_getpid());
+    $trail = substr(pack('N', $this-&gt;inc++), 1, 3);
+
+    $bin = sprintf('%s%s%s%s', $ts, $m, $pid, $trail);
+
+    $id = '';
+    for ($i = 0; $i &lt; 12; $i++ ) {
+        $id .= sprintf('%02X', ord($bin[$i]));
+    }
+
+    return new \MongoID($id);
+}
+</code></pre>
+
+<p>This was useful when migrating legacy data in to a collection where we utilize the _id for pagination and displaying a created date. If we simply created identifiers with todays date then it would show old records with all the same date and pagination/sorting would be broken.</p>
+
+        </div>
+                
+                    <nav class="article">
+                <ul>
+                                            <li>Next: <a class="next" href="https://jwage.github.io/jwage.com/post/2013/12/23/sending-safari-push-notifications-with-php" title="Sending Safari Push Notifications with PHP"><span class="title">Sending Safari Push Notifications with PHP</span></a></li>
+                                                                <li>Previous: <a class="previous" href="https://jwage.github.io/jwage.com/post/2013/07/13/quotes-from-the-road-to-serfdom-by-friedrich-hayek" title="Quotes from The Road to Serfdom by Friedrich Hayek"><span class="title">Quotes from The Road to Serfdom by Friedrich Hayek</span></a></li>
+                                    </ul>
+            </nav>
+            </article>
+
+
+
+                </div>
+            </div>
+        </div>
+        <footer class="container">
+            &copy; 2018 jwage.com
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.github.io/jwage.com/components/jquery/jquery.min.js"><\/script>')</script>
+        <script src="https://jwage.github.io/jwage.com/components/bootstrap/js/bootstrap.min.js"></script>
+                
+                <script src="https://jwage.github.io/jwage.com/components/highlightjs/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
+                    </body>
+</html>

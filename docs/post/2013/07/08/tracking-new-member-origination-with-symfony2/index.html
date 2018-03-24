@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tracking New Member Origination with Symfony2 &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="robots" content="index, follow">
+        <link href="https://jwage.github.io/jwage.com/components/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.github.io/jwage.com/css/style.css" rel="stylesheet" type="text/css" />
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <link rel="apple-touch-startup-image" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="shortcut icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="shortcut icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="shortcut icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="shortcut icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="shortcut icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="shortcut icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="shortcut icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="shortcut icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="apple-touch-icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="apple-touch-icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="apple-touch-icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="apple-touch-icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="apple-touch-icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+
+        <link rel="stylesheet" href="https://jwage.github.io/jwage.com/components/highlightjs/styles/github.css" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.github.io/jwage.com/atom.xml" title="jwage.com activity feed" />
+        <style>
+        /** quick fix because bootstrap <pre> has a background-color. */
+        pre code { background-color: inherit; }
+        </style>
+                                    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="https://jwage.github.io/jwage.com/">jwage.com</a>
+                    </div>
+                    <div id="navbar" class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="https://jwage.github.io/jwage.com/articles">Articles</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/about">About</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/blog">Blog</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="mainContent container">
+            <div class="row-fluid">
+                <div class="span8">
+                        <article>
+        <header>
+            <h2>Tracking New Member Origination with Symfony2 <small>post</small></h2>
+        </header>
+        <div>
+            <blockquote>
+  <p><strong>NOTE</strong>
+  The example code in this blog post has been simplified to make things more concise and easy to read.</p>
+</blockquote>
+
+<p>At <a href="http://www.opensky.com" target="_blank">OpenSky</a> it is important for us to track how a member joined so that we can determine causation between joining and any subsequent actions taken on the site, like an order.</p>
+
+<p>To get started create a new class called <code>OriginationManager</code> with a method named <code>updateHistory</code>. It will accept a <code>Request</code> object and record the query parameters from the current URL in the session.</p>
+
+<pre><code>&lt;?php class OriginationManager
+{
+    public function updateHistory(Request $request)
+    {
+        $session = $request-&gt;getSession();
+
+        $history = $session-&gt;get('user_origination_history', array());
+        $history[] = $request-&gt;query-&gt;all();
+
+        $session-&gt;set('user_origination_history', $history);
+    }
+}
+</code></pre>
+
+<p>Now create an <code>OriginationListener</code> class that will listen to the <code>kernel.request</code> event and make use of the <code>OriginationManager::updateHistory()</code> API we just created.</p>
+
+<pre><code>&lt;?php class OriginationListener
+{
+    // ...
+
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        $request = $event-&gt;getRequest();
+
+        // Only process non-logged-in users
+        if ($token = $this-&gt;securityContext-&gt;getToken()) {
+            $user = $token-&gt;getUser();
+            if ($user instanceof User) {
+                return;
+            }
+        }
+
+        $this-&gt;originationManager-&gt;updateHistory($request);
+    }
+}
+</code></pre>
+
+<p>Now we are tracking the query parameters of logged out users on every request. We can make use of this information later when a user joins. First, lets define a new model that can be used to store the origination information along with the user (assume the model is persisted with <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a>). Each new <code>User</code> gets an <code>Originator</code> record when they join. It allows us to essentially see how a new user entered the site and what clicks they made before joining.</p>
+
+<pre><code>&lt;?php class Originator
+{
+    /**
+     * The raw array of request query data.
+     *
+     * @var array
+     */
+    protected $history = array();
+
+    /**
+     * The user that originated this member.
+     *
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * The value of the first osky_origin parameter we encounter.
+     *
+     * @var string
+     */
+    protected $origin;
+
+    /**
+     * The value of the first osky_source parameter we encounter.
+     *
+     * @var string
+     */
+    protected $source;
+
+    // ...
+}
+</code></pre>
+
+<p>Assume your application already notifies an event named <code>user.created</code>. In <code>OriginationListener</code> create an <code>onUserCreated</code> method that will listen to the <code>user.created</code> event.</p>
+
+<pre><code>&lt;?php
+
+class OriginationListener
+{
+    // ...
+
+    public function onUserCreated(UserCreatedEvent $event)
+    {
+        $user = $event-&gt;getUser();
+        $request = $event-&gt;getRequest();
+
+        $this-&gt;originationManager-&gt;assignUserOrigination($user, $request);
+    }
+}
+</code></pre>
+
+<p>Next, create the <code>OriginationManager::assignUserOrigination()</code> method. It will utilize the request query parameters we saved on the session earlier to create a new <code>Originator</code> record.</p>
+
+<pre><code>&lt;?php class OriginationManager
+{
+    public function assignUserOrigination(User $user, Request $request)
+    {
+        $session = $request-&gt;getSession();
+
+        $history = $session-&gt;get('user_origination_history', array());
+
+        $originator = new Originator();
+        $originator-&gt;setHistory($history);
+
+        foreach ($history as $query) {
+            if (!$originator-&gt;getOrigin() &amp;&amp; isset($query['osky_origin'])) {
+                $originator-&gt;setOrigin($query['osky_origin']);
+
+                if ($user = $this-&gt;userRepository-&gt;find($query['osky_origin'])) {
+                    $originator-&gt;setUser($user);
+                }
+            }
+
+            if (!$originator-&gt;getSource() &amp;&amp; isset($query['osky_source'])) {
+                $originator-&gt;setSource($query['osky_source']);
+            }
+        }
+
+        $user-&gt;setOriginator($originator);
+
+        $session-&gt;remove('user_origination_history');
+    }
+}
+</code></pre>
+
+<p>Now if a logged out user were to visit OpenSky with a parameter named <code>osky_origin</code> in the URL with another users id as the value, the <code>Originator</code> record that gets created for the new member will have a reference to that <code>User</code>. We can then utilize that information do whatever we want. In our case we give the user that got the new <code>User</code> to join a credit and a thank you. The <code>osky_source</code> parameter can be used as an arbitrary reporting variable to help with identifying marketing campaigns.</p>
+
+<p>Keep in mind that this is an example implementation and it omits many details specific to OpenSky for the sake of simplicity. The real implementation we use has dozens of other parameters that can be used to associate records together and assist with reporting. You can add to this implementation and check for custom parameters and standard ones like <code>utm_source</code>, <code>utm_campaign</code>, etc.</p>
+
+        </div>
+                
+                    <nav class="article">
+                <ul>
+                                            <li>Next: <a class="next" href="https://jwage.github.io/jwage.com/post/2013/07/13/quotes-from-the-road-to-serfdom-by-friedrich-hayek" title="Quotes from The Road to Serfdom by Friedrich Hayek"><span class="title">Quotes from The Road to Serfdom by Friedrich Hayek</span></a></li>
+                                                                <li>Previous: <a class="previous" href="https://jwage.github.io/jwage.com/post/2013/07/02/building-activity-streams" title="Building Activity Streams using Symfony2, Doctrine2 and MongoDB"><span class="title">Building Activity Streams using Symfony2, Doctrine2 and MongoDB</span></a></li>
+                                    </ul>
+            </nav>
+            </article>
+
+
+
+                </div>
+            </div>
+        </div>
+        <footer class="container">
+            &copy; 2018 jwage.com
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.github.io/jwage.com/components/jquery/jquery.min.js"><\/script>')</script>
+        <script src="https://jwage.github.io/jwage.com/components/bootstrap/js/bootstrap.min.js"></script>
+                
+                <script src="https://jwage.github.io/jwage.com/components/highlightjs/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
+                    </body>
+</html>

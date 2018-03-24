@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MongoDB Tailable Cursors &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="robots" content="index, follow">
+        <link href="https://jwage.github.io/jwage.com/components/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.github.io/jwage.com/css/style.css" rel="stylesheet" type="text/css" />
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <link rel="apple-touch-startup-image" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="shortcut icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="shortcut icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="shortcut icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="shortcut icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="shortcut icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="shortcut icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="shortcut icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="shortcut icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="apple-touch-icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="apple-touch-icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="apple-touch-icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="apple-touch-icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="apple-touch-icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+
+        <link rel="stylesheet" href="https://jwage.github.io/jwage.com/components/highlightjs/styles/github.css" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.github.io/jwage.com/atom.xml" title="jwage.com activity feed" />
+        <style>
+        /** quick fix because bootstrap <pre> has a background-color. */
+        pre code { background-color: inherit; }
+        </style>
+                                    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="https://jwage.github.io/jwage.com/">jwage.com</a>
+                    </div>
+                    <div id="navbar" class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="https://jwage.github.io/jwage.com/articles">Articles</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/about">About</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/blog">Blog</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="mainContent container">
+            <div class="row-fluid">
+                <div class="span8">
+                        <article>
+        <header>
+            <h2>MongoDB Tailable Cursors <small>post</small></h2>
+        </header>
+        <div>
+            <p>Tailable cursors are a cool feature of MongoDB. It allows you to setup scripts that run forever and are constantly processing new data that gets inserted to the collection. You need a capped collection in order to tail a cursor so just create a new collection and make sure it is capped to a size you can specify:</p>
+
+<pre><code>&gt; db.createCollection("my_collection", {capped:true, size:100000})
+</code></pre>
+
+<p>Now you can tail a cursor in your favorite language. I have a few examples of the same script in PHP, Ruby, Python and Perl!</p>
+
+<h2>PHP</h2>
+
+<pre><code>$mongo = new Mongo();
+$db = $mongo-&gt;selectDB('my_db')
+$coll = $db-&gt;selectCollection('my_collection');
+$cursor = $coll-&gt;find()-&gt;tailable(true);
+while (true) {
+    if ($cursor-&gt;hasNext()) {
+        $doc = $cursor-&gt;getNext();
+        print_r($doc);
+    } else {
+        sleep(1);
+    }
+}
+</code></pre>
+
+<h2>Ruby</h2>
+
+<pre><code>db   = Mongo::Connection.new().db('my_db')
+coll = db.collection('my_collection')
+cursor = Mongo::Cursor.new(coll, :tailable =&gt; true)
+loop do
+  if doc = cursor.next_document
+    puts doc
+  else
+    sleep 1
+  end
+end
+</code></pre>
+
+<h2>Python</h2>
+
+<p>By <a href="http://wombatnation.com" target="_blank">Robert Stewart</a>:</p>
+
+<pre><code>from pymongo import Connection
+import time
+
+db = Connection().my_db
+coll = db.my_collection
+cursor = coll.find(tailable=True)
+while cursor.alive:
+    try:
+        doc = cursor.next()
+        print doc
+    except StopIteration:
+        time.sleep(1)
+</code></pre>
+
+<h2>Perl</h2>
+
+<p>By <a href="http://tong.ijenko.net/" target="_BLANK">Max</a></p>
+
+<pre><code>use 5.010;
+
+use strict;
+use warnings;
+use MongoDB;
+
+my $db = MongoDB::Connection-&gt;new;
+my $coll = $db-&gt;my_db-&gt;my_collection;
+my $cursor = $coll-&gt;find-&gt;tailable(1);
+for (;;)
+{
+    if (defined(my $doc = $cursor-&gt;next))
+    {
+        say $doc;
+    }
+    else
+    {
+        sleep 1;
+    }
+}
+</code></pre>
+
+<p>If you want to provide the same example in another language please add it in the comments and I&rsquo;d be glad to include it here!</p>
+
+        </div>
+                
+                    <nav class="article">
+                <ul>
+                                            <li>Next: <a class="next" href="https://jwage.github.io/jwage.com/post/2011/06/10/something-to-always-think-about" title="Something to always think about"><span class="title">Something to always think about</span></a></li>
+                                                                <li>Previous: <a class="previous" href="https://jwage.github.io/jwage.com/post/2011/02/28/tips-on-being-successful-in-open-source" title="Tips on Being Successful in Open Source"><span class="title">Tips on Being Successful in Open Source</span></a></li>
+                                    </ul>
+            </nav>
+            </article>
+
+
+
+                </div>
+            </div>
+        </div>
+        <footer class="container">
+            &copy; 2018 jwage.com
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.github.io/jwage.com/components/jquery/jquery.min.js"><\/script>')</script>
+        <script src="https://jwage.github.io/jwage.com/components/bootstrap/js/bootstrap.min.js"></script>
+                
+                <script src="https://jwage.github.io/jwage.com/components/highlightjs/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
+                    </body>
+</html>

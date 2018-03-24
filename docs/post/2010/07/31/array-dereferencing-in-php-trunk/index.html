@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Array dereferencing in PHP trunk &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="robots" content="index, follow">
+        <link href="https://jwage.github.io/jwage.com/components/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.github.io/jwage.com/css/style.css" rel="stylesheet" type="text/css" />
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <link rel="apple-touch-startup-image" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="shortcut icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="shortcut icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="shortcut icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="shortcut icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="shortcut icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="shortcut icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="shortcut icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="shortcut icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="apple-touch-icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="apple-touch-icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="apple-touch-icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="apple-touch-icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="apple-touch-icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+
+        <link rel="stylesheet" href="https://jwage.github.io/jwage.com/components/highlightjs/styles/github.css" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.github.io/jwage.com/atom.xml" title="jwage.com activity feed" />
+        <style>
+        /** quick fix because bootstrap <pre> has a background-color. */
+        pre code { background-color: inherit; }
+        </style>
+                                    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="https://jwage.github.io/jwage.com/">jwage.com</a>
+                    </div>
+                    <div id="navbar" class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="https://jwage.github.io/jwage.com/articles">Articles</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/about">About</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/blog">Blog</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="mainContent container">
+            <div class="row-fluid">
+                <div class="span8">
+                        <article>
+        <header>
+            <h2>Array dereferencing in PHP trunk <small>post</small></h2>
+        </header>
+        <div>
+            <p>Today I was reading an <a href="http://schlueters.de/blog/archives/138-Features-in-PHP-trunk-Array-dereferencing.html" target="_blank">article</a> about array dereferencing in PHP trunk. It is an awesome new feature added to PHP! Imagine you had some code like this:</p>
+
+<pre><code>class Foo
+{
+    public function bar()
+    {
+    }
+}
+
+function func()
+{
+    return new Foo();
+}
+</code></pre>
+
+<p>Previous to this addition in PHP you had to do something like this:</p>
+
+<pre><code>$foo = func();
+$foo-&gt;bar();
+</code></pre>
+
+<p>Now it is possible to just call bar() directly without having to set the return of func() to a variable temporarily:</p>
+
+<pre><code>func()-&gt;bar();
+</code></pre>
+
+<p>You can also now access arrays when they are the return of a method:</p>
+
+<pre><code>function foo()
+{
+    return array(1, 2, 3);
+}
+echo foo()[2]; // prints 3
+</code></pre>
+
+<p>This greatly improves the syntax of PHP and I am very happy to see this committed!</p>
+
+        </div>
+                
+                    <nav class="article">
+                <ul>
+                                            <li>Next: <a class="next" href="https://jwage.github.io/jwage.com/post/2010/08/02/doctrine-annotations-library" title="Doctrine Annotations Library"><span class="title">Doctrine Annotations Library</span></a></li>
+                                                                <li>Previous: <a class="previous" href="https://jwage.github.io/jwage.com/post/2010/07/30/doctrine-mongodb-odm-schema-migrations" title="Doctrine MongoDB ODM Schema Migrations"><span class="title">Doctrine MongoDB ODM Schema Migrations</span></a></li>
+                                    </ul>
+            </nav>
+            </article>
+
+
+
+                </div>
+            </div>
+        </div>
+        <footer class="container">
+            &copy; 2018 jwage.com
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.github.io/jwage.com/components/jquery/jquery.min.js"><\/script>')</script>
+        <script src="https://jwage.github.io/jwage.com/components/bootstrap/js/bootstrap.min.js"></script>
+                
+                <script src="https://jwage.github.io/jwage.com/components/highlightjs/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
+                    </body>
+</html>

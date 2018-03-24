@@ -68,26 +68,164 @@
                 <div class="span8">
                         <article>
         <header>
-            <h2><a href="https://jwage.github.io/jwage.com/_posts/2012-09-24-doctrine-common-library"></a></h2>
+            <h2><a href="https://jwage.github.io/jwage.com/post/2011/06/10/something-to-always-think-about">Something to always think about</a></h2>
         </header>
         <div>
-            
+            <p>My friend <a href="http://twitter.com/nicholasholland" target="_blank">Nicholas Holland (@nicholasholland)</a>, passed this gem on to me while I was working with him at <a href="http://www.centresource.com" target="_blank">CentreSource</a>. He heard it at a conference and shared it with me. I liked it and learned quite a bit from it so I wanted to share it as well!
+
+</p>
+
+<h2>story:</h2>
+
+<p>guy was traveling<br/>
+had a terrible trip<br/>
+went to 5 star hotel<br/>
+got to his room at midnight<br/>
+called roomservice, polite/professional guy answers<br/>
+he asks for Milkshake<br/>
+guys apologizes says they don&rsquo;t have it<br/>
+then recommends a bowl of ice cream<br/>
+the traveler says sure, and asks for a large glass of milk<br/>
+the guy says, no problem<br/>
+then the traveler asks for an extra glass and a tall spoon, the guy says sure<br/>
+20 min later<br/>
+tray arrives with bowl of ice cream, glass of milk, empty glass, and tall spoon<br/><br/></p>
+
+<h2>moral:</h2>
+
+<p>the guy had everything he needed, including the desire to make the traveler happy, to make the milkshake
+but he couldn&rsquo;t get past his own systems / limitations to actually make it&hellip; because the system didn&rsquo;t have a &lsquo;milkshake&rsquo; button, he couldn&rsquo;t get it done<br/>
+thus, the traveler was less than happy - even though the guy had everything he needed to make the guy happy</p>
+
         </div>
             </article>
     <article>
         <header>
-            <h2><a href="https://jwage.github.io/jwage.com/_posts/2013-02-11-sunshinephp-miami"></a></h2>
+            <h2><a href="https://jwage.github.io/jwage.com/post/2011/03/16/mongodb-tailable-cursors">MongoDB Tailable Cursors</a></h2>
         </header>
         <div>
-            
+            <p>Tailable cursors are a cool feature of MongoDB. It allows you to setup scripts that run forever and are constantly processing new data that gets inserted to the collection. You need a capped collection in order to tail a cursor so just create a new collection and make sure it is capped to a size you can specify:</p>
+
+<pre><code>&gt; db.createCollection("my_collection", {capped:true, size:100000})
+</code></pre>
+
+<p>Now you can tail a cursor in your favorite language. I have a few examples of the same script in PHP, Ruby, Python and Perl!</p>
+
+<h2>PHP</h2>
+
+<pre><code>$mongo = new Mongo();
+$db = $mongo-&gt;selectDB('my_db')
+$coll = $db-&gt;selectCollection('my_collection');
+$cursor = $coll-&gt;find()-&gt;tailable(true);
+while (true) {
+    if ($cursor-&gt;hasNext()) {
+        $doc = $cursor-&gt;getNext();
+        print_r($doc);
+    } else {
+        sleep(1);
+    }
+}
+</code></pre>
+
+<h2>Ruby</h2>
+
+<pre><code>db   = Mongo::Connection.new().db('my_db')
+coll = db.collection('my_collection')
+cursor = Mongo::Cursor.new(coll, :tailable =&gt; true)
+loop do
+  if doc = cursor.next_document
+    puts doc
+  else
+    sleep 1
+  end
+end
+</code></pre>
+
+<h2>Python</h2>
+
+<p>By <a href="http://wombatnation.com" target="_blank">Robert Stewart</a>:</p>
+
+<pre><code>from pymongo import Connection
+import time
+
+db = Connection().my_db
+coll = db.my_collection
+cursor = coll.find(tailable=True)
+while cursor.alive:
+    try:
+        doc = cursor.next()
+        print doc
+    except StopIteration:
+        time.sleep(1)
+</code></pre>
+
+<h2>Perl</h2>
+
+<p>By <a href="http://tong.ijenko.net/" target="_BLANK">Max</a></p>
+
+<pre><code>use 5.010;
+
+use strict;
+use warnings;
+use MongoDB;
+
+my $db = MongoDB::Connection-&gt;new;
+my $coll = $db-&gt;my_db-&gt;my_collection;
+my $cursor = $coll-&gt;find-&gt;tailable(1);
+for (;;)
+{
+    if (defined(my $doc = $cursor-&gt;next))
+    {
+        say $doc;
+    }
+    else
+    {
+        sleep 1;
+    }
+}
+</code></pre>
+
+<p>If you want to provide the same example in another language please add it in the comments and I&rsquo;d be glad to include it here!</p>
+
         </div>
             </article>
     <article>
         <header>
-            <h2><a href="https://jwage.github.io/jwage.com/_posts/2013-07-02-building-activity-streams"></a></h2>
+            <h2><a href="https://jwage.github.io/jwage.com/post/2011/02/28/tips-on-being-successful-in-open-source">Tips on Being Successful in Open Source</a></h2>
         </header>
         <div>
-            
+            <p>This morning I got an e-mail from someone asking for some pointers on how to build a successul open source project. It&rsquo;s a difficult question to answer. In the end I think it comes down to a lot of things, but mainly it is being consistent and active. I responded to him with some of my thoughts and when I was done I practically had a blog post so I decided flesh it out a little more and post it here.</p>
+
+<h2>Identity</h2>
+
+<p>First, it is extremely important for your project to have a <strong>name</strong> and an <strong>identity</strong>. Just pick a word, anything, something is better than nothing. Then pick some colors and slice up a logo in Photoshop.</p>
+
+<h2>Source Control</h2>
+
+<p>You <strong>must</strong> use some kind of source control. I recommend using <a href="http://www.github.com" target="_blank">GitHub</a> as it will help to build the <strong>community</strong> around your project and <strong>generate contributions</strong>.</p>
+
+<h2>Mailing Lists &amp; IRC</h2>
+
+<p>Next, setup a <strong>mailing list</strong> using <a href="http://google.com/groups" target="_blank">Google Groups</a> and create an <strong>IRC channel</strong> on the irc.freenode.net network. Now you have a way to communicate with your users and contributors!</p>
+
+<h2>Setup a Website</h2>
+
+<p>Once you have your identity, your code publicly available and a way to communicate with your users you need a <strong>website</strong> to organize all the information about your project. I recommend a blog, documentation, information about your community, how to contribute, how to download your code, release/download information, etc.</p>
+
+<h2>Social Networking</h2>
+
+<p>I think leveraging social networking is also a big part of connecting with your users. Create a Twitter account for your project and announce updates there. When you are developing and working on your project, be sure to let your users know what you are up to. Be active and passionate about what you do and your users will more likely connect with you and help contribute to building a great open source project.</p>
+
+<h2>Release Early and Release Often</h2>
+
+<p>In the early days of an open source project you need to release early and release often. The project is new, and the users know that so the project needs to show that it is active and moving fast in order for developers to consider using your project. As your project matures, and you have stable versions users can rely on, then you can consider throttling down the frequency of releases. Get your users new stuff fast!</p>
+
+<h2>Maintenance</h2>
+
+<p>After you have your project ground work done, you need to maintain your project and stay active. If you do not maintain your project, then it will die a slow death. Frequently write blog posts about new developments, new versions, updates to documentation, use cases and example tutorials, etc. This will get your users coming back to your site and seeing the new stuff you are working on and will be more likely to use and or contribute to your library.</p>
+
+<p>I hope this helps someone with getting a new open source project off the ground or sparks someones interest to open source something today!</p>
+
         </div>
             </article>
     <nav>

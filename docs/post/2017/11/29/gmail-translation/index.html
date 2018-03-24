@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Gmail trying to translate our e-mails when it should not &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="robots" content="index, follow">
+        <link href="https://jwage.github.io/jwage.com/components/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.github.io/jwage.com/css/style.css" rel="stylesheet" type="text/css" />
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <link rel="apple-touch-startup-image" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="shortcut icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="shortcut icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="shortcut icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="shortcut icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="shortcut icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="shortcut icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="shortcut icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="shortcut icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="https://jwage.github.io/jwage.com/images/jackson/76x76.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="https://jwage.github.io/jwage.com/images/jackson/120x120.png">
+        <link rel="apple-touch-icon" sizes="128x128" href="https://jwage.github.io/jwage.com/images/jackson/128x128.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="https://jwage.github.io/jwage.com/images/jackson/152x152.png">
+        <link rel="apple-touch-icon" sizes="196x196" href="https://jwage.github.io/jwage.com/images/jackson/196x196.png">
+        <link rel="apple-touch-icon" sizes="512x512" href="https://jwage.github.io/jwage.com/images/jackson/512x512.png">
+        <link rel="apple-touch-icon" sizes="1024x1024" href="https://jwage.github.io/jwage.com/images/jackson/1024x1024.png">
+        <link rel="apple-touch-icon" sizes="2048x2048" href="https://jwage.github.io/jwage.com/images/jackson/2048x2048.png">
+
+        <link rel="stylesheet" href="https://jwage.github.io/jwage.com/components/highlightjs/styles/github.css" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.github.io/jwage.com/atom.xml" title="jwage.com activity feed" />
+        <style>
+        /** quick fix because bootstrap <pre> has a background-color. */
+        pre code { background-color: inherit; }
+        </style>
+                                    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="https://jwage.github.io/jwage.com/">jwage.com</a>
+                    </div>
+                    <div id="navbar" class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="https://jwage.github.io/jwage.com/articles">Articles</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/about">About</a></li>
+                            <li><a href="https://jwage.github.io/jwage.com/blog">Blog</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="mainContent container">
+            <div class="row-fluid">
+                <div class="span8">
+                        <article>
+        <header>
+            <h2>Gmail trying to translate our e-mails when it should not <small>post</small></h2>
+        </header>
+        <div>
+            <p>Recently at <a href="https://www.opensky.com" target="_blank">OpenSky</a> we migrated our e-mail service provider to Oracle Responsys and since then we&rsquo;ve had issues with Gmail trying to translate our e-mails from random languages. Over the last month it has tried to translate from the following languages:</p>
+
+<ul><li>Finnish</li>
+<li>Afrikaans</li>
+<li>Catalan</li>
+<li>German</li>
+<li>Hungarian</li>
+<li>Italian</li>
+<li>Latvian</li>
+<li>Norwegian</li>
+<li>Polish</li>
+<li>Slovak</li>
+<li>Vietnamese</li>
+</ul>
+
+<p>We have tried to find someone at gmail support to help but we haven&rsquo;t had any success. If we did have something in our HTML or e-mail service provider that was making gmail think our emails are in another language, I would think it would be the same language consistently. I&rsquo;ve seen gmail try to translate the same e-mail to multiple different languages. This feels like a bug in gmail causing false positives.</p>
+
+<p>Here is another Responsys customer that is experiencing the same thing <a href="https://litmus.com/community/discussions/7028-gmail-mis-translating-our-english-only-emails-into-other-languages" target="_blank">https://litmus.com/community/discussions/7028-gmail-mis-translating-our-english-only-emails-into-other-languages</a>.</p>
+
+<p>Here is a post on the gmail help forum about the issue <a href="https://productforums.google.com/forum/?utm_medium=email&amp;utm_source=footer#!msg/gmail/Tfxb9iu-xgk/NMzTCe_SCgAJ" target="_blank">https://productforums.google.com/forum/?utm_medium=email&amp;utm_source=footer#!msg/gmail/Tfxb9iu-xgk/NMzTCe_SCgAJ</a></p>
+
+<p>Here is a screenshot of an e-mail coming from one gmail user going to another gmail user. This rules out the problem being anything at all related to our e-mail service provider. I am confident that Gmail language detection is broken:</p>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a2afb0efa08eb4c991b4230.png?publicId=c27733e&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a2afb0efa08eb4c991b4230.png?publicId=c27733e&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<p>Here are some screenshots:</p>
+
+<h2>Finnish</h2>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a20875f6130b21c322880f6.png?publicId=8053e29&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a20875f6130b21c322880f6.png?publicId=8053e29&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<h2>Afrikaans</h2>
+
+<p><a href="https://lh4.googleusercontent.com/qYJW4XT79EWda4V2wHbeSEnShEv26W6KxLuC_F7AdKjPzbfda0xmwjsxwe1HRcin6xmevliPKPRdKQe8k-74=w3350-h1574-rw" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed61f40f76c5d8d00dacd.png?publicId=3c10391&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<h2>Catalan</h2>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a1ed659c915e42b8c680062.png?publicId=bae13dd&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed659c915e42b8c680062.png?publicId=bae13dd&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<h2>German</h2>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a1ed6966d88eb74d569b2a5.png?publicId=e6b7c09&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed6966d88eb74d569b2a5.png?publicId=e6b7c09&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<h2>Hungarian</h2>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a1ed6b7927b0c2f3f380797.png?publicId=56be9fe&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed6b7927b0c2f3f380797.png?publicId=56be9fe&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<h2>Italian</h2>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a1ed6e85ec748219267f42e.png?publicId=c245813&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed6e85ec748219267f42e.png?publicId=c245813&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<h2>Latvian</h2>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a1ed70940f76c5db61aa640.png?publicId=5c6e8b9&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed70940f76c5db61aa640.png?publicId=5c6e8b9&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<h2>Norwegian</h2>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a1ed72ec915e42b8958a52d.png?publicId=f64cf09&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed72ec915e42b8958a52d.png?publicId=f64cf09&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<h2>Polish</h2>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a1ed80d78a3c9554f17bba9.png?publicId=5f8d4ea&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed80d78a3c9554f17bba9.png?publicId=5f8d4ea&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<h2>Slovak</h2>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a1ed8373474d756662084b1.png?publicId=d301802&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed8373474d756662084b1.png?publicId=d301802&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+<h2>Vietnamese</h2>
+
+<p><a href="https://cdn1.ykso.co/image/cdn_image/5a1ed856782800481b035f65.png?publicId=9e10659&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed856782800481b035f65.png?publicId=9e10659&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
+
+        </div>
+                
+                    <nav class="article">
+                <ul>
+                                                                <li>Previous: <a class="previous" href="https://jwage.github.io/jwage.com/post/2014/11/27/when-to-inject-the-container" title="When to Inject the Container"><span class="title">When to Inject the Container</span></a></li>
+                                    </ul>
+            </nav>
+            </article>
+
+
+
+                </div>
+            </div>
+        </div>
+        <footer class="container">
+            &copy; 2018 jwage.com
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.github.io/jwage.com/components/jquery/jquery.min.js"><\/script>')</script>
+        <script src="https://jwage.github.io/jwage.com/components/bootstrap/js/bootstrap.min.js"></script>
+                
+                <script src="https://jwage.github.io/jwage.com/components/highlightjs/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
+                    </body>
+</html>
