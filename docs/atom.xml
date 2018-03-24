@@ -3,36 +3,77 @@
     <title><![CDATA[jwage.com]]></title>
     <link href="https://jwage.github.io/jwage.com/atom.xml" rel="self"/>
     <link href="https://jwage.github.io/jwage.com/"/>
-    <updated>2018-03-23T22:05:01-04:00</updated>
+    <updated>2018-03-23T22:29:44-04:00</updated>
     <id>https://jwage.github.io/jwage.com/</id>
         <generator uri="http://sculpin.io/">Sculpin</generator>
             <entry>
-            <title type="html"><![CDATA[Test Post]]></title>
-            <link href="https://jwage.github.io/jwage.com/post/2018/03/23/test-post"/>
-            <updated>2018-03-23T00:00:00-04:00</updated>
-            <id>https://jwage.github.io/jwage.com/post/2018/03/23/test-post</id>
-            <content type="html"><![CDATA[<p>Here is some code!</p>
-
-<pre><code>namespace Foo;
-
-/**
- * Awesome Contrived Example.
- */
-class Bar implements BarInterface
-{
-    private $baz;
-
-    public function __construct(BazInterface $baz)
-    {
-        $this-&gt;baz = $baz;
-    }
-
-    public function doIt()
-    {
-        return $this-&gt;baz-&gt;do('it');
-    }
-}
-</code></pre>
-]]></content>
+            <title type="html"><![CDATA[]]></title>
+            <link href="https://jwage.github.io/jwage.com/_posts/2010-07-26-doctrine-mongodb-object-document-mapper-in"/>
+            <updated>2010-07-26T00:00:00-04:00</updated>
+            <id>https://jwage.github.io/jwage.com/_posts/2010-07-26-doctrine-mongodb-object-document-mapper-in</id>
+            <content type="html"><![CDATA[]]></content>
+        </entry>
+            <entry>
+            <title type="html"><![CDATA[]]></title>
+            <link href="https://jwage.github.io/jwage.com/_posts/2010-07-26-executing-sql-after-loading-your-data-fixtures-in"/>
+            <updated>2010-07-26T00:00:00-04:00</updated>
+            <id>https://jwage.github.io/jwage.com/_posts/2010-07-26-executing-sql-after-loading-your-data-fixtures-in</id>
+            <content type="html"><![CDATA[]]></content>
+        </entry>
+            <entry>
+            <title type="html"><![CDATA[]]></title>
+            <link href="https://jwage.github.io/jwage.com/_posts/2010-07-27-multiple-levels-of-embedded-documents-in-mongodb"/>
+            <updated>2010-07-27T00:00:00-04:00</updated>
+            <id>https://jwage.github.io/jwage.com/_posts/2010-07-27-multiple-levels-of-embedded-documents-in-mongodb</id>
+            <content type="html"><![CDATA[]]></content>
+        </entry>
+            <entry>
+            <title type="html"><![CDATA[]]></title>
+            <link href="https://jwage.github.io/jwage.com/_posts/2010-07-27-storing-files-with-mongodb-gridfs"/>
+            <updated>2010-07-27T00:00:00-04:00</updated>
+            <id>https://jwage.github.io/jwage.com/_posts/2010-07-27-storing-files-with-mongodb-gridfs</id>
+            <content type="html"><![CDATA[]]></content>
+        </entry>
+            <entry>
+            <title type="html"><![CDATA[]]></title>
+            <link href="https://jwage.github.io/jwage.com/_posts/2010-07-27-using-yql-to-get-geo-location-information-for-an"/>
+            <updated>2010-07-27T00:00:00-04:00</updated>
+            <id>https://jwage.github.io/jwage.com/_posts/2010-07-27-using-yql-to-get-geo-location-information-for-an</id>
+            <content type="html"><![CDATA[]]></content>
+        </entry>
+            <entry>
+            <title type="html"><![CDATA[]]></title>
+            <link href="https://jwage.github.io/jwage.com/_posts/2010-07-28-inheritance-and-mapped-super-classes-in-doctrine"/>
+            <updated>2010-07-28T00:00:00-04:00</updated>
+            <id>https://jwage.github.io/jwage.com/_posts/2010-07-28-inheritance-and-mapped-super-classes-in-doctrine</id>
+            <content type="html"><![CDATA[]]></content>
+        </entry>
+            <entry>
+            <title type="html"><![CDATA[]]></title>
+            <link href="https://jwage.github.io/jwage.com/_posts/2010-07-28-setting-entitydocument-references-without-hitting"/>
+            <updated>2010-07-28T00:00:00-04:00</updated>
+            <id>https://jwage.github.io/jwage.com/_posts/2010-07-28-setting-entitydocument-references-without-hitting</id>
+            <content type="html"><![CDATA[]]></content>
+        </entry>
+            <entry>
+            <title type="html"><![CDATA[]]></title>
+            <link href="https://jwage.github.io/jwage.com/_posts/2010-07-30-doctrine-mongodb-odm-schema-migrations"/>
+            <updated>2010-07-30T00:00:00-04:00</updated>
+            <id>https://jwage.github.io/jwage.com/_posts/2010-07-30-doctrine-mongodb-odm-schema-migrations</id>
+            <content type="html"><![CDATA[]]></content>
+        </entry>
+            <entry>
+            <title type="html"><![CDATA[]]></title>
+            <link href="https://jwage.github.io/jwage.com/_posts/2010-07-31-array-dereferencing-in-php-trunk"/>
+            <updated>2010-07-31T00:00:00-04:00</updated>
+            <id>https://jwage.github.io/jwage.com/_posts/2010-07-31-array-dereferencing-in-php-trunk</id>
+            <content type="html"><![CDATA[]]></content>
+        </entry>
+            <entry>
+            <title type="html"><![CDATA[]]></title>
+            <link href="https://jwage.github.io/jwage.com/_posts/2010-08-02-doctrine-annotations-library"/>
+            <updated>2010-08-02T00:00:00-04:00</updated>
+            <id>https://jwage.github.io/jwage.com/_posts/2010-08-02-doctrine-annotations-library</id>
+            <content type="html"><![CDATA[]]></content>
         </entry>
     </feed>

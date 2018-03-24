@@ -9,6 +9,9 @@ class ComposerStaticInit464e57654e654dc3a4ff82c726b5a0e1
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '32dcc8afd4335739640db7d200c1971d' => __DIR__ . '/..' . '/symfony/polyfill-apcu/bootstrap.php',
+        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'ce89ac35a6c330c55f4710717db9ff78' => __DIR__ . '/..' . '/kriswallsmith/assetic/src/functions.php',
     );
 
@@ -36,10 +39,17 @@ class ComposerStaticInit464e57654e654dc3a4ff82c726b5a0e1
         'P' => 
         array (
             'Psr\\Log\\' => 8,
+            'Psr\\Http\\Message\\' => 17,
         ),
         'J' => 
         array (
             'JsonSchema\\' => 11,
+        ),
+        'G' => 
+        array (
+            'GuzzleHttp\\Psr7\\' => 16,
+            'GuzzleHttp\\Promise\\' => 19,
+            'GuzzleHttp\\' => 11,
         ),
         'C' => 
         array (
@@ -123,9 +133,25 @@ class ComposerStaticInit464e57654e654dc3a4ff82c726b5a0e1
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
+        'Psr\\Http\\Message\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
         'JsonSchema\\' => 
         array (
             0 => __DIR__ . '/..' . '/justinrainbow/json-schema/src/JsonSchema',
+        ),
+        'GuzzleHttp\\Psr7\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
+        ),
+        'GuzzleHttp\\Promise\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
+        ),
+        'GuzzleHttp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
         'Composer\\Spdx\\' => 
         array (
@@ -169,6 +195,10 @@ class ComposerStaticInit464e57654e654dc3a4ff82c726b5a0e1
             'Twig_' => 
             array (
                 0 => __DIR__ . '/..' . '/twig/twig/lib',
+            ),
+            'Tumblr\\API' => 
+            array (
+                0 => __DIR__ . '/..' . '/tumblr/tumblr/lib',
             ),
         ),
         'S' => 
@@ -227,6 +257,10 @@ class ComposerStaticInit464e57654e654dc3a4ff82c726b5a0e1
             'Evenement' => 
             array (
                 0 => __DIR__ . '/..' . '/evenement/evenement/src',
+            ),
+            'Eher\\OAuth' => 
+            array (
+                0 => __DIR__ . '/..' . '/eher/oauth/src',
             ),
         ),
         'D' => 

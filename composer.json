@@ -21,7 +21,8 @@
       "kriswallsmith/assetic": "1.1.2",
       "components/bootstrap": "^3.3",
       "components/jquery": "^3.1",
-      "components/highlightjs": "^9.7"
+      "components/highlightjs": "^9.7",
+        "tumblr/tumblr": "^0.4.0"
     },
     "config": {
         "component-dir": "source/components",
