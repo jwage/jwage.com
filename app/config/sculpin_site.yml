@@ -3,6 +3,7 @@
 # in a template to get the contents of the `title` key.
 title: Sculpin Blog Skeleton
 subtitle: To Get You Started
+url: https://jwage.github.io/jwage.com/
 
 # Insert your disqus shortname
 #disqus:
