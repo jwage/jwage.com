@@ -2,12 +2,16 @@
 <html>
     <head>
         <title>Sending Safari Push Notifications with PHP &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+
         <meta charset="utf-8">
         <meta name="theme-color" content="#ffffff">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
             <meta name="robots" content="index, follow">
+
         <link href="https://jwage.com/components/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="https://jwage.com/css/style.css" rel="stylesheet" type="text/css" />
+
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -18,37 +22,41 @@
 
         <link rel="stylesheet" href="https://jwage.com/components/highlightjs/styles/github.css" />
         <link rel="alternate" type="application/atom+xml" href="https://jwage.com/atom.xml" title="jwage.com activity feed" />
-        <style>
-        /** quick fix because bootstrap <pre> has a background-color. */
-        pre code { background-color: inherit; }
-        </style>
-                                    </head>
+
+        
+            </head>
     <body>
+
         <header>
-            <nav class="navbar navbar-inverse navbar-fixed-top">
-                <div class="container">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="https://jwage.com/">jwage.com</a>
-                    </div>
-                    <div id="navbar" class="collapse navbar-collapse">
-                        <ul class="nav navbar-nav">
-                            <li><a href="https://jwage.com/about">About</a></li>
-                            <li><a href="https://jwage.com/blog">Blog</a></li>
-                        </ul>
-                    </div>
+            <!-- Fixed navbar -->
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                <a class="navbar-brand" href="https://jwage.com">jwage.com</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/blog">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/archive">Archive</a>
+                        </li>
+                    </ul>
+<!--                     <form class="form-inline mt-2 mt-md-0">
+                        <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form> -->
                 </div>
             </nav>
         </header>
-        <div class="mainContent container">
-            <div class="row-fluid">
-                <div class="span8">
-                        <article>
+
+        <!-- Begin page content -->
+        <main role="main" class="container">
+                <article>
         <header>
             <h2>Sending Safari Push Notifications with PHP <small>post</small></h2>
         </header>
@@ -227,29 +235,31 @@ $safariPushNotificationSender-&gt;sendToUser($user, 'Title of push', 'Body of pu
 
 
 
-                </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <span class="text-muted">&copy; 2018 jwage.com</span>
             </div>
-        </div>
-        <footer class="container">
-            &copy; 2018 jwage.com
         </footer>
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="https://jwage.com/components/jquery/jquery.min.js"><\/script>')</script>
         <script src="https://jwage.com/components/bootstrap/js/bootstrap.min.js"></script>
-                
-        
-        <script type="text/javascript">
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-            ga('create', 'UA-288343-6', 'auto');
-            ga('send', 'pageview');
-        </script>
-                <script src="https://jwage.com/components/highlightjs/highlight.pack.js"></script>
+        
+                    <script type="text/javascript">
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-288343-6', 'auto');
+                ga('send', 'pageview');
+            </script>
+        
+        <script src="https://jwage.com/components/highlightjs/highlight.pack.js"></script>
         <script>hljs.initHighlightingOnLoad();</script>
 
-                    </body>
+            </body>
 </html>

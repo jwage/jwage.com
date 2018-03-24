@@ -3,10 +3,8 @@
 # in a template to get the contents of the `title` key.
 title: jwage.com
 subtitle: I am Jonathan H. Wage
-url: https://jwage.com
+url: http://lcl.jwage.com
 
 # Insert your disqus shortname
 #disqus:
 #    shortname:
-
-google_analytics_tracking_id: UA-288343-6

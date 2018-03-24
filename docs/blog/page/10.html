@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Blog &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+                    <meta name="robots" content="noindex, follow">
+        
+        <link href="https://jwage.com/components/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.com/css/style.css" rel="stylesheet" type="text/css" />
+
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+
+        <link rel="stylesheet" href="https://jwage.com/components/highlightjs/styles/github.css" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.com/atom.xml" title="jwage.com activity feed" />
+
+        
+            </head>
+    <body>
+
+        <header>
+            <!-- Fixed navbar -->
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                <a class="navbar-brand" href="https://jwage.com">jwage.com</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/blog">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/archive">Archive</a>
+                        </li>
+                    </ul>
+<!--                     <form class="form-inline mt-2 mt-md-0">
+                        <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form> -->
+                </div>
+            </nav>
+        </header>
+
+        <!-- Begin page content -->
+        <main role="main" class="container">
+                                <article>
+        <header>
+            <h2><a href="https://jwage.com/post/2010/08/25/blending-the-doctrine-orm-and-mongodb-odm">Blending the Doctrine ORM and MongoDB ODM</a></h2>
+        </header>
+        <div>
+            <p>Since the start of the <a href="http://www.doctrine-project.org/projects/mongodb_odm" target="_blank">Doctrine MongoDB Object Document Mapper</a> project people have asked how it can be integrated with the <a href="http://www.doctrine-project.org/projects/orm" target="_blank">ORM</a>. This blog post demonstrates how you can integrate the two transparently, maintaining a clean domain model.</p>
+
+<p>This example will have a <code>Product</code> that is stored in MongoDB and the <code>Order</code> stored in a MySQL database.</p>
+
+<h2>Defining our Document and Entity</h2>
+
+<p>First lets define our <code>Product</code> document:</p>
+
+<pre><code>namespace Documents;
+
+/** @Document */
+class Product
+{
+    /** @Id */
+    private $id;
+
+    /** @String */
+    private $title;
+
+    public function getId()
+    {
+        return $this-&gt;id;
+    }
+
+    public function getTitle()
+    {
+        return $this-&gt;title;
+    }
+
+    public function setTitle($title)
+    {
+        $this-&gt;title = $title;
+    }
+}
+</code></pre>
+
+<p>Next create the <code>Order</code> entity that has a <code>$product</code> and <code>$productId</code> property linking it to the <code>Product</code> that is stored with MongoDB:</p>
+
+<pre><code>namespace Entities;
+
+use Documents\Product;
+
+/**
+ * @Entity
+ * @Table(name="orders")
+ * @HasLifecycleCallbacks
+ */
+class Order
+{
+    /**
+     * @Id @Column(type="integer")
+     * @GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @Column(type="string")
+     */
+    private $productId;
+
+    /**
+     * @var Documents\Product
+     */
+    private $product;
+
+    public function getId()
+    {
+        return $this-&gt;id;
+    }
+
+    public function getProductId()
+    {
+        return $this-&gt;productId;
+    }
+
+    public function setProduct(Product $product)
+    {
+        $this-&gt;productId = $product-&gt;getId();
+        $this-&gt;product = $product;
+    }
+
+    public function getProduct()
+    {
+        return $this-&gt;product;
+    }
+}
+</code></pre>
+
+<h2>Event Subscriber</h2>
+
+<p>Now we need to setup an event subscriber that will set the <code>$product</code> property of all <code>Order</code> instances to a reference to the document product so it can be lazily loaded when it is accessed the first time. So first register a new event subscriber:</p>
+
+<pre><code>$eventManager = $em-&gt;getEventManager();
+$eventManager-&gt;addEventListener(
+    array(\Doctrine\ORM\Events::postLoad), new MyEventSubscriber($dm)
+);
+</code></pre>
+
+<p>So now we need to define a class named <code>MyEventSubscriber</code> and pass a dependency to the <code>DocumentManager</code>. It will have a <code>postLoad()</code> method that sets the product document reference:</p>
+
+<pre><code>use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ORM\Event\LifecycleEventArgs;
+
+class MyEventSubscriber
+{
+    public function __construct(DocumentManager $dm)
+    {
+        $this-&gt;dm = $dm;
+    }
+
+    public function postLoad(LifecycleEventArgs $eventArgs)
+    {
+        $order = $eventArgs-&gt;getEntity();
+        $em = $eventArgs-&gt;getEntityManager();
+        $productReflProp = $em-&gt;getClassMetadata('Entities\Order')
+            -&gt;reflClass-&gt;getProperty('product');
+        $productReflProp-&gt;setAccessible(true);
+        $productReflProp-&gt;setValue(
+            $order, $this-&gt;dm-&gt;getReference('Documents\Product', $order-&gt;getProductId())
+        );
+    }
+}
+</code></pre>
+
+<p>The <code>postLoad</code> method will be invoked after an ORM entity is loaded from the database. This allows us to use the <code>DocumentManager</code> to set the <code>$product</code> property with a reference to the <code>Product</code> document with the product id we previously stored.</p>
+
+<p>First create a new <code>Product</code>:</p>
+
+<pre><code>$product = new \Documents\Product();
+$product-&gt;setTitle('Test Product');
+$dm-&gt;persist($product);
+$dm-&gt;flush();
+</code></pre>
+
+<p>Now create a new <code>Order</code> and link it to a <code>Product</code> in MySQL:</p>
+
+<pre><code>$order = new \Entities\Order();
+$order-&gt;setProduct($product);
+$em-&gt;persist($order);
+$em-&gt;flush();
+</code></pre>
+
+<p>Later we can retrieve the entity and lazily load the reference to the document in MongoDB:</p>
+
+<pre><code>$order = $em-&gt;find('Order', $order-&gt;getId());
+
+// Instance of an uninitialized product proxy
+$product = $order-&gt;getProduct();
+
+// Initializes proxy and queries the database
+echo "Order Title: " . $product-&gt;getTitle();
+</code></pre>
+
+<p>If you were to print the <code>$order</code> you would see that we got back regular PHP objects:</p>
+
+<pre><code>print_r($order);
+</code></pre>
+
+<p>The above would output the following:</p>
+
+<pre><code>Order Object
+(
+    [id:Entities\Order:private] =&gt; 53
+    [productId:Entities\Order:private] =&gt; 4c74a1868ead0ed7a9000000
+    [product:Entities\Order:private] =&gt; Proxies\DocumentsProductProxy Object
+        (
+            [__isInitialized__] =&gt; 1
+            [id:Documents\Product:private] =&gt; 4c74a1868ead0ed7a9000000
+            [title:Documents\Product:private] =&gt; Test Product
+        )
+
+)
+</code></pre>
+
+<p>That is it! It is not a very abstract example right now but it demonstrates how to utilize the events to do some very interesting things with the Doctrine persistence libraries! I hope that now someone will inspired to create an extension that offers an abstract solution for blending the ORM and ODM together!</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/post/2010/08/19/new-doctrine-mongodb-odm-documentation">New Doctrine MongoDB ODM Documentation</a></h2>
+        </header>
+        <div>
+            <p>Yesterday I added a few new chapters to the <a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/en" target="_blank">Doctrine MongoDB ODM Documentation</a>:</p>
+
+<ul><li><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/capped-collections/en" target="_blank">Capped Collections</a></li>
+<li><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/indexes/en" target="_blank">Indexes</a></li>
+<li><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/geospatial-queries/en" target="_blank">Geospatial Queries</a></li>
+<li><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/trees/en" target="_blank">Storing Trees/Hierarchical Data</a></li>
+</ul>
+
+<p>I hope it is helpful to someone! :)</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/post/2010/08/02/doctrine-annotations-library">Doctrine Annotations Library</a></h2>
+        </header>
+        <div>
+            <p>The Doctrine Annotations library was born from a need in the Doctrine2 ORM to allow the mapping information to be specified inside the doc-blocks of classes, properties and methods. The library is independent and can be used in your own libraries to implement doc block annotations.</p>
+
+<h2>Setup and Configuration</h2>
+
+<p>To use the annotations library is simple, you just need to create a new <code>AnnotationReader</code>
+instance:</p>
+
+<pre><code>$reader = new \Doctrine\Common\Annotations\AnnotationReader();
+</code></pre>
+
+<h2>Usage</h2>
+
+<p>Using the library API is simple. Imagine you had some annotation classes that looked like the following:</p>
+
+<pre><code>namespace MyCompany\Annotations;
+
+class Foo extends \Doctrine\Common\Annotations\Annotation
+{
+    public $bar;
+}
+
+class Bar extends \Doctrine\Common\Annotations\Annotation
+{
+    public $foo;
+}
+</code></pre>
+
+<p>Now to use the annotations you would just need to do the following:</p>
+
+<pre><code>/**
+ * @MyCompany\Annotations\Foo(bar="test")
+ * @MyCompany\Annotations\Bar(foo="test")
+ */
+class User
+{
+}
+</code></pre>
+
+<p>Now we can write a script to get the annotations above:</p>
+
+<pre><code>$reflClass = new ReflectionClass('User');
+$classAnnotations = $reader-&gt;getClassAnnotations($reflClass);
+echo $classAnnotations['MyCompany\Annotations\Foo']-&gt;bar; // prints foo
+echo $classAnnotations['MyCompany\Annotations\Foo']-&gt;foo; // prints bar
+</code></pre>
+
+<p>You have a complete API for retrieving annotation class instances from a class, property
+or method docblock:</p>
+
+<ul><li>getClassAnnotations(ReflectionClass $class)</li>
+<li>getClassAnnotation(ReflectionClass $class, $annotation)</li>
+<li>getPropertyAnnotations(ReflectionProperty $property)</li>
+<li>getPropertyAnnotation(ReflectionProperty $property, $annotation)</li>
+<li>getMethodAnnotations(ReflectionMethod $method)</li>
+<li>getMethodAnnotation(ReflectionMethod $method, $annotation)</li>
+</ul>
+
+<p>Read the full <a href="http://www.doctrine-project.org/projects/common/2.0/docs/reference/annotations/en" target="_blank">documentation</a> to learn more about how to use the Doctrine annotations library!</p>
+
+        </div>
+            </article>
+    <nav>
+        <a href="https://jwage.com/blog/page/9.html">Newer Posts</a><br />
+        <a href="https://jwage.com/blog/page/11.html">Older Posts</a><br />
+    </nav>
+                    </main>
+
+        <footer class="footer">
+            <div class="container">
+                <span class="text-muted">&copy; 2018 jwage.com</span>
+            </div>
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.com/components/jquery/jquery.min.js"><\/script>')</script>
+        <script src="https://jwage.com/components/bootstrap/js/bootstrap.min.js"></script>
+
+        
+                    <script type="text/javascript">
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-288343-6', 'auto');
+                ga('send', 'pageview');
+            </script>
+        
+        <script src="https://jwage.com/components/highlightjs/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
+            </body>
+</html>

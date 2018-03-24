@@ -4,28 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f8e70f335839a5059806ef37b83fd41f",
-    "content-hash": "e8e09eed1c60446f0d623f1c7fc3d3a1",
+    "hash": "34edbb32eb3241924ff3c3e317e9beaf",
+    "content-hash": "00257b60a48db41bd8eb06c68361a69c",
     "packages": [
         {
             "name": "components/bootstrap",
-            "version": "3.3.7",
+            "version": "4.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/components/bootstrap.git",
-                "reference": "fe6e7683be66ba45a725816efdb51d4566733043"
+                "reference": "ec1e94b67ec0bcb335c442d60c53f6219d92ce97"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/components/bootstrap/zipball/fe6e7683be66ba45a725816efdb51d4566733043",
-                "reference": "fe6e7683be66ba45a725816efdb51d4566733043",
+                "url": "https://api.github.com/repos/components/bootstrap/zipball/ec1e94b67ec0bcb335c442d60c53f6219d92ce97",
+                "reference": "ec1e94b67ec0bcb335c442d60c53f6219d92ce97",
                 "shasum": ""
             },
             "require": {
-                "components/jquery": "1.9.1 - 3"
-            },
-            "suggest": {
-                "components/bootstrap-default": "Provide a theme for Bootstrap as components/bootstrap only provides the CSS as file assets"
+                "components/jquery": ">=2"
             },
             "type": "component",
             "extra": {
@@ -36,10 +33,7 @@
                     "files": [
                         "js/*.js",
                         "css/*.css",
-                        "css/*.map",
-                        "fonts/*",
-                        "less/mixins/*.less",
-                        "less/*.less"
+                        "css/*.map"
                     ],
                     "shim": {
                         "deps": [
@@ -68,12 +62,12 @@
                 "css",
                 "framework",
                 "front-end",
-                "less",
                 "mobile-first",
                 "responsive",
+                "sass",
                 "web"
             ],
-            "time": "2016-07-26 05:59:20"
+            "time": "2017-08-20 19:44:28"
         },
         {
             "name": "components/highlightjs",
@@ -3143,12 +3137,13 @@
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
         "sculpin/sculpin": 20,
-        "dflydev/embedded-composer": 20
+        "dflydev/embedded-composer": 20,
+        "components/bootstrap": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": []
