@@ -39,3 +39,9 @@ code {
 .navbar-brand img {
     width: 40px;
 }
+
+pre {
+    background-color: #232323;
+    color: white;
+}
+

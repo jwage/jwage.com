@@ -22,7 +22,7 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
 
-        <link rel="stylesheet" href="{{ site.url }}/components/highlightjs/styles/github.css?{{ site.cacheBuster }}" />
+        <link rel="stylesheet" href="{{ site.url }}/components/highlightjs/styles/railscasts.css?{{ site.cacheBuster }}" />
         <link rel="alternate" type="application/atom+xml" href="{{ site.url }}/atom.xml" title="{{ site.title }} activity feed" />
 
         {% block head_styles '' %}
@@ -92,7 +92,7 @@
         {% endif %}
 
         <script src="{{ site.url }}/components/highlightjs/highlight.pack.js?{{ site.cacheBuster }}"></script>
-        <script>hljs.initHighlightingOnLoad();</script>
+        <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
 
         {% block scripts_after '' %}
 
