@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Blog &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+                    <meta name="robots" content="noindex, follow">
+        
+        <link href="https://jwage.com/components/bootstrap/css/bootstrap.min.css?4" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.com/css/style.css?4" rel="stylesheet" type="text/css" />
+
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+
+        <link rel="stylesheet" href="https://jwage.com/components/highlightjs/styles/railscasts.css?4" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.com/atom.xml" title="jwage.com activity feed" />
+
+        
+            </head>
+    <body>
+
+        <header>
+            <!-- Fixed navbar -->
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                <a class="navbar-brand" href="https://jwage.com"><img src="https://jwage.com/images/me.jpg" class="rounded-circle mr-3" />jwage.com</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/blog">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/articles">Articles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/kubota-l210">Kubota L210</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/archive">Archive</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Begin page content -->
+        <main role="main" class="container">
+                            <h1 class="display-4">Blog</h1>
+
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2013/07/16/mongodb-php-mongodate-tricks">MongoDB PHP MongoDate Tricks</a></h2>
+        </header>
+        <div>
+            <p>Here are a few tricks I&rsquo;ve learned working with MongoDB and PHP.</p>
+
+<p><strong>Create DateTime from MongoId</strong></p>
+
+<p>Because MongoDB identifiers contain the date you can easily create a <code>DateTime</code> instance from them.</p>
+
+<pre><code>public function getDateTimeFromMongoId(MongoId $mongoId)
+{
+    $dateTime = new DateTime('@'.$mongoId-&gt;getTimestamp());
+    $dateTime-&gt;setTimezone(new DateTimeZone(date_default_timezone_get()));
+    return $dateTime;
+}
+</code></pre>
+
+<p>This is useful when you don&rsquo;t want to create an additional field to store the date a document was created. You can also use the _id index that already exists to paginate and filter/sort by date.</p>
+
+<p><strong>Create MongoId with Date in the Past</strong></p>
+
+<p>For the same reason as above, you can create a MongoId instance with a date in the past. This was copied from a <a href="http://stackoverflow.com/questions/14370143/create-mongodb-objectid-from-date-in-the-past-using-php-driver/14380093#14380093" target="_blank">stackoverflow answer</a> by <a href="http://derickrethans.nl/" target="_blank">Derek Rethans</a>.</p>
+
+<pre><code>public createMongoIdFromTimestamp($timestamp)
+{
+    $ts = pack('N', $timestamp);
+    $m = substr(md5(gethostname()), 0, 3);
+    $pid = pack('n', posix_getpid());
+    $trail = substr(pack('N', $this-&gt;inc++), 1, 3);
+
+    $bin = sprintf('%s%s%s%s', $ts, $m, $pid, $trail);
+
+    $id = '';
+    for ($i = 0; $i &lt; 12; $i++ ) {
+        $id .= sprintf('%02X', ord($bin[$i]));
+    }
+
+    return new \MongoID($id);
+}
+</code></pre>
+
+<p>This was useful when migrating legacy data in to a collection where we utilize the _id for pagination and displaying a created date. If we simply created identifiers with todays date then it would show old records with all the same date and pagination/sorting would be broken.</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2013/07/13/quotes-from-the-road-to-serfdom-by-friedrich-hayek">Quotes from The Road to Serfdom by Friedrich Hayek</a></h2>
+        </header>
+        <div>
+            <p><strong>I recently finished reading <a href="http://www.amazon.com/The-Road-Serfdom-Intellectuals-Socialism/dp/0255365764" target="_blank">The Road to Serfdom</a> by Friedrich Hayek. Here are some parts that stood out to me.</strong></p>
+
+<p>&ldquo;We are ready to accept almost any explanation of the present crisis of our civilization except one: that the present state of the world may be the result of genuine error on our own part and that the pursuit of some of our most cherished ideals has apparently produced results utterly different from those which we expected.&rdquo;</p>
+
+<p>“Democracy extends the sphere of individual freedom,” he said in 1848; “socialism restricts it. Democracy attaches all possible value to each man; socialism makes each man a mere agent, a mere number. Democracy and socialism have nothing in common but one word: equality. But notice the difference: while democracy seeks equality in liberty, socialism seeks equality in restraint and servitude.”</p>
+
+<p>&ldquo;While it is true, of course, that inventions have given us tremendous power, it is absurd to suggest that we must use this power to destroy our most precious inheritance: liberty. It does mean, however, that if we want to preserve it, we must guard it more jealously than ever and that we must be prepared to make sacrifices for it.&rdquo;</p>
+
+<p>&ldquo;The “social goal,” or “common purpose,” for which society is to be organized is usually vaguely described as the “common good,” the “general welfare,” or the “general interest.” It does not need much reflection to see that these terms have no sufficiently definite meaning to determine a particular course of action. The welfare and the happiness of millions cannot be measured on a single scale of less and more. The welfare of a people, like the happiness of a man, depends on a great many things that can be provided in an infinite variety of combinations. It cannot be adequately expressed as a single end, but only as a hierarchy of ends, a comprehensive scale of values in which every need of every person is given its place.&rdquo;</p>
+
+<p>&ldquo;Although each individual might wish the state to act in some way, there will be almost as many views about what the government should do as there are different people.&rdquo;</p>
+
+<p>&ldquo;It is not difficult to see what must be the consequences when democracy embarks upon a course of planning which in its execution requires more agreement than in fact exists. The people may have agreed on adopting a system of directed economy because they have been convinced that it will produce great prosperity.&rdquo;</p>
+
+<p>&ldquo;But the democratic legislature will long hesitate to relinquish the decisions on really vital issues, and so long as it does so it makes it impossible for anyone else to provide the comprehensive plan. Yet agreement that planning is necessary, together with the inability of democratic assemblies to produce a plan, will evoke stronger and stronger demands that the government or some single individual should be given powers to act on their own responsibility.&rdquo;</p>
+
+<p>&ldquo;The belief is becoming more and more widespread that, if things are to get done, the responsible authorities must be freed from the fetters of democratic procedure.&rdquo;</p>
+
+<p>&ldquo;Hitler did not have to destroy democracy; he merely took advantage of the decay of democracy and at the critical moment obtained the support of many to whom, though they detested Hitler, he yet seemed the only man strong enough to get things done.&rdquo;</p>
+
+<p>&ldquo;Nothing distinguishes more clearly conditions in a free country from those in a country under arbitrary government than the observance in the former of the great principles known as the Rule of Law. Stripped of all technicalities, this means that government in all its actions is bound by rules fixed and announced beforehand—rules which make it possible to foresee with fair certainty how the authority will use its coercive powers in given circumstances and to plan one’s individual affairs on the basis of this knowledge.&rdquo;</p>
+
+<p>&ldquo;Hence the familiar fact that the more the state “plans,” the more difficult planning becomes for the individual.&rdquo;</p>
+
+<p>&ldquo;Those most immediately interested in a particular issue are not necessarily the best judges of the interests of society as a whole.&rdquo;</p>
+
+<p>&ldquo;The important thing is that the rule enables us to predict other people’s behavior correctly, and this requires that it should apply to all cases—even if in a particular instance we feel it to be unjust.&rdquo;</p>
+
+<p>&ldquo;Man is free if he needs to obey no person but solely the laws.&rdquo;</p>
+
+<p>&ldquo;The idea that there is no limit to the powers of the legislator is in part a result of popular sovereignty and democratic government. It has been strengthened by the belief that, so long as all actions of the state are duly authorized by legislation, the Rule of Law will be preserved. But this is completely to misconceive the meaning of the Rule of Law. This rule has little to do with the question whether all actions of government are legal in the juridical sense. They may well be and yet not conform to the Rule of Law.&rdquo;</p>
+
+<p>&ldquo;If the law says that such a board or authority may do what it pleases, anything that board or authority does is legal—but its actions are certainly not subject to the Rule of Law. By giving the government unlimited powers, the most arbitrary rule can be made legal; and in this way a democracy may set up the most complete despotism imaginable.&rdquo;</p>
+
+<p>&ldquo;Indeed, when security is understood in too absolute a sense, the general striving for it, far from increasing the chances of freedom, becomes the gravest threat to it.&rdquo;</p>
+
+<p>&ldquo;There is no reason why in a society which has reached the general level of wealth which ours has attained the first kind of security should not be guaranteed to all without endangering general freedom.&rdquo;</p>
+
+<p>&ldquo;We must here return for a moment to the position which precedes the suppression of democratic institutions and the creation of a totalitarian regime. In this stage it is the general demand for quick and determined government action that is the dominating element in the situation, dissatisfaction with the slow and cumbersome course of democratic procedure which makes action for action’s sake the goal. It is then the man or the party who seems strong and resolute enough “to get things done” who exercises the greatest appeal. “Strong” in this sense means not merely a numerical majority—it is the ineffectiveness of parliamentary majorities with which people are dissatisfied. What they will seek is somebody with such solid support as to inspire confidence that he can carry out whatever he wants. It is here that the new type of party, organized on military lines, comes in.&rdquo;</p>
+
+<p>&ldquo;That socialism can be put into practice only by methods which most socialists disapprove is, of course, a lesson learned by many social reformers in the past.&rdquo;</p>
+
+<p>&ldquo;It seems to be almost a law of human nature that it is easier for people to agree on a negative program—on the hatred of an enemy, on the envy of those better off— than on any positive task.&rdquo;</p>
+
+<p>&ldquo;The definitely antagonistic attitude which most planners take toward internationalism is further explained by the fact that in the existing world all outside contacts of a group are obstacles to their effectively planning the sphere in which they can attempt it. It is therefore no accident that, as the editor of one of the most comprehensive collective studies on planning has discovered to his chagrin, “most ‘planners’ are militant nationalists.”</p>
+
+<p>&quot;The desire to organize social life according to a unitary plan itself springs largely from a desire for power.&rdquo;</p>
+
+<p>&ldquo;We have seen before how the separation of economic and political aims is an essential guaranty of individual freedom and how it is consequently attacked by all collectivists. To this we must now add that the “substitution of political for economic power” now so often demanded means necessarily the substitution of power from which there is no escape for a power which is always limited. What is called economic power, while it can be an instrument of coercion, is, in the hands of private individuals, never exclusive or complete power, never power over the whole life of a person. But centralized as an instrument of political power it creates a degree of dependence scarcely distinguishable from slavery.&rdquo;</p>
+
+<p>&ldquo;It would, however, be highly unjust to regard the masses of the totalitarian people as devoid of moral fervor because they give unstinted support to a system which to us seems a denial of most moral values. For the great majority of them the opposite is probably true: the intensity of the moral emotions behind a movement like that of National Socialism or communism can probably be compared only to those of the great religious movements of history.&rdquo;</p>
+
+<p>&ldquo;Yet while there is little that is likely to induce men who are good by our standards to aspire to leading positions in the totalitarian machine, and much to deter them, there will be special opportunities for the ruthless and unscrupulous. There will be jobs to be done about the badness of which taken by themselves nobody has any doubt, but which have to be done in the service of some higher end, and which have to be executed with the same expertness and efficiency as any others. And as there will be need for actions which are bad in themselves, and which all those still influenced by traditional morals will be reluctant to perform, the readiness to do bad things becomes a path to promotion and power. The positions in a totalitarian society in which it is necessary to practice cruelty and intimidation, deliberate deception and spying, are numerous. Neither the Gestapo nor the administration of a concentration camp, neither the Ministry of Propaganda nor the SA or SS (or their Italian or Russian counterparts), are suitable places for the exercise of humanitarian feelings.13 Yet it is through positions like these that the road to the highest positions in the totalitarian state leads. It is only too true when a distinguished American economist concludes from a similar brief enumeration of the duties of the authorities of a collectivist state that “they would have to do these things whether they wanted to or not: and the probability of the people in power being individuals who would dislike the possession and exercise of power is on a level with the probability that an extremely tender-hearted person would get the job of whipping-master in a slave plantation.”</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2013/07/08/tracking-new-member-origination-with-symfony2">Tracking New Member Origination with Symfony2</a></h2>
+        </header>
+        <div>
+            <blockquote>
+  <p><strong>NOTE</strong>
+  The example code in this blog post has been simplified to make things more concise and easy to read.</p>
+</blockquote>
+
+<p>At <a href="http://www.opensky.com" target="_blank">OpenSky</a> it is important for us to track how a member joined so that we can determine causation between joining and any subsequent actions taken on the site, like an order.</p>
+
+<p>To get started create a new class called <code>OriginationManager</code> with a method named <code>updateHistory</code>. It will accept a <code>Request</code> object and record the query parameters from the current URL in the session.</p>
+
+<pre><code>&lt;?php class OriginationManager
+{
+    public function updateHistory(Request $request)
+    {
+        $session = $request-&gt;getSession();
+
+        $history = $session-&gt;get('user_origination_history', array());
+        $history[] = $request-&gt;query-&gt;all();
+
+        $session-&gt;set('user_origination_history', $history);
+    }
+}
+</code></pre>
+
+<p>Now create an <code>OriginationListener</code> class that will listen to the <code>kernel.request</code> event and make use of the <code>OriginationManager::updateHistory()</code> API we just created.</p>
+
+<pre><code>&lt;?php class OriginationListener
+{
+    // ...
+
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        $request = $event-&gt;getRequest();
+
+        // Only process non-logged-in users
+        if ($token = $this-&gt;securityContext-&gt;getToken()) {
+            $user = $token-&gt;getUser();
+            if ($user instanceof User) {
+                return;
+            }
+        }
+
+        $this-&gt;originationManager-&gt;updateHistory($request);
+    }
+}
+</code></pre>
+
+<p>Now we are tracking the query parameters of logged out users on every request. We can make use of this information later when a user joins. First, lets define a new model that can be used to store the origination information along with the user (assume the model is persisted with <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a>). Each new <code>User</code> gets an <code>Originator</code> record when they join. It allows us to essentially see how a new user entered the site and what clicks they made before joining.</p>
+
+<pre><code>&lt;?php class Originator
+{
+    /**
+     * The raw array of request query data.
+     *
+     * @var array
+     */
+    protected $history = array();
+
+    /**
+     * The user that originated this member.
+     *
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * The value of the first osky_origin parameter we encounter.
+     *
+     * @var string
+     */
+    protected $origin;
+
+    /**
+     * The value of the first osky_source parameter we encounter.
+     *
+     * @var string
+     */
+    protected $source;
+
+    // ...
+}
+</code></pre>
+
+<p>Assume your application already notifies an event named <code>user.created</code>. In <code>OriginationListener</code> create an <code>onUserCreated</code> method that will listen to the <code>user.created</code> event.</p>
+
+<pre><code>&lt;?php
+
+class OriginationListener
+{
+    // ...
+
+    public function onUserCreated(UserCreatedEvent $event)
+    {
+        $user = $event-&gt;getUser();
+        $request = $event-&gt;getRequest();
+
+        $this-&gt;originationManager-&gt;assignUserOrigination($user, $request);
+    }
+}
+</code></pre>
+
+<p>Next, create the <code>OriginationManager::assignUserOrigination()</code> method. It will utilize the request query parameters we saved on the session earlier to create a new <code>Originator</code> record.</p>
+
+<pre><code>&lt;?php class OriginationManager
+{
+    public function assignUserOrigination(User $user, Request $request)
+    {
+        $session = $request-&gt;getSession();
+
+        $history = $session-&gt;get('user_origination_history', array());
+
+        $originator = new Originator();
+        $originator-&gt;setHistory($history);
+
+        foreach ($history as $query) {
+            if (!$originator-&gt;getOrigin() &amp;&amp; isset($query['osky_origin'])) {
+                $originator-&gt;setOrigin($query['osky_origin']);
+
+                if ($user = $this-&gt;userRepository-&gt;find($query['osky_origin'])) {
+                    $originator-&gt;setUser($user);
+                }
+            }
+
+            if (!$originator-&gt;getSource() &amp;&amp; isset($query['osky_source'])) {
+                $originator-&gt;setSource($query['osky_source']);
+            }
+        }
+
+        $user-&gt;setOriginator($originator);
+
+        $session-&gt;remove('user_origination_history');
+    }
+}
+</code></pre>
+
+<p>Now if a logged out user were to visit OpenSky with a parameter named <code>osky_origin</code> in the URL with another users id as the value, the <code>Originator</code> record that gets created for the new member will have a reference to that <code>User</code>. We can then utilize that information do whatever we want. In our case we give the user that got the new <code>User</code> to join a credit and a thank you. The <code>osky_source</code> parameter can be used as an arbitrary reporting variable to help with identifying marketing campaigns.</p>
+
+<p>Keep in mind that this is an example implementation and it omits many details specific to OpenSky for the sake of simplicity. The real implementation we use has dozens of other parameters that can be used to associate records together and assist with reporting. You can add to this implementation and check for custom parameters and standard ones like <code>utm_source</code>, <code>utm_campaign</code>, etc.</p>
+
+        </div>
+            </article>
+
+    <nav>
+        <a href="https://jwage.com/blog/page/3.html">Newer Posts</a><br />
+        <a href="https://jwage.com/blog/page/5.html">Older Posts</a><br />
+    </nav>
+                    </main>
+
+        <footer class="footer">
+            <div class="container">
+                <span class="text-muted"><img src="https://jwage.com/images/me.jpg" class="rounded-circle mr-3" style="width: 25px;" />&copy; 2018 jwage.com</span>
+            </div>
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js?4"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.com/components/jquery/jquery.min.js?4"><\/script>')</script>
+        <script src="https://jwage.com/components/bootstrap/js/bootstrap.min.js?4"></script>
+
+        
+                    <script type="text/javascript">
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-288343-6', 'auto');
+                ga('send', 'pageview');
+            </script>
+        
+        <script src="https://jwage.com/components/highlightjs/highlight.pack.js?4"></script>
+        <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+
+        
+            </body>
+</html>

@@ -3,14 +3,14 @@
     <title><![CDATA[jwage.com]]></title>
     <link href="https://jwage.com/atom.xml" rel="self"/>
     <link href="https://jwage.com/"/>
-    <updated>2018-03-24T23:48:14-04:00</updated>
+    <updated>2018-03-24T23:49:33-04:00</updated>
     <id>https://jwage.com/</id>
         <generator uri="http://sculpin.io/">Sculpin</generator>
             <entry>
             <title type="html"><![CDATA[Gmail trying to translate our e-mails when it should not]]></title>
-            <link href="https://jwage.com/post/2017/11/29/gmail-translation"/>
+            <link href="https://jwage.com/posts/2017/11/29/gmail-translation"/>
             <updated>2017-11-29T00:00:00-05:00</updated>
-            <id>https://jwage.com/post/2017/11/29/gmail-translation</id>
+            <id>https://jwage.com/posts/2017/11/29/gmail-translation</id>
             <content type="html"><![CDATA[<p>Recently at <a href="https://www.opensky.com" target="_blank">OpenSky</a> we migrated our e-mail service provider to Oracle Responsys and since then we&rsquo;ve had issues with Gmail trying to translate our e-mails from random languages. Over the last month it has tried to translate from the following languages:</p>
 
 <ul><li>Finnish</li>
@@ -85,9 +85,9 @@
         </entry>
             <entry>
             <title type="html"><![CDATA[When to Inject the Container]]></title>
-            <link href="https://jwage.com/post/2014/11/27/when-to-inject-the-container"/>
+            <link href="https://jwage.com/posts/2014/11/27/when-to-inject-the-container"/>
             <updated>2014-11-27T00:00:00-05:00</updated>
-            <id>https://jwage.com/post/2014/11/27/when-to-inject-the-container</id>
+            <id>https://jwage.com/posts/2014/11/27/when-to-inject-the-container</id>
             <content type="html"><![CDATA[<p>Deciding when to inject the container in Symfony is a frequent topic of discussion. Many would have you believe that you should NEVER inject the container because it breaks the &ldquo;rules&rdquo; and is an anti-pattern. This is not always true and, just like most things, it should not be applied blindly to everything you do. This post aims to demonstrate cases where injecting the container makes sense.</p>
 
 <p><strong>The problem with unused dependencies</strong></p>
@@ -232,9 +232,9 @@ abstract class LazyService extends ContainerAware
         </entry>
             <entry>
             <title type="html"><![CDATA[Fixing nginx &quot;Too many open files&quot; errors]]></title>
-            <link href="https://jwage.com/post/2014/11/27/fixing-nginx-too-many-open-files-errors"/>
+            <link href="https://jwage.com/posts/2014/11/27/fixing-nginx-too-many-open-files-errors"/>
             <updated>2014-11-27T00:00:00-05:00</updated>
-            <id>https://jwage.com/post/2014/11/27/fixing-nginx-too-many-open-files-errors</id>
+            <id>https://jwage.com/posts/2014/11/27/fixing-nginx-too-many-open-files-errors</id>
             <content type="html"><![CDATA[<p>At <a href="https://www.opensky.com" target="_blank">OpenSky</a>, we recently migrated to the <a href="http://instartlogic.com/" target="_blank">InstartLogic CDN</a>. One of the features they provide is the ability to resize images by appending <code>?iresize=width:500,height:500</code> to your image URLs.</p>
 
 <p>This feature allowed us to start serving static files directly through nginx instead of going through our application to generate the requested size. Now, InstartLogic does all the resizing work for us and our backend PHP servers are relieved of this responsibility.</p>
@@ -249,9 +249,9 @@ abstract class LazyService extends ContainerAware
         </entry>
             <entry>
             <title type="html"><![CDATA[Forcing HTTPS for all traffic with F5 iRules]]></title>
-            <link href="https://jwage.com/post/2014/10/18/forcing-https-for-all-traffic-with-f5-irules"/>
+            <link href="https://jwage.com/posts/2014/10/18/forcing-https-for-all-traffic-with-f5-irules"/>
             <updated>2014-10-18T00:00:00-04:00</updated>
-            <id>https://jwage.com/post/2014/10/18/forcing-https-for-all-traffic-with-f5-irules</id>
+            <id>https://jwage.com/posts/2014/10/18/forcing-https-for-all-traffic-with-f5-irules</id>
             <content type="html"><![CDATA[<p>If you want to force all traffic to HTTPS you can do so pretty easily by adding a F5 iRule to the HTTP VIP.</p>
 
 <pre><code>when HTTP_REQUEST {
@@ -273,9 +273,9 @@ abstract class LazyService extends ContainerAware
         </entry>
             <entry>
             <title type="html"><![CDATA[2014 Vacation Books]]></title>
-            <link href="https://jwage.com/post/2014/07/22/2014-vacation-books"/>
+            <link href="https://jwage.com/posts/2014/07/22/2014-vacation-books"/>
             <updated>2014-07-22T20:14:00-04:00</updated>
-            <id>https://jwage.com/post/2014/07/22/2014-vacation-books</id>
+            <id>https://jwage.com/posts/2014/07/22/2014-vacation-books</id>
             <content type="html"><![CDATA[<ul><li><p><a href="http://www.amazon.com/Five-Love-Languages-Heartfelt-Commitment-ebook/dp/B00F4KBJ8I" target="_blank">The Five Love Languages: How to Express Heartfelt Commitment to Your Mate</a></p></li>
 <li><p><a href="http://www.amazon.com/How-Win-Friends-Influence-People/dp/0671027034" target="_blank">How to Win Friends &amp; Influence People</a></p></li>
 <li><p><a href="http://www.amazon.com/Nikola-Tesla-Imagination-Invented-Century-ebook/dp/B00CATSONE/" target="_blank">Nikola Tesla: Imagination and the Man That Invented the 20th Century</a></p></li>
@@ -286,9 +286,9 @@ abstract class LazyService extends ContainerAware
         </entry>
             <entry>
             <title type="html"><![CDATA[Using the Symfony Expression Language for a Reward Rules Engine]]></title>
-            <link href="https://jwage.com/post/2014/02/15/using-the-symfony-expression-language-for-a-reward"/>
+            <link href="https://jwage.com/posts/2014/02/15/using-the-symfony-expression-language-for-a-reward"/>
             <updated>2014-02-15T00:00:00-05:00</updated>
-            <id>https://jwage.com/post/2014/02/15/using-the-symfony-expression-language-for-a-reward</id>
+            <id>https://jwage.com/posts/2014/02/15/using-the-symfony-expression-language-for-a-reward</id>
             <content type="html"><![CDATA[<p>We recently adopted the <a href="http://symfony.com/doc/current/components/expression_language/index.html" target="_blank">Symfony Expression Language</a> in the rules engine at <a href="http://www.opensky.com" target="_blank">OpenSky</a>. It has brought a new level of flexibility to our system and creating new logic has never been easier.</p>
 
 <p>Installing the expression language in your application is easy with composer. Just add the following to your <code>composer.json</code>:</p>
@@ -532,9 +532,9 @@ class RuleSubcriber implements EventSubscriberInterface
         </entry>
             <entry>
             <title type="html"><![CDATA[Tailing Log Files Across Multiple Servers]]></title>
-            <link href="https://jwage.com/post/2014/02/12/tailing-log-files-across-multiple-servers"/>
+            <link href="https://jwage.com/posts/2014/02/12/tailing-log-files-across-multiple-servers"/>
             <updated>2014-02-12T00:00:00-05:00</updated>
-            <id>https://jwage.com/post/2014/02/12/tailing-log-files-across-multiple-servers</id>
+            <id>https://jwage.com/posts/2014/02/12/tailing-log-files-across-multiple-servers</id>
             <content type="html"><![CDATA[<p>Install the utility named <code>dsh</code>:</p>
 
 <pre><code>apt-get install dsh
@@ -570,9 +570,9 @@ web6.prod.domain.com
         </entry>
             <entry>
             <title type="html"><![CDATA[Doctrine is not just an ORM for Relational Databases]]></title>
-            <link href="https://jwage.com/post/2014/01/18/doctrine-is-not-just-an-orm-for-relational"/>
+            <link href="https://jwage.com/posts/2014/01/18/doctrine-is-not-just-an-orm-for-relational"/>
             <updated>2014-01-18T00:00:00-05:00</updated>
-            <id>https://jwage.com/post/2014/01/18/doctrine-is-not-just-an-orm-for-relational</id>
+            <id>https://jwage.com/posts/2014/01/18/doctrine-is-not-just-an-orm-for-relational</id>
             <content type="html"><![CDATA[<p>In April of 2010 the <a href="https://github.com/doctrine/mongodb-odm/commit/92582ffe5facffa4d2379f176dbee539918db962" target="_blank">first commit</a> for the Doctrine MongoDB ODM project was made. I was experimenting with MongoDB at the time and I wanted to see how difficult it would be to build a version of Doctrine for MongoDB.</p>
 
 <p>Up until the MongoDB ODM, Doctrine was solely a project built around the DBAL/ORM and was advertised as such. In May of 2010 we decided to widen the scope of the project so that we could host libraries like the MongoDB ODM. This change led to a spur of new contributors and development and we now have several object mappers developed under Doctrine and things are more active than ever.</p>
@@ -923,9 +923,9 @@ $om-&gt;flush(); // updates the object in the database
         </entry>
             <entry>
             <title type="html"><![CDATA[Sending Safari Push Notifications with PHP]]></title>
-            <link href="https://jwage.com/post/2013/12/23/sending-safari-push-notifications-with-php"/>
+            <link href="https://jwage.com/posts/2013/12/23/sending-safari-push-notifications-with-php"/>
             <updated>2013-12-23T00:00:00-05:00</updated>
-            <id>https://jwage.com/post/2013/12/23/sending-safari-push-notifications-with-php</id>
+            <id>https://jwage.com/posts/2013/12/23/sending-safari-push-notifications-with-php</id>
             <content type="html"><![CDATA[<p>When OSX Mavericks was released, I was excited to see that push notifications were supported within Safari. So now, just like iOS, we can send push notifications to Safari regardless of whether the browser is open or not. This post gives overview of how to get them working from PHP using the <a href="http://github.com/jwage/php-apns" target="_blank">PHP APNS</a> library.</p>
 
 <h3>Registering with Apple and Generating Certificates</h3>
@@ -1091,9 +1091,9 @@ $safariPushNotificationSender-&gt;sendToUser($user, 'Title of push', 'Body of pu
         </entry>
             <entry>
             <title type="html"><![CDATA[MongoDB PHP MongoDate Tricks]]></title>
-            <link href="https://jwage.com/post/2013/07/16/mongodb-php-mongodate-tricks"/>
+            <link href="https://jwage.com/posts/2013/07/16/mongodb-php-mongodate-tricks"/>
             <updated>2013-07-16T00:00:00-04:00</updated>
-            <id>https://jwage.com/post/2013/07/16/mongodb-php-mongodate-tricks</id>
+            <id>https://jwage.com/posts/2013/07/16/mongodb-php-mongodate-tricks</id>
             <content type="html"><![CDATA[<p>Here are a few tricks I&rsquo;ve learned working with MongoDB and PHP.</p>
 
 <p><strong>Create DateTime from MongoId</strong></p>

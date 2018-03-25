@@ -62,2075 +62,294 @@
 
     <article>
         <header>
-            <h2><a href="https://jwage.com/post/2012/07/10/testing-query-counts-in-functional-web-tests-with">Testing query counts in functional web tests with Symfony2 and PHPUnit</a></h2>
+            <h2><a href="https://jwage.com/posts/2014/10/18/forcing-https-for-all-traffic-with-f5-irules">Forcing HTTPS for all traffic with F5 iRules</a></h2>
         </header>
         <div>
-            <p>At <a href="https://opensky.com" target="_blank">OpenSky</a> we were faced with a challenge of being able to evolve functionality fast without having the overhead of developers constantly watching for changes in performance, or the number of queries required for a request. To help solve part of this problem we integrated the Symfony2 profiler with our functional web tests to assert that a request required a certain number of database queries.</p>
+            <p>If you want to force all traffic to HTTPS you can do so pretty easily by adding a F5 iRule to the HTTP VIP.</p>
 
-<p>First in order to accomplish this we need to create a special test environment named <strong>test_logging</strong> that will be the same as the normal test environment except profiling and logging is enabled. We don&rsquo;t want this enabled for all of our tests as it does add some overhead to the request and will slow things down a little bit.</p>
-
-<pre><code>imports:
-    - { resource: config_test.yml }
-
-doctrine:
-    dbal:
-        connections:
-            default:
-                logging: true
-
-doctrine_mongodb:
-    document_managers:
-        default:
-            logging: true
-</code></pre>
-
-<p>Now in your PHPUnit functional tests you can issue requests with the <strong>test_logging</strong> environment client and run assertions afterwards to make sure the request executed the queries you expected.</p>
-
-<pre><code>namespace OpenSky\Bundle\MainBundle\Tests\Functional;
-
-use OpenSky\Bundle\MainBundle\Tests\WebTestCase;
-
-class TestSomeQueryCounts extends WebTestCase
-{
-    // ...
-
-    public function testQueryCounts()
-    {
-        $client = static::createClient(array(
-            'environment' =&gt; 'test_logging'
-        ), array(
-            'PHP_AUTH_USER' =&gt; 'foobar',
-            'PHP_AUTH_PW'   =&gt; 'foobar',
-        ));
-
-        $client-&gt;request('GET', '/some_page');
-        $response = $client-&gt;getResponse();
-        $profile = $this-&gt;getContainer()-&gt;get('profiler')-&gt;loadProfileFromResponse($response);
-
-        $numMysqlQueries = $profile-&gt;getCollector('db')-&gt;getQueryCount();
-        $numMongoQueries = $profile-&gt;getCollector('mongodb')-&gt;getQueryCount();
-
-        $this-&gt;assertEquals($numMysqlQueries, 1);
-        $this-&gt;assertEquals($numMongoQueries, 1);
-    }
+<pre><code>when HTTP_REQUEST {
+    HTTP::redirect "https://[HTTP::host][HTTP::uri]"
 }
 </code></pre>
 
-<p>You can abstract this a little bit and add some convenience methods in your base WebTestCase class that would clean this up and make it more reusable. Here is an example:</p>
+<p>You should have two virtual servers configured in the F5, one for HTTP and one for HTTPS. By adding the redirect iRule to the HTTP virtual server it will only be executed for traffic that comes in without HTTPS. This means the iRule code above does not need any kind of conditional to check what the protocol is and only redirect when it is not HTTPS.</p>
 
-<pre><code>// ...
-class WebTestCase
-{
-    // ...
-    protected function assertResponseQueryCounts(Response $response, $expectedMysql, $expectedMongo)  
-    {
-        $profile = $this-&gt;getContainer()-&gt;get('profiler')-&gt;loadProfileFromResponse($response);
+<p>If you wanted to wrap some other conditional around the redirect, say you don&rsquo;t want to redirect one particular section of your site, you can do this:</p>
 
-        $numMysqlQueries = $profile-&gt;getCollector('db')-&gt;getQueryCount();
-        $numMongoQueries = $profile-&gt;getCollector('mongodb')-&gt;getQueryCount();
-
-        if ($expectedMysql !== $numMysqlQueries) {
-            print_r($profile-&gt;getCollector('db')-&gt;getQueries());
-        }
-        $this-&gt;assertEquals($expectedMysql, $numMysqlQueries);
-        if ($expectedMongo !== $numMongoQueries) {
-            print_r($profile-&gt;getCollector('mongodb')-&gt;getQueries());
-        }
-        $this-&gt;assertEquals($expectedMongo, $numMongoQueries);
-    }
-
-    protected function assertRequestQueryCounts($client, $url, $method, $expectedMysql, $expectedMongo)
-    {
-        if ($client-&gt;getKernel()-&gt;getEnvironment() !== 'test_logging') {
-            throw new \InvalidArgumentException(
-                'You must pass a client created with createClient(array("environment" =&gt; "test_logging"))'
-            );
-        }
-        $client-&gt;request($method, $url);
-        $this-&gt;assertResponseQueryCounts($client-&gt;getResponse(), $expectedMysql, $expectedMongo);
+<pre><code>when HTTP_REQUEST {
+    if { not ([string tolower [HTTP::path]] starts_with "/non-secure-section") } {
+        HTTP::redirect "https://[HTTP::host][HTTP::uri]"
     }
 }
 </code></pre>
-
-<p>Now the example functional test we showed in the beginning can be cleaned up quite a bit to use the convenience methods we created above:</p>
-
-<pre><code>// ...
-class TestSomeQueryCounts extends WebTestCase
-{
-    // ...
-    public function testQueryCounts()
-    {
-        $client = static::createClient(array(
-            'environment' =&gt; 'test_logging'
-        ), array(
-            'PHP_AUTH_USER' =&gt; 'foobar',
-            'PHP_AUTH_PW'   =&gt; 'foobar',
-        ));
-
-        $this-&gt;assertRequestQueryCounts($client, '/some_page', 'GET', 1, 1);
-    }
-}
-</code></pre>
-
-<p>I hope this is a helpful tip for someone else.</p>
 
         </div>
             </article>
     <article>
         <header>
-            <h2><a href="https://jwage.com/post/2012/07/10/asynchronous-events-with-php-and-symfony2">Asynchronous Events with PHP and Symfony2</a></h2>
+            <h2><a href="https://jwage.com/posts/2014/07/22/2014-vacation-books">2014 Vacation Books</a></h2>
         </header>
         <div>
-            <p><a href="http://symfony.com" target="_blank">Symfony2</a> is a great framework. I use it at <a href="https://opensky.com" target="_blank">OpenSky</a> daily and have contributed a little bit of code to it related to the <a href="http://doctrine-project.org" target="_blank">Doctrine</a> integration.</p>
-
-<h2>Symfony2 EventDispatcher</h2>
-
-<p>One of the core components is the <a href="https://github.com/symfony/EventDispatcher" target="_blank">EventDispatcher</a> and it implements a lightweight version of the <a href="http://en.wikipedia.org/wiki/Observer_pattern" target="_blank">Observer design pattern</a>.</p>
-
-<p>At <a href="http://opensky.com" target="_blank">OpenSky</a> we make heavy use of events. All of our core functionality notifies events that we can then listen to and execute other functionality. Here is an example where we notify the <strong>user.created</strong> event when a new user registers on the site:</p>
-
-<pre><code>$eventDispatcher-&gt;notify(new Event($user, 'user.created'));
-</code></pre>
-
-<p>Now we can setup a listener for that and execute some more PHP code in the same process:</p>
-
-<pre><code>&lt;service id="user.created.listener" class="UserCreatedListener"&gt;
-    &lt;tag name="kernel.event_listener" event="user.created" method="onUserCreated" /&gt;
-&lt;/service&gt;
-</code></pre>
-
-<p>The listener class might look something like this:</p>
-
-<pre><code>class UserCreatedListener
-{
-    public function onUserCreated(EventInterface $event)
-    {
-        $user = $event-&gt;getSubject(); // $user instanceof User
-        $params = $event-&gt;all();
-        // do something
-    }
-}
-</code></pre>
-
-<p>The above gets executed in the same process that the <strong>user.created</strong> event was notified in.</p>
-
-<h2>Notifying Asynchronous Events</h2>
-
-<p>What if we want to do something else, like notify a third party API of the new user. We shouldn&rsquo;t do that in the main request as it would slow it down, and it doesn&rsquo;t need to be real time, so an asynchronous event is perfect.</p>
-
-<p>At OpenSky we make use of <a href="https://www.jboss.org/hornetq" target="_blank">HornetQ</a>, a message queue, and a Java application written using <a href="http://en.wikipedia.org/wiki/Mule_(software)" target="_blank">Mule</a> to consume messages our PHP application sends. We&rsquo;ve added a way for Symfony2 events to be forwarded to HornetQ which are then received by our Java app and POSTed back to our PHP application in another request.</p>
-
-<p>Sending an asynchronous event from our PHP app looks like this:</p>
-
-<pre><code>$eventDispatcher-&gt;notifyAsync(new Event($user, 'user.created'));
-</code></pre>
-
-<p>The above would not execute any <strong>user.created</strong> listeners in this process, instead the <strong>Event</strong> instance is sent through HornetQ, received by our Java app and POSTed back to our PHP application in another request. The Java app posts to a controller that reconstructs the <strong>Event</strong> object and notifies it on the event dispatcher.</p>
-
-<p>So this ends up happening but in another request/process:</p>
-
-<pre><code>class EventController
-{
-    public function handle()
-    {
-        $event = $this-&gt;getEventFactory()-&gt;getReconstructedEvent($request);
-        $this-&gt;getEventDispatcher()-&gt;notify($event);
-    }
-}
-</code></pre>
-
-<p>Now any code that listens on <strong>user.created</strong> will be executed in an asynchronous process:</p>
-
-<pre><code>class UserCreatedListener
-{
-    // ...
-
-    public function onUserCreated(EventInterface $event)
-    {
-        $user = $event-&gt;getSubject(); // $user instanceof User
-        $this-&gt;someApi-&gt;notifyNewUser($user);
-    }
-}
-</code></pre>
-
-<h2>I don&rsquo;t have a message queue</h2>
-
-<p>In order for you to implement the above example you will need some kind of message queue and middle ware. If you don&rsquo;t have that you could very easily stash the calls to notifyAsync() and issue the events as async ajax requests when the response renders in the browser or implement some other kind of event persistence and a console command that runs as a daemon constantly processing the events. It is possible to build out a smaller scale version of the example above that is easy to upgrade later.</p>
+            <ul><li><p><a href="http://www.amazon.com/Five-Love-Languages-Heartfelt-Commitment-ebook/dp/B00F4KBJ8I" target="_blank">The Five Love Languages: How to Express Heartfelt Commitment to Your Mate</a></p></li>
+<li><p><a href="http://www.amazon.com/How-Win-Friends-Influence-People/dp/0671027034" target="_blank">How to Win Friends &amp; Influence People</a></p></li>
+<li><p><a href="http://www.amazon.com/Nikola-Tesla-Imagination-Invented-Century-ebook/dp/B00CATSONE/" target="_blank">Nikola Tesla: Imagination and the Man That Invented the 20th Century</a></p></li>
+<li><p><a href="http://www.amazon.com/My-Life-Work-Henry-Ford-ebook/dp/B0084AMXOY" target="_blank">My Life and Work (Henry Ford Autobiography)</a></p></li>
+<li><p>Started this but did not finish. <a href="http://www.amazon.com/Black-Swan-Impact-Highly-Improbable-ebook/dp/B00139XTG4" target="_blank">The Black Swan: Second Edition: The Impact of the Highly Improbable Fragility</a></p></li>
+</ul>
 
         </div>
             </article>
     <article>
         <header>
-            <h2><a href="https://jwage.com/post/2012/02/22/logging-mongodb-explains-in-symfony2">Logging MongoDB Explains in Symfony2</a></h2>
+            <h2><a href="https://jwage.com/posts/2014/02/15/using-the-symfony-expression-language-for-a-reward">Using the Symfony Expression Language for a Reward Rules Engine</a></h2>
         </header>
         <div>
-            <p>At <a href="http://opensky.com" target="_blank">OpenSky.com</a> we use <a href="http://mongodb.org" target="_blank">MongoDB</a> as one of our primary data stores. We use the slow query log in the <a href="http://www.mongodb.org/display/DOCS/Database+Profiler" target="_blank">profiling tools</a> to identify to slow queries but sometimes it is hard to tell exactly where in our application it originated from. Thanks to the flexibility of <a href="http://doctrine-project.org" target="_blank">Doctrine</a> and <a href="http://symfony.com" target="_blank">Symfony2</a> we can easily listen to a few events and log the information without modifying any application code.</p>
+            <p>We recently adopted the <a href="http://symfony.com/doc/current/components/expression_language/index.html" target="_blank">Symfony Expression Language</a> in the rules engine at <a href="http://www.opensky.com" target="_blank">OpenSky</a>. It has brought a new level of flexibility to our system and creating new logic has never been easier.</p>
 
-<p>First lets write a simple listener class:</p>
+<p>Installing the expression language in your application is easy with composer. Just add the following to your <code>composer.json</code>:</p>
 
-<pre><code>namespace Application\Bundle\MainBundle\ODM\MongoDB\Explainer;
-
-use Doctrine\MongoDB\Event\EventArgs;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-class ExplainerListener
-{
-    private $container;
-    private $lastQuery;
-    private $explains = array();
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this-&gt;container = $container;
-    }
-
-    public function collectionPreFind(EventArgs $args)
-    {
-        $this-&gt;lastQuery = $args-&gt;getData();
-    }
-
-    public function collectionPostFind(EventArgs $args)
-    {
-        $e = new \Exception();
-        $collection = $args-&gt;getInvoker();
-        $cursor = $args-&gt;getData();
-        $explain = $cursor-&gt;explain();
-        $this-&gt;explains[] = array(
-            'explain' =&gt; $explain,
-            'query' =&gt; $this-&gt;lastQuery,
-            'database' =&gt; $collection-&gt;getDatabase()-&gt;getName(),
-            'collection' =&gt; $collection-&gt;getName(),
-            'traceAsString' =&gt; $e-&gt;getTraceAsString()
-        );
-    }
-
-    private function getCollection()
-    {
-        $databaseName = $this-&gt;container-&gt;getParameter('doctrine.odm.mongodb.default_configuration.default_database');
-        return $this-&gt;container-&gt;get('doctrine.odm.mongodb.document_manager')
-            -&gt;getConnection()
-            -&gt;selectCollection($databaseName, 'query_explains');
-    }
-
-    public function __destruct()
-    {
-        $this-&gt;getCollection()-&gt;batchInsert($this-&gt;explains);
-    }
-}
+<pre><code>"symfony/expression-language": "2.5.*@dev"
 </code></pre>
 
-<p>This class will listen on the <code>Doctrine\MongoDB\Collection#find()</code> <code>pre</code> and <code>post</code> event and capture the explain of the query.</p>
+<p>The expression language allows you to perform expressions that get evaluated with raw PHP code and return a single value. It can be any type of value and is not limited to boolean values. Here is a simple example:</p>
 
-<p>Next just configure the listener we wrote above in the DIC:</p>
+<pre><code>use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-<pre><code>&lt;?xml version="1.0" encoding="utf-8" ?&gt;
-&lt;container xmlns="http://symfony.com/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services <a href="http://symfony.com/schema/dic/services/services-1.0.xsd" target="_blank">http://symfony.com/schema/dic/services/services-1.0.xsd</a>"&gt;
+$language = new ExpressionLanguage();
 
-    &lt;services&gt;
-        &lt;service id="odm.explainer" class="Application\Bundle\MainBundle\ODM\MongoDB\Explainer\ExplainerListener"&gt;
-            &lt;tag name="doctrine.odm.mongodb.default_event_listener" event="collectionPreFind" method="collectionPreFind" /&gt;
-            &lt;tag name="doctrine.odm.mongodb.default_event_listener" event="collectionPostFind" method="collectionPostFind" /&gt;
-            &lt;argument type="service" id="service_container" /&gt;
-        &lt;/service&gt;
-    &lt;/services&gt;
-&lt;/container&gt;
+$expression = 'user["isActive"] == true and product["price"] &gt; 20';
+$context = array(
+    'user' =&gt; array(
+        'isActive' =&gt; true
+    ),
+    'product' =&gt; array(
+        'price' =&gt; 30
+    ),
+);
+
+$return = $language-&gt;evaluate($expression, $context);
+
+var_export($return); // true
 </code></pre>
 
-<p>Now all your queries will be logged in to a mongodb collection named query_explains. If you take a look in the collection after triggering a few queries in your application you will see documents that look like the following:</p>
+<p>That is a very simple example on how to use the raw expression language. Now I will try to demonstrate how you could model a real implementation using <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a> to persist your rules to a database, the <a href="http://symfony.com/doc/current/components/event_dispatcher/introduction.html" target="_blank">Symfony Event Dispatcher</a> to evaluate your rules and execute actions when your expressions evaluate to true.</p>
 
-<pre><code>{
-    "_id" : ObjectId("4f4480d4acee41cd6800001b"),
-    "explain" : {
-        "cursor" : "ForwardCappedCursor",
-        "nscanned" : 0,
-        "nscannedObjects" : 0,
-        "n" : 0,
-        "millis" : 0,
-        "nYields" : 0,
-        "nChunkSkips" : 0,
-        "isMultiKey" : false,
-        "indexOnly" : false,
-        "indexBounds" : [ ],
-        "allPlans" : [
-            {
-                "cursor" : "ForwardCappedCursor",
-                "indexBounds" : [ ]
-            }
-        ]
-    },
-    "query" : [ ],
-    "database" : "database_name",
-    "collection" : "collection_name",
-    "traceAsString" : "..."
-}
-</code></pre>
+<p>To get started create a new <code>Rule</code> class and map it to a database using one of the Doctrine object mappers. For this example we will map it using the MongoDB ODM:</p>
 
-<p>The traceAsString field is a string representation of the trace that led up to the query so you can easily identify what triggered the query in your application.</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2011/10/29/a-cool-script-for-running-phpunit-tests-in">A cool script for running PHPUnit tests in parallel processes</a></h2>
-        </header>
-        <div>
-            <p>At <a href="http://opensky.com" target="_blank">OpenSky</a> we&rsquo;re exploring options for getting better build times. We came across this script found <a href="http://pebblesinthesand.wordpress.com/2008/05/22/a-srcipt-for-running-processes-in-parallel-in-bash/" target="_blank">here</a> for executing commands and running the processes in parallel.</p>
-
-<pre><code>#!/bin/bash
-NUM=0
-QUEUE=""
-MAX_NPROC=2 # default
-REPLACE_CMD=0 # no replacement by default
-USAGE="A simple wrapper for running processes in parallel.
-Usage: `basename $0` [-h] [-r] [-j nb_jobs] command arg_list
-    -h      Shows this help
-    -r      Replace asterix * in the command string with argument
-    -j nb_jobs  Set number of simultanious jobs [2]
- Examples:
-    `basename $0` somecommand arg1 arg2 arg3
-    `basename $0` -j 3 \"somecommand -r -p\" arg1 arg2 arg3
-    `basename $0` -j 6 -r \"convert -scale 50% * small/small_*\" *.jpg"
-
-function queue {
-    QUEUE="$QUEUE $1"
-    NUM=$(($NUM+1))
-}
-
-function regeneratequeue {
-    OLDREQUEUE=$QUEUE
-    QUEUE=""
-    NUM=0
-    for PID in $OLDREQUEUE
-    do
-        if [ -d /proc/$PID  ] ; then
-            QUEUE="$QUEUE $PID"
-            NUM=$(($NUM+1))
-        fi
-    done
-}
-
-function checkqueue {
-    OLDCHQUEUE=$QUEUE
-    for PID in $OLDCHQUEUE
-    do
-        if [ ! -d /proc/$PID ] ; then
-            regeneratequeue # at least one PID has finished
-            break
-        fi
-    done
-}
-
-# parse command line
-if [ $# -eq 0 ]; then #  must be at least one arg
-    echo "$USAGE" &gt;&amp;2
-    exit 1
-fi
-
-while getopts j:rh OPT; do # "j:" waits for an argument "h" doesnt
-    case $OPT in
-    h)  echo "$USAGE"
-        exit 0 ;;
-    j)  MAX_NPROC=$OPTARG ;;
-    r)  REPLACE_CMD=1 ;;
-    \?) # getopts issues an error message
-        echo "$USAGE" &gt;&amp;2
-        exit 1 ;;
-    esac
-done
-
-# Main program
-echo Using $MAX_NPROC parallel threads
-shift `expr $OPTIND - 1` # shift input args, ignore processed args
-COMMAND=$1
-shift
-
-for INS in $* # for the rest of the arguments
-do
-    # DEFINE COMMAND
-    if [ $REPLACE_CMD -eq 1 ]; then
-        CMD=${COMMAND//"*"/$INS}
-    else
-        CMD="$COMMAND $INS" #append args
-    fi
-    echo "Running $CMD"
-
-    $CMD &amp;
-    # DEFINE COMMAND END
-
-    PID=$!
-    queue $PID
-
-    while [ $NUM -ge $MAX_NPROC ]; do
-        checkqueue
-        sleep 0.4
-    done
-done
-wait # wait for all processes to finish before exit
-</code></pre>
-
-<p>Here is a <a href="https://gist.github.com/30055f607fedf2f384d7" target="_blank">gist</a> of the code. Save the above file to a script named parallel and make it executable.</p>
-
-<p>We can now easily use this with PHPUnit to run our tests in parallel processes. If you were to setup 10 groups of tests like this:</p>
-
-<pre><code>/**
- * @group group1
- */
-class MyTest
-{
-    // ...
-}
-</code></pre>
-
-<p>You could run the groups in parallel processes like this:</p>
-
-<pre><code>$ ./parallel -j 10 -r "phpunit -c opensky --group=*" group1 group2 group3 group4 group5 group6 group7 group8 group9 group10
-</code></pre>
-
-<p>So if each group took ~1 minute to run, running them all together would take ~10 minutes, but if you ran it with this script you could get them all done in ~1 minute!</p>
-
-<p>One caveat is we have to figure out a way for each test run inside parallel to use a different configuration, database, etc. so that the tests do not walk on each other and are isolated.</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2011/06/10/something-to-always-think-about">Something to always think about</a></h2>
-        </header>
-        <div>
-            <p>My friend <a href="http://twitter.com/nicholasholland" target="_blank">Nicholas Holland (@nicholasholland)</a>, passed this gem on to me while I was working with him at <a href="http://www.centresource.com" target="_blank">CentreSource</a>. He heard it at a conference and shared it with me. I liked it and learned quite a bit from it so I wanted to share it as well!
-
-</p>
-
-<h2>story:</h2>
-
-<p>guy was traveling<br/>
-had a terrible trip<br/>
-went to 5 star hotel<br/>
-got to his room at midnight<br/>
-called roomservice, polite/professional guy answers<br/>
-he asks for Milkshake<br/>
-guys apologizes says they don&rsquo;t have it<br/>
-then recommends a bowl of ice cream<br/>
-the traveler says sure, and asks for a large glass of milk<br/>
-the guy says, no problem<br/>
-then the traveler asks for an extra glass and a tall spoon, the guy says sure<br/>
-20 min later<br/>
-tray arrives with bowl of ice cream, glass of milk, empty glass, and tall spoon<br/><br/></p>
-
-<h2>moral:</h2>
-
-<p>the guy had everything he needed, including the desire to make the traveler happy, to make the milkshake
-but he couldn&rsquo;t get past his own systems / limitations to actually make it&hellip; because the system didn&rsquo;t have a &lsquo;milkshake&rsquo; button, he couldn&rsquo;t get it done<br/>
-thus, the traveler was less than happy - even though the guy had everything he needed to make the guy happy</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2011/03/16/mongodb-tailable-cursors">MongoDB Tailable Cursors</a></h2>
-        </header>
-        <div>
-            <p>Tailable cursors are a cool feature of MongoDB. It allows you to setup scripts that run forever and are constantly processing new data that gets inserted to the collection. You need a capped collection in order to tail a cursor so just create a new collection and make sure it is capped to a size you can specify:</p>
-
-<pre><code>&gt; db.createCollection("my_collection", {capped:true, size:100000})
-</code></pre>
-
-<p>Now you can tail a cursor in your favorite language. I have a few examples of the same script in PHP, Ruby, Python and Perl!</p>
-
-<h2>PHP</h2>
-
-<pre><code>$mongo = new Mongo();
-$db = $mongo-&gt;selectDB('my_db')
-$coll = $db-&gt;selectCollection('my_collection');
-$cursor = $coll-&gt;find()-&gt;tailable(true);
-while (true) {
-    if ($cursor-&gt;hasNext()) {
-        $doc = $cursor-&gt;getNext();
-        print_r($doc);
-    } else {
-        sleep(1);
-    }
-}
-</code></pre>
-
-<h2>Ruby</h2>
-
-<pre><code>db   = Mongo::Connection.new().db('my_db')
-coll = db.collection('my_collection')
-cursor = Mongo::Cursor.new(coll, :tailable =&gt; true)
-loop do
-  if doc = cursor.next_document
-    puts doc
-  else
-    sleep 1
-  end
-end
-</code></pre>
-
-<h2>Python</h2>
-
-<p>By <a href="http://wombatnation.com" target="_blank">Robert Stewart</a>:</p>
-
-<pre><code>from pymongo import Connection
-import time
-
-db = Connection().my_db
-coll = db.my_collection
-cursor = coll.find(tailable=True)
-while cursor.alive:
-    try:
-        doc = cursor.next()
-        print doc
-    except StopIteration:
-        time.sleep(1)
-</code></pre>
-
-<h2>Perl</h2>
-
-<p>By <a href="http://tong.ijenko.net/" target="_BLANK">Max</a></p>
-
-<pre><code>use 5.010;
-
-use strict;
-use warnings;
-use MongoDB;
-
-my $db = MongoDB::Connection-&gt;new;
-my $coll = $db-&gt;my_db-&gt;my_collection;
-my $cursor = $coll-&gt;find-&gt;tailable(1);
-for (;;)
-{
-    if (defined(my $doc = $cursor-&gt;next))
-    {
-        say $doc;
-    }
-    else
-    {
-        sleep 1;
-    }
-}
-</code></pre>
-
-<p>If you want to provide the same example in another language please add it in the comments and I&rsquo;d be glad to include it here!</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2011/02/28/tips-on-being-successful-in-open-source">Tips on Being Successful in Open Source</a></h2>
-        </header>
-        <div>
-            <p>This morning I got an e-mail from someone asking for some pointers on how to build a successul open source project. It&rsquo;s a difficult question to answer. In the end I think it comes down to a lot of things, but mainly it is being consistent and active. I responded to him with some of my thoughts and when I was done I practically had a blog post so I decided flesh it out a little more and post it here.</p>
-
-<h2>Identity</h2>
-
-<p>First, it is extremely important for your project to have a <strong>name</strong> and an <strong>identity</strong>. Just pick a word, anything, something is better than nothing. Then pick some colors and slice up a logo in Photoshop.</p>
-
-<h2>Source Control</h2>
-
-<p>You <strong>must</strong> use some kind of source control. I recommend using <a href="http://www.github.com" target="_blank">GitHub</a> as it will help to build the <strong>community</strong> around your project and <strong>generate contributions</strong>.</p>
-
-<h2>Mailing Lists &amp; IRC</h2>
-
-<p>Next, setup a <strong>mailing list</strong> using <a href="http://google.com/groups" target="_blank">Google Groups</a> and create an <strong>IRC channel</strong> on the irc.freenode.net network. Now you have a way to communicate with your users and contributors!</p>
-
-<h2>Setup a Website</h2>
-
-<p>Once you have your identity, your code publicly available and a way to communicate with your users you need a <strong>website</strong> to organize all the information about your project. I recommend a blog, documentation, information about your community, how to contribute, how to download your code, release/download information, etc.</p>
-
-<h2>Social Networking</h2>
-
-<p>I think leveraging social networking is also a big part of connecting with your users. Create a Twitter account for your project and announce updates there. When you are developing and working on your project, be sure to let your users know what you are up to. Be active and passionate about what you do and your users will more likely connect with you and help contribute to building a great open source project.</p>
-
-<h2>Release Early and Release Often</h2>
-
-<p>In the early days of an open source project you need to release early and release often. The project is new, and the users know that so the project needs to show that it is active and moving fast in order for developers to consider using your project. As your project matures, and you have stable versions users can rely on, then you can consider throttling down the frequency of releases. Get your users new stuff fast!</p>
-
-<h2>Maintenance</h2>
-
-<p>After you have your project ground work done, you need to maintain your project and stay active. If you do not maintain your project, then it will die a slow death. Frequently write blog posts about new developments, new versions, updates to documentation, use cases and example tutorials, etc. This will get your users coming back to your site and seeing the new stuff you are working on and will be more likely to use and or contribute to your library.</p>
-
-<p>I hope this helps someone with getting a new open source project off the ground or sparks someones interest to open source something today!</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/08/25/blending-the-doctrine-orm-and-mongodb-odm">Blending the Doctrine ORM and MongoDB ODM</a></h2>
-        </header>
-        <div>
-            <p>Since the start of the <a href="http://www.doctrine-project.org/projects/mongodb_odm" target="_blank">Doctrine MongoDB Object Document Mapper</a> project people have asked how it can be integrated with the <a href="http://www.doctrine-project.org/projects/orm" target="_blank">ORM</a>. This blog post demonstrates how you can integrate the two transparently, maintaining a clean domain model.</p>
-
-<p>This example will have a <code>Product</code> that is stored in MongoDB and the <code>Order</code> stored in a MySQL database.</p>
-
-<h2>Defining our Document and Entity</h2>
-
-<p>First lets define our <code>Product</code> document:</p>
-
-<pre><code>namespace Documents;
-
-/** @Document */
-class Product
-{
-    /** @Id */
-    private $id;
-
-    /** @String */
-    private $title;
-
-    public function getId()
-    {
-        return $this-&gt;id;
-    }
-
-    public function getTitle()
-    {
-        return $this-&gt;title;
-    }
-
-    public function setTitle($title)
-    {
-        $this-&gt;title = $title;
-    }
-}
-</code></pre>
-
-<p>Next create the <code>Order</code> entity that has a <code>$product</code> and <code>$productId</code> property linking it to the <code>Product</code> that is stored with MongoDB:</p>
-
-<pre><code>namespace Entities;
-
-use Documents\Product;
+<pre><code>use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @Entity
- * @Table(name="orders")
- * @HasLifecycleCallbacks
+ * @ODM\Document
  */
-class Order
+class Rule
 {
     /**
-     * @Id @Column(type="integer")
-     * @GeneratedValue(strategy="AUTO")
+     * @ODM\Id
      */
     private $id;
 
     /**
-     * @Column(type="string")
+     * @ODM\Collection
      */
-    private $productId;
+    private $eventNames = array();
 
     /**
-     * @var Documents\Product
+     * @ODM\String
      */
+    private $expression;
+
+    /**
+     * @ODM\Collection
+     */
+    private $actionEvents = array();
+
+    // ...
+}
+</code></pre>
+
+<p>Now imagine you already have an event named <code>user.add_to_cart</code> being notified in your application. It looks something like this:</p>
+
+<pre><code>use Symfony\Component\EventDispatcher\Event;
+
+class UserAddToCartEvent extends Event
+{
+    const onUserAddToCart = 'user.add_to_cart';
+
+    private $user;
     private $product;
 
-    public function getId()
-    {
-        return $this-&gt;id;
-    }
+    // ...
+}
 
-    public function getProductId()
-    {
-        return $this-&gt;productId;
-    }
+class AddToCartController
+{
+    // ...
 
-    public function setProduct(Product $product)
+    public function addToCartAction($productId)
     {
-        $this-&gt;productId = $product-&gt;getId();
-        $this-&gt;product = $product;
-    }
+        // ...
 
-    public function getProduct()
-    {
-        return $this-&gt;product;
+        $this-&gt;dispatcher-&gt;dispatch(UserAddToCartEvent::onUserAddToCart, new UserAddToCartEvent($user, $product));
     }
 }
 </code></pre>
 
-<h2>Event Subscriber</h2>
+<p>Say you want to give a reward to users who add items to their cart when they have loved more than <code>20</code> items and the price of the product is greater than <code>50</code> dollars. The <code>Rule</code> model we created earlier allows us to define a rule that will be executed when <code>UserAddToCart::onUserAddToCart</code> is dispatched:</p>
 
-<p>Now we need to setup an event subscriber that will set the <code>$product</code> property of all <code>Order</code> instances to a reference to the document product so it can be lazily loaded when it is accessed the first time. So first register a new event subscriber:</p>
+<pre><code>$rule = new Rule();
 
-<pre><code>$eventManager = $em-&gt;getEventManager();
-$eventManager-&gt;addEventListener(
-    array(\Doctrine\ORM\Events::postLoad), new MyEventSubscriber($dm)
-);
+// set the events this rule should be executed on.
+$rule-&gt;setEventNames(array(
+    UserAddToCartEvent::onUserAddToCart
+));
+
+// set the expression to evaluate when the rule is executed.
+// if the user has loved more than 20 items and the price of the product is more than 50 dollars.
+// the expression string will be evaluated by the Symfony expression language.
+$rule-&gt;setExpression('event.getUser().getNumLoves() &gt; 20 and event.getProduct().getPrice() &gt; 50');
+
+// set the action events to dispatch when the expression evaluates to true.
+$rule-&gt;setActionEvents(array(
+    array(
+        'eventName' =&gt; UserCreditRewardEvent::onUserCreditReward,
+        'recipientExpression' =&gt; 'event.getUser()',
+        'attributes' =&gt; array(
+            'amount' =&gt; 50
+        ),
+    )
+));
+
+$dm-&gt;persist($rule);
+$dm-&gt;flush();
 </code></pre>
 
-<p>So now we need to define a class named <code>MyEventSubscriber</code> and pass a dependency to the <code>DocumentManager</code>. It will have a <code>postLoad()</code> method that sets the product document reference:</p>
+<p>The above example assumes you have a <code>UserCreditRewardEvent</code> setup and a listener setup to process the event to give the user a credit. Here is what the event would look like:</p>
 
-<pre><code>use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+<pre><code>use Symfony\Component\EventDispatcher\Event;
 
-class MyEventSubscriber
+class UserCreditRewardEvent extends Event
 {
-    public function __construct(DocumentManager $dm)
-    {
-        $this-&gt;dm = $dm;
-    }
+    const onUserCreditReward = 'user.credit_reward';
 
-    public function postLoad(LifecycleEventArgs $eventArgs)
+    private $user;
+    private $amount;
+
+    // ...
+}
+</code></pre>
+
+<p>And here is what the listener would look like to give the user the credit. This example assumes you already have a <code>CreditManager</code> service with an <code>issueCredit()</code> method you can use to give a user a credit for a dollar amount:</p>
+
+<pre><code>class UserCreditRewardListener
+{
+    private $creditManager;
+
+    // ...
+
+    public function onUserCreditReward(UserCreditRewardEvent $event)
     {
-        $order = $eventArgs-&gt;getEntity();
-        $em = $eventArgs-&gt;getEntityManager();
-        $productReflProp = $em-&gt;getClassMetadata('Entities\Order')
-            -&gt;reflClass-&gt;getProperty('product');
-        $productReflProp-&gt;setAccessible(true);
-        $productReflProp-&gt;setValue(
-            $order, $this-&gt;dm-&gt;getReference('Documents\Product', $order-&gt;getProductId())
+        $this-&gt;creditManager-&gt;issueCredit(
+            $event-&gt;getUser(),
+            $event-&gt;getAmount()
         );
     }
 }
 </code></pre>
 
-<p>The <code>postLoad</code> method will be invoked after an ORM entity is loaded from the database. This allows us to use the <code>DocumentManager</code> to set the <code>$product</code> property with a reference to the <code>Product</code> document with the product id we previously stored.</p>
+<p>Now to bring it all together we need a <code>RuleSubcriber</code> to lookup the <code>Rule</code> objects from the database when events occur in our application. This class will evaluate the rules and then dispatch the resulting action events when the expressions return true.</p>
 
-<p>First create a new <code>Product</code>:</p>
+<pre><code>use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-<pre><code>$product = new \Documents\Product();
-$product-&gt;setTitle('Test Product');
-$dm-&gt;persist($product);
-$dm-&gt;flush();
-</code></pre>
-
-<p>Now create a new <code>Order</code> and link it to a <code>Product</code> in MySQL:</p>
-
-<pre><code>$order = new \Entities\Order();
-$order-&gt;setProduct($product);
-$em-&gt;persist($order);
-$em-&gt;flush();
-</code></pre>
-
-<p>Later we can retrieve the entity and lazily load the reference to the document in MongoDB:</p>
-
-<pre><code>$order = $em-&gt;find('Order', $order-&gt;getId());
-
-// Instance of an uninitialized product proxy
-$product = $order-&gt;getProduct();
-
-// Initializes proxy and queries the database
-echo "Order Title: " . $product-&gt;getTitle();
-</code></pre>
-
-<p>If you were to print the <code>$order</code> you would see that we got back regular PHP objects:</p>
-
-<pre><code>print_r($order);
-</code></pre>
-
-<p>The above would output the following:</p>
-
-<pre><code>Order Object
-(
-    [id:Entities\Order:private] =&gt; 53
-    [productId:Entities\Order:private] =&gt; 4c74a1868ead0ed7a9000000
-    [product:Entities\Order:private] =&gt; Proxies\DocumentsProductProxy Object
-        (
-            [__isInitialized__] =&gt; 1
-            [id:Documents\Product:private] =&gt; 4c74a1868ead0ed7a9000000
-            [title:Documents\Product:private] =&gt; Test Product
-        )
-
-)
-</code></pre>
-
-<p>That is it! It is not a very abstract example right now but it demonstrates how to utilize the events to do some very interesting things with the Doctrine persistence libraries! I hope that now someone will inspired to create an extension that offers an abstract solution for blending the ORM and ODM together!</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/08/19/new-doctrine-mongodb-odm-documentation">New Doctrine MongoDB ODM Documentation</a></h2>
-        </header>
-        <div>
-            <p>Yesterday I added a few new chapters to the <a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/en" target="_blank">Doctrine MongoDB ODM Documentation</a>:</p>
-
-<ul><li><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/capped-collections/en" target="_blank">Capped Collections</a></li>
-<li><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/indexes/en" target="_blank">Indexes</a></li>
-<li><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/geospatial-queries/en" target="_blank">Geospatial Queries</a></li>
-<li><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/trees/en" target="_blank">Storing Trees/Hierarchical Data</a></li>
-</ul>
-
-<p>I hope it is helpful to someone! :)</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/08/02/doctrine-annotations-library">Doctrine Annotations Library</a></h2>
-        </header>
-        <div>
-            <p>The Doctrine Annotations library was born from a need in the Doctrine2 ORM to allow the mapping information to be specified inside the doc-blocks of classes, properties and methods. The library is independent and can be used in your own libraries to implement doc block annotations.</p>
-
-<h2>Setup and Configuration</h2>
-
-<p>To use the annotations library is simple, you just need to create a new <code>AnnotationReader</code>
-instance:</p>
-
-<pre><code>$reader = new \Doctrine\Common\Annotations\AnnotationReader();
-</code></pre>
-
-<h2>Usage</h2>
-
-<p>Using the library API is simple. Imagine you had some annotation classes that looked like the following:</p>
-
-<pre><code>namespace MyCompany\Annotations;
-
-class Foo extends \Doctrine\Common\Annotations\Annotation
+class RuleSubcriber implements EventSubscriberInterface
 {
-    public $bar;
-}
+    private $dm;
+    private $expressionLanguage;
+    private $actionEventFactory;
 
-class Bar extends \Doctrine\Common\Annotations\Annotation
-{
-    public $foo;
-}
-</code></pre>
+    // ...
 
-<p>Now to use the annotations you would just need to do the following:</p>
-
-<pre><code>/**
- * @MyCompany\Annotations\Foo(bar="test")
- * @MyCompany\Annotations\Bar(foo="test")
- */
-class User
-{
-}
-</code></pre>
-
-<p>Now we can write a script to get the annotations above:</p>
-
-<pre><code>$reflClass = new ReflectionClass('User');
-$classAnnotations = $reader-&gt;getClassAnnotations($reflClass);
-echo $classAnnotations['MyCompany\Annotations\Foo']-&gt;bar; // prints foo
-echo $classAnnotations['MyCompany\Annotations\Foo']-&gt;foo; // prints bar
-</code></pre>
-
-<p>You have a complete API for retrieving annotation class instances from a class, property
-or method docblock:</p>
-
-<ul><li>getClassAnnotations(ReflectionClass $class)</li>
-<li>getClassAnnotation(ReflectionClass $class, $annotation)</li>
-<li>getPropertyAnnotations(ReflectionProperty $property)</li>
-<li>getPropertyAnnotation(ReflectionProperty $property, $annotation)</li>
-<li>getMethodAnnotations(ReflectionMethod $method)</li>
-<li>getMethodAnnotation(ReflectionMethod $method, $annotation)</li>
-</ul>
-
-<p>Read the full <a href="http://www.doctrine-project.org/projects/common/2.0/docs/reference/annotations/en" target="_blank">documentation</a> to learn more about how to use the Doctrine annotations library!</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/07/31/array-dereferencing-in-php-trunk">Array dereferencing in PHP trunk</a></h2>
-        </header>
-        <div>
-            <p>Today I was reading an <a href="http://schlueters.de/blog/archives/138-Features-in-PHP-trunk-Array-dereferencing.html" target="_blank">article</a> about array dereferencing in PHP trunk. It is an awesome new feature added to PHP! Imagine you had some code like this:</p>
-
-<pre><code>class Foo
-{
-    public function bar()
+    public static function getSubscribedEvents()
     {
+        return array(
+            UserAddToCartEvent::onUserAddToCart =&gt; array('handleEvent', 0),
+        );
     }
-}
 
-function func()
-{
-    return new Foo();
-}
-</code></pre>
-
-<p>Previous to this addition in PHP you had to do something like this:</p>
-
-<pre><code>$foo = func();
-$foo-&gt;bar();
-</code></pre>
-
-<p>Now it is possible to just call bar() directly without having to set the return of func() to a variable temporarily:</p>
-
-<pre><code>func()-&gt;bar();
-</code></pre>
-
-<p>You can also now access arrays when they are the return of a method:</p>
-
-<pre><code>function foo()
-{
-    return array(1, 2, 3);
-}
-echo foo()[2]; // prints 3
-</code></pre>
-
-<p>This greatly improves the syntax of PHP and I am very happy to see this committed!</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/07/30/doctrine-mongodb-odm-schema-migrations">Doctrine MongoDB ODM Schema Migrations</a></h2>
-        </header>
-        <div>
-            <p><a href="http://www.mongodb.org" target="_blank">MongoDB</a> is a schema-less database so as your domain model changes in Doctrine, you&rsquo;ll have newer documents with different fields than older documents. Since we don&rsquo;t have a way to rename a field internally in MongoDB, <a href="http://jira.mongodb.org/browse/SERVER-394" target="_blank">yet</a>, the only other option is to fetch all the documents and rename it in your application and update the document. This could take a really long time depending on how big your database is and will require downtime.</p>
-
-<p>Doctrine provides ways for you to &ldquo;eventually&rdquo; migrate all your documents at application run-time. You have several options for working with database schema changes and this blog post will try and demonstrate them!</p>
-
-<h2>Renaming a Field</h2>
-
-<p>Imagine you have a document in your domain named Person and it looked like this:</p>
-
-<pre><code>/** @Document */
-class Person
-{
-    /** @Id */
-    public $id;
-
-    /** @String */
-    public $name;
-}
-</code></pre>
-
-<p>Then imagine later you decide you want to rename $name to $fullName like this:</p>
-
-<pre><code>/** @Document */
-class Person
-{
-    /** @Id */
-    public $id;
-
-    /** @String */
-    public $fullName;
-}
-</code></pre>
-
-<p>All documents from now on will be created with a fullName property but you&rsquo;ll still have old documents with the name field. You can use the @AlsoLoad annotation here to also load another fields value in that property if it exists:</p>
-
-<pre><code>/** @Document */
-class Person
-{
-    /** @Id */
-    public $id;
-
-    /**
-     * @String
-     * @AlsoLoad("name")
-     */
-    public $fullName;
-}
-</code></pre>
-
-<h2>Transforming Data</h2>
-
-<p>Another situation might be you want to load the name and fullName fields in to individual first and last name fields. We can handle this using the @AlsoLoad annotation on a method:</p>
-
-<pre><code>/** @Document */
-class Person
-{
-    /** @Id */
-    public $id;
-
-    /** @String */
-    public $firstName;
-
-    /** @String */
-    public $lastName;
-
-    /** @AlsoLoad({"name", "fullName"}) */
-    public function populateFirstAndLastName($fullName)
+    public function handleEvent(Event $event)
     {
-        $e = explode(' ', $fullName);
-        $this-&gt;firstName = $e[0];
-        $this-&gt;lastName = $e[1];
+        $rules = $this-&gt;findRulesByEventName($event-&gt;getName());
+
+        foreach ($rules as $rule) {
+            if ($this-&gt;evaluateRule($rule, $event)) {
+                $this-&gt;dispatchActionEvents($rule, $event);
+            }
+        }
+    }
+
+    private function findRulesByEventName($eventName)
+    {
+        return $this-&gt;dm-&gt;createQueryBuilder()
+            -&gt;field('eventNames')-&gt;equals($eventName)
+            -&gt;getQuery()
+            -&gt;execute();
+    }
+
+    private function evaluateRule(Rule $rule, Event $event)
+    {
+        return $this-&gt;expressionLanguage-&gt;evaluate($rule-&gt;getExpression(), array(
+            'event' =&gt; $event,
+        ));
+    }
+
+    private function dispatchActionEvents(Rule $rule, Event $event)
+    {
+        foreach ($rule-&gt;getActionEvents() as $action) {
+            $this-&gt;dispatchActionEvent($action, $rule, $event);
+        }
+    }
+
+    private function dispatchActionEvent(array $action, Rule $rule, Event $event)
+    {
+        $recipientUser = $this-&gt;expressionLanguage($action['recipientExpression'], array(
+            'event' =&gt; $event,
+        ));
+
+        $actionEvent = $this-&gt;actionEventFactory-&gt;createActionEvent(
+            $action,
+            $recipientUser,
+            $rule
+        );
+
+        $this-&gt;dispatcher-&gt;dispatch($action['eventName'], $actionEvent);
     }
 }
 </code></pre>
 
-<p>So when a document has a field named name, or fullName it will execute the populateFirstAndLastName() method to handle the change when the document is loaded.</p>
+<p>The <code>ActionEventFactory</code> used in the above <code>RuleSubcriber</code> is a simple service used to create the action events we dispatch for our rules.</p>
 
-<h2>Moving Fields</h2>
-
-<p>You also have a few other options for dealing with changes in your model:</p>
-
-<ul><li>@PostLoad - execute code after all fields have been loaded.</li>
-<li>@PrePersist - execute code before your document gets saved.</li>
-<li>@NotSaved - load values into fields without saving them again.</li>
-</ul>
-
-<p>Imagine you have some address fields on a Person document:</p>
-
-<pre><code>/** @Document(collection="people") */
-class Person
+<pre><code>class ActionEventFactory
 {
-    /** @Id */
-    public $id;
-
-    /** @String */
-    public $name;
-
-    /** @String */
-    public $street;
-
-    /** @String */
-    public $city;
-}
-</code></pre>
-
-<p>Then later you want to store a persons address in another object as an embedded document:</p>
-
-<pre><code>/** @EmbeddedDocument */
-class Address
-{
-    /** @String */
-    public $street;
-
-    /** @String */
-    public $city;
-
-    public function __construct($street, $city)
+    public function createActionEvent(array $action, User $user, Rule $rule)
     {
-        $this-&gt;street = $street;
-        $this-&gt;city = $city;
-    }
-}
+        switch ($action['eventName']) {
+            // ...
 
-/**
- * @Document(collection="people")
- * @HasLifecycleCallbacks
- */
-class Person
-{
-    /** @Id */
-    public $id;
-
-    /** @String */
-    public $name;
-
-    /** @NotSaved */
-    public $street;
-
-    /** @NotSaved */
-    public $city;
-
-    /** @EmbedOne(targetDocument="Address") */
-    public $address;
-
-    /** @PostLoad */
-    public function postLoad()
-    {
-        if ($this-&gt;street !== null || $this-&gt;city !== null)
-        {
-            $this-&gt;address = new Address($this-&gt;street, $this-&gt;city);
+            case UserCreditRewardEvent::onUserCreditReward:
+                return new UserCreditRewardEvent($user, $action['attributes']['amount']);
         }
     }
 }
 </code></pre>
 
-<p>The above will change the document each time it is loaded. If you want to change it permanently in the database you can do it when the document is being updated:</p>
-
-<pre><code>/**
-  * @Document(collection="people")
-  * @HasLifecycleCallbacks
-  */
-class Person
-{
-    // ...
-
-    /** @PreUpdate */
-    public function preUpdate()
-    {
-        if ($this-&gt;street !== null || $this-&gt;city !== null)
-        {
-            $this-&gt;address = new Address($this-&gt;street, $this-&gt;city);
-        }
-    }
-}
-</code></pre>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/07/28/setting-entitydocument-references-without-hitting">Setting Entity/Document references without hitting the database</a></h2>
-        </header>
-        <div>
-            <p>In <a href="http://www.doctrine-project.org/projects/orm/1.2/docs/en" target="_blank">Doctrine 1</a> when you want to specify a reference you have two options, you can set the foreign key manually:</p>
-
-<pre><code>$user-&gt;setProfileId($profileId);
-$user-&gt;save();
-</code></pre>
-
-<p>The problem here is that the profile_id is set in the object but the reference to a Profile instance is not set. The next option is to actually set the object reference:</p>
-
-<pre><code>$profile = Doctrine_Core::getTable('Profile')-&gt;find($profileId);
-$user-&gt;setProfile($profile);
-$user-&gt;save();
-</code></pre>
-
-<p>Here the reference is set properly but the downside to this approach is that it requires us to load the entire Profile object just to set the reference. It is silly! Thanks to the <a href="http://www.doctrine-project.org/projects/orm" target="_blank">Doctrine2 ORM</a> and <a href="http://www.doctrine-project.org/projects/mongodb_odm" target="_blank">MongoDB ODM</a> you have the ability to retrieve a reference to an object without having to hit the database. Here is an example:</p>
-
-<pre><code>$profile = $em-&gt;getReference('Profile', $profileId);
-$user-&gt;setProfile($profile);
-$em-&gt;flush();
-</code></pre>
-
-<p>Or the same thing with the MongoDB ODM:</p>
-
-<pre><code>$profile = $dm-&gt;getReference('Profile', $profileId);
-$user-&gt;setProfile($profile);
-$dm-&gt;flush();
-</code></pre>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/07/28/inheritance-and-mapped-super-classes-in-doctrine">Inheritance and Mapped Super Classes in Doctrine</a></h2>
-        </header>
-        <div>
-            <p><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/inheritance-mapping/en#single-collection-inheritance" target="_blank">Single Collection Inheritance</a> in the <a href="http://www.doctrine-project.org/projects/mongodb_odm" target="_blank">Doctrine MongoDB ODM</a> allows you to map multiple classes in an inheritance hierarchy to a single collection in <a href="http://www.mongodb.org" target="_blank">MongoDB</a>. An example might be in a CMS where you have several different content types like the base Node, Page and BlogPost which all extends an abstract ContentType class.</p>
-
-<p>First define the ContentType class that is a @MappedSuperclass:</p>
-
-<pre><code>/**
- * @MappedSuperclass
- * @HasLifecycleCallbacks
- */
-abstract class ContentType
-{
-    /** @Id */
-    protected $id;
-
-    /** @Date */
-    protected $createdAt;
-
-    /** @Date */
-    protected $updatedAt;
-
-    public function getId()
-    {
-        return $this-&gt;id;
-    }
-
-    /** @PreUpdate */
-    public function preUpdate()
-    {
-        $this-&gt;updatedAt = new DateTime();
-    }
-
-    /** @PrePersist */
-    public function prePersist()
-    {
-        $this-&gt;createdAt = new DateTime();
-        $this-&gt;updatedAt = new DateTime();
-    }
-}
-</code></pre>
-
-<p>Now we can define our base Node content type:</p>
-
-<pre><code>/**
- * @Document(collection="pages")
- * @InheritanceType("SINGLE_COLLECTION")
- * @DiscriminatorField(fieldName="type")
- * @DiscriminatorMap({
- *   "node"="Node",
- *   "page"="Page",
- *   "blog_post"="BlogPost"
- * })
- */
-class Node extends ContentType
-{
-    /** @String */
-    protected $title;
-
-    public function getTitle()
-    {
-        return $this-&gt;title;
-    }
-
-    public function setTitle($title)
-    {
-        $this-&gt;title = $title;
-    }
-}
-</code></pre>
-
-<p>This gives us our base content type node functionality that we can extend to create the Page document which adds a body field for the page:</p>
-
-<pre><code>/** @Document */
-class Page extends Node
-{
-    /** @String */
-    protected $body;
-
-    public function getBody()
-    {
-        return $this-&gt;body;
-    }
-
-    public function setBody($body)
-    {
-        $this-&gt;body = $body;
-    }
-}
-</code></pre>
-
-<p>And the BlogPost document is a custom type of page that adds some additional fields related to blog posts like an excerpt and tags:</p>
-
-<pre><code>/** @Document */
-class BlogPost extends Page
-{
-    /** @Collection */
-    private $tags = array();
-
-    /** @String */
-    private $excerpt;
-
-    public function getExcerpt()
-    {
-        return $this-&gt;excerpt;
-    }
-
-    public function setExcerpt($excerpt)
-    {
-        $this-&gt;excerpt = $excerpt;
-    }
-
-    public function addTag($tag)
-    {
-        $this-&gt;tags[] = $tag;
-    }
-
-    public function removeTag($tag)
-    {
-        $key = array_search($tag, $this-&gt;tags);
-        if ($key !== false) {
-            unset($this-&gt;tags[$key]);
-        }
-    }
-
-    public function getTags()
-    {
-        return $this-&gt;tags;
-    }
-}
-</code></pre>
-
-<p>You can easily add new content types by mapping a document class that extends the base Node. All your documents will be stored in a single collection and a discriminator field will be used to discriminate which class created each document.</p>
-
-<p>Now we can use our document classes and create new instances and persist them. Here is an example where we create a new blog post:</p>
-
-<pre><code>$post = new BlogPost();
-$post-&gt;setTitle('Test');
-$post-&gt;setExcerpt('Testing');
-$post-&gt;setBody('w00t');
-$post-&gt;addTag('test');
-$dm-&gt;persist($post);
-$dm-&gt;flush();
-</code></pre>
-
-<p>The above would result in a document like the following in MongoDB:</p>
-
-<pre><code>Array
-(
-    [_id] =&gt; 4c4f38978ead0ef23f000000
-    [createdAt] =&gt; MongoDate Object
-        (
-            [sec] =&gt; 1280260247
-            [usec] =&gt; 0
-        )
-
-    [updatedAt] =&gt; MongoDate Object
-        (
-            [sec] =&gt; 1280260247
-            [usec] =&gt; 0
-        )
-
-    [title] =&gt; Test
-    [body] =&gt; w00t
-    [tags] =&gt; Array
-        (
-            [0] =&gt; test
-        )
-
-    [excerpt] =&gt; Testing
-    [type] =&gt; blog_post
-)
-</code></pre>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/07/27/using-yql-to-get-geo-location-information-for-an">Using YQL to get geo location information for an IP address</a></h2>
-        </header>
-        <div>
-            <p>The <a href="http://developer.yahoo.com/yql/" target="_blank">Yahoo! YQL API</a> has the ability to provide geo location information for IP addresses. Using this in PHP is dead simple. Here is a barebones example demonstrating how you can use PHP and YQL for this:</p>
-
-<pre><code>$ipAddress = '76.22.200.69';
-$query = sprintf("select * from ip.location where ip='%s'", $ipAddress);
-$queryUrl = "http://query.yahooapis.com/v1/public/yql?q=" . urlencode($query)."&amp;format=json&amp;env=".urlencode("store://datatables.org/alltableswithkeys");
-$json = file_get_contents($queryUrl);
-$data = json_decode($json);
-print_r($data);
-</code></pre>
-
-<p>The above code would output the following:</p>
-
-<pre><code>stdClass Object
-(
-    [query] =&gt; stdClass Object
-        (
-            [count] =&gt; 1
-            [created] =&gt; 2010-07-27T04:27:20Z
-            [lang] =&gt; en-US
-            [results] =&gt; stdClass Object
-                (
-                    [Response] =&gt; stdClass Object
-                        (
-                            [Ip] =&gt; 76.22.200.69
-                            [Status] =&gt; OK
-                            [CountryCode] =&gt; US
-                            [CountryName] =&gt; United States
-                            [RegionCode] =&gt; 47
-                            [RegionName] =&gt; Tennessee
-                            [City] =&gt; Nashville
-                            [ZipPostalCode] =&gt; 37205
-                            [Latitude] =&gt; 36.1121
-                            [Longitude] =&gt; -86.863
-                            [Timezone] =&gt; 0
-                            [Gmtoffset] =&gt; 0
-                            [Dstoffset] =&gt; 0
-                        )
-
-                )
-
-        )
-
-)
-</code></pre>
-
-<p>I took this a step further and built a little abstraction layer on top of this functionality. Now, retrieving geo location information for IP addresses using the YQL API is easier than ever using the PHP YQL Geo Locator library. You can get the code on <a href="http://github.com/jwage/php-yql-geo-locator" target="_blank">github</a>. Continue reading to learn how to get started!</p>
-
-<p>First, clone the git repository:</p>
-
-<pre><code>$ git clone git://github.com/jwage/php-yql-geo-locator.git
-</code></pre>
-
-<p>Now you need to setup your code to use the library:</p>
-
-<pre><code>use GeoLocator\Locator;
-use GeoLocator\Location;
-use GeoLocator\GoogleMapImage;
-
-require 'php-yql-geo-locator/lib/GeoLocator/Location.php';
-require 'php-yql-geo-locator/lib/GeoLocator/Locator.php';
-require 'php-yql-geo-locator/lib/GeoLocator/GoogleMapImage.php';
-</code></pre>
-
-<p>After setting everything up you are ready to start working with geo locations
-using the locator API:</p>
-
-<ul><li>getGeoLocation($ip)</li>
-<li>getGoogleMapImageForIps(array $ips)</li>
-<li>getGoogleMapImageForIp($ip)</li>
-</ul>
-
-<p>Here is an example using the getGeoLocation() method:</p>
-
-<pre><code>$geoLocation = $locator-&gt;getGeoLocation('76.22.200.69');
-</code></pre>
-
-<p>It returns an instance of GeoLocator\Location and has a simple public API for retrieving the geo location information for the IP address:</p>
-
-<pre><code>echo $geoLocation-&gt;getLatitude();
-</code></pre>
-
-<p>You can also export all the information to a PHP array using the toArray() method:</p>
-
-<pre><code>print_r($geoLocation-&gt;toArray());
-</code></pre>
-
-<p>It would result in an array that looks like this:</p>
-
-<pre><code>Array
-(
-    [ip] =&gt; 76.22.200.69
-    [countryCode] =&gt; US
-    [countryName] =&gt; United States
-    [regionCode] =&gt; 47
-    [regionName] =&gt; Tennessee
-    [city] =&gt; Nashville
-    [zipPostalCode] =&gt; 37205
-    [latitude] =&gt; 36.1121
-    [longitude] =&gt; -86.863
-    [timezone] =&gt; 0
-    [gmtOffset] =&gt; 0
-    [dstOffset] =&gt; 0
-)
-</code></pre>
-
-<p>Get a google map that plots multiple IP addresses:</p>
-
-<pre><code>$image = $locator-&gt;getGoogleMapImageForIps(array(
-    '76.22.200.69',
-    '74.125.65.106'
-));
-</code></pre>
-
-<p>The above method returns an instance of GoogleMapImage and has the following API:</p>
-
-<ul><li>setWidth($width)</li>
-<li>setHeight($height)</li>
-<li>setMaptype($maptype)</li>
-<li>setSensor($sensor)</li>
-<li>setZoom($zoom)</li>
-<li>addLocation(Location $location)</li>
-<li>getUrl()</li>
-<li>getHTMLImageTag()</li>
-<li>__toString()</li>
-</ul>
-
-<p>Now you can just echo the $image to get the HTML image:</p>
-
-<pre><code>echo $image;
-</code></pre>
-
-<p>The above would result in an image tag that looks like the following:</p>
-
-<pre><code>&lt;img src="http://maps.google.com/maps/api/staticmap?zoom=&amp;size=550x550&amp;maptype=roadmap&amp;sensor=false&amp;markers=color:blue|label:76.22.200.69|36.1121,-86.863&amp;markers=color:blue|label:74.125.65.106|37.4192,-122.057" width="550" height="550" /&gt;
-</code></pre>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/07/27/storing-files-with-mongodb-gridfs">Storing Files with MongoDB GridFS</a></h2>
-        </header>
-        <div>
-            <p>The <a href="http://www.php.net/mongo" target="_blank">PHP MongoDB</a> extension provides a nice and convenient way to store files in chunks of data with the <a href="http://us.php.net/manual/en/class.mongogridfs.php" target="_blank">MongoDB GridFS</a>. It uses two database collections, one to store the metadata for the file, and another to store the contents of the file. The contents are stored in chunks to avoid going over the maximum allowed size of a MongoDB document.</p>
-
-<p>You can easily setup a Document that is stored using the MongoDB GridFS by using the @File annotation:</p>
-
-<pre><code>namespace Documents;
-
-/** @Document(collection="files") */
-class Image
-{
-    /** @Id */
-    private $id;
-
-    /** @String */
-    private $name;
-
-    /** @File */
-    private $file;
-
-    private function getId()
-    {
-        return $this-&gt;id;
-    }
-
-    private function setName($name)
-    {
-        $this-&gt;name = $name;
-    }
-
-    private function getName()
-    {
-        return $this-&gt;name;
-    }
-
-    private function getFile()
-    {
-        return $this-&gt;file;
-    }
-
-    private function setFile($file)
-    {
-        $this-&gt;file = $file;
-    }
-}
-</code></pre>
-
-<p>Notice the $file property with @File annotation, it tells the Document that it is is to be stored using the MongoGridFS and the <a href="http://www.php.net/MongoGridFSFile" target="_blank">MongoGridFSFile</a> instance is placed in the $file property for you.</p>
-
-<p>Now you can create a new Image setting the path to a file and persist it:</p>
-
-<pre><code>$image = new Image();
-$image-&gt;setName('Test image');
-$image-&gt;setFile('/path/to/image.png');
-
-$dm-&gt;persist($image);
-$dm-&gt;flush();
-</code></pre>
-
-<p>Then later you can retrieve that image and render it:</p>
-
-<pre><code>$image = $dm-&gt;createQuery('Documents\Image')
-    -&gt;field('name')
-    -&gt;equals('Test image')
-    -&gt;getSingleResult();
-
-header('Content-type: image/png;');
-echo $image-&gt;getFile()-&gt;getBytes();
-</code></pre>
-
-<p>You can of course make references to this Image document from another document.
-Imagine you had a Profile document and you wanted every Profile to have a profile
-image:</p>
-
-<pre><code>namespace Documents;
-
-/** @Document(collection="profiles") */
-class Profile
-{
-    /** @Id */
-    private $id;
-
-    /** @String */
-    private $name;
-
-    /** @ReferenceOne(targetDocument="Documents\Image") */
-    private $image;
-
-    private function getId()
-    {
-      return $this-&gt;id;
-    }
-
-    private function getName()
-    {
-        return $this-&gt;name;
-    }
-
-    private function setName($name)
-    {
-        $this-&gt;name = $name;
-    }
-
-    private function getImage()
-    {
-        return $this-&gt;image;
-    }
-
-    private function setImage(Image $image)
-    {
-        $this-&gt;image = $image;
-    }
-}
-</code></pre>
-
-<p>Now you can create a new Profile and give it an Image:</p>
-
-<pre><code>$image = new Image();
-$image-&gt;setName('Test image');
-$image-&gt;setFile('/path/to/image.png');
-
-$profile = new Profile();
-$profile-&gt;setName('Jonathan H. Wage');
-$profile-&gt;setImage($image);
-
-$dm-&gt;persist($profile);
-$dm-&gt;flush();
-</code></pre>
-
-<p>If you want to query for the Profile and load the Image reference in a query
-you can use:</p>
-
-<pre><code>$profile = $dm-&gt;createQuery('Profile')
-    -&gt;field('name')-&gt;equals('Jonathan H. Wage')
-    -&gt;getSingleResult();
-
-$image = $profile-&gt;getImage();
-
-header('Content-type: image/png;');
-echo $image-&gt;getFile()-&gt;getBytes();
-</code></pre>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/07/27/multiple-levels-of-embedded-documents-in-mongodb">Multiple levels of Embedded Documents in MongoDB</a></h2>
-        </header>
-        <div>
-            <p>One of the greatest things about <a href="http://www.mongodb.org" target="_blank">MongoDB</a> is the fact that it is schema-less. It makes for a very flexible domain model persistence layer. For example it is possible to have multiple levels of embedded documents. A useful example might be where you have many profiles and each profile has many addresses. In the <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a> MongoDB <a href="http://www.doctrine-project.org/projects/odm" target="_blank">ODM</a> mapping this is trivial.</p>
-
-<p>First create your top level <code>User</code> document:</p>
-
-<pre><code>/** @Document(collection="users") */
-class User
-{
-    /** @Id */
-    private $id;
-
-    /** @String */
-    private $username;
-
-    /** @EmbedMany(targetDocument="Profile") */
-    private $profiles = array();
-
-    public function setUsername($username)
-    {
-        $this-&gt;username = $username;
-    }
-
-    public function addProfile(Profile $profile)
-    {
-        $this-&gt;profiles[] = $profile;
-    }
-}
-</code></pre>
-
-<p>As you can see we embed another document class named Profile so lets define that as an embedded document:</p>
-
-<pre><code>/** @EmbeddedDocument */
-class Profile
-{
-    /** @String */
-    private $name;
-
-    /** @EmbedMany(targetDocument="Address") */
-    private $addresses = array();
-
-    public function setName($name)
-    {
-        $this-&gt;name = $name;
-    }
-
-    public function addAddress(Address $address)
-    {
-        $this-&gt;addresses[] = $address;
-    }
-}
-</code></pre>
-
-<p>Finally, we&rsquo;ve embedded a document in Profile named Address so lets define it:</p>
-
-<pre><code>/** @EmbeddedDocument */
-class Address
-{
-    /** @String */
-    private $number;
-
-    /** @String */
-    private $street;
-
-    /** @String */
-    private $city;
-
-    /** @String */
-    private $state;
-
-    /** @String */
-    private $zipcode;
-
-    public function setNumber($number)
-    {
-        $this-&gt;number = $number;
-    }
-
-    public function setStreet($street)
-    {
-        $this-&gt;street = $street;
-    }
-
-    public function setCity($city)
-    {
-        $this-&gt;city = $city;
-    }
-
-    public function setState($state)
-    {
-        $this-&gt;state = $state;
-    }
-
-    public function setZipcode($zipcode)
-    {
-        $this-&gt;zipcode = $zipcode;
-    }
-}
-</code></pre>
-
-<p>Now you can start working with the PHP objects just like you would if no persistence layer was present at all and persist the objects transparently when you are ready to have the state of the objects managed by Doctrine:</p>
-
-<pre><code>$user = new User();
-$user-&gt;setUsername('jwage');
-
-$profile = new Profile();
-$profile-&gt;setName('Profile #1');
-
-$user-&gt;addProfile($profile);
-
-$address = new Address();
-$address-&gt;setNumber('6512');
-$address-&gt;setStreet('Mercomatic');
-$address-&gt;setCity('Nashville');
-$address-&gt;setState('Tennessee');
-$address-&gt;setZipcode('37209');
-
-$profile-&gt;addAddress($address);
-
-$profile = new Profile();
-$profile-&gt;setName('Profile #2');
-
-$user-&gt;addProfile($profile);
-
-$address = new Address();
-$address-&gt;setNumber('475');
-$address-&gt;setStreet('Buckhead Ave');
-$address-&gt;setCity('Atlanta');
-$address-&gt;setState('Georgia');
-$address-&gt;setZipcode('30303');
-
-$profile-&gt;addAddress($address);
-
-$dm-&gt;persist($user);
-$dm-&gt;flush();
-</code></pre>
-
-<p>The above would result in an array being stored in MongoDB like the following:</p>
-
-<pre><code>Array
-(
-    [_id] =&gt; MongoId Object
-        (
-        )
-    [username] =&gt; jwage
-    [profiles] =&gt; Array
-        (
-            [0] =&gt; Array
-                (
-                    [name] =&gt; Profile #1
-                    [addresses] =&gt; Array
-                        (
-                            [0] =&gt; Array
-                                (
-                                    [number] =&gt; 6512
-                                    [street] =&gt; Mercomatic
-                                    [city] =&gt; Nashville
-                                    [state] =&gt; Tennessee
-                                    [zipcode] =&gt; 37209
-                                )
-                        )
-                )
-            [1] =&gt; Array
-                (
-                    [name] =&gt; Profile #2
-                    [addresses] =&gt; Array
-                        (
-                            [0] =&gt; Array
-                                (
-                                    [number] =&gt; 475
-                                    [street] =&gt; Buckhead Ave
-                                    [city] =&gt; Atlanta
-                                    [state] =&gt; Georgia
-                                    [zipcode] =&gt; 30303
-                                )
-                        )
-                )
-        )
-)
-</code></pre>
-
-<p>We can then later retrieve the documents from MongoDB and our object domain model will be reconstructed as you have mapped it:</p>
-
-<pre><code>$user = $dm-&gt;findOne('User', array('username' =&gt; 'jwage'));
-</code></pre>
-
-<p>You can see the complete working script for this blog post as a gist on <a href="http://gist.github.com/492509" target="_blank">github</a>.</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/07/26/executing-sql-after-loading-your-data-fixtures-in">Executing SQL after loading your data fixtures in symfony 1.4</a></h2>
-        </header>
-        <div>
-            <p>Sometimes you may need to execute some SQL after your data fixtures are loaded in <a href="http://www.symfony-project.org" target="_blank">symfony</a> 1.4 if you need to do something that is specific to your RDBMS that is not supported by <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a> or <a href="http://www.propelorm.org" target="_blank">Propel</a>. Thankfully symfony 1.4 has many well placed events which allow you to hook in to core functionality and execute your own code when certain actions are performed.</p>
-
-<p>Here is an example where you execute some manually SQL statements after the doctrine:data-load task:</p>
-
-<pre><code>class ProjectConfiguration extends sfProjectConfiguration
-{
-  public function setup()
-  {
-    // ...
-    $this-&gt;dispatcher-&gt;connect('command.post_command', array(
-      $this, 'listenToCommandPostCommandEvent'
-    ));
-  }
-
-  public function listenToCommandPostCommandEvent(sfEvent $event)
-  {
-    $invoker = $event-&gt;getSubject();
-    if ($invoker instanceof sfDoctrineDataLoadTask)
-    {
-      $conn = Doctrine_Manager::connection();
-      $conn-&gt;exec(// ...);
-    }
-  }
-}
-</code></pre>
-
-<p>Symfony 1.4 has many events that you can use to customize things when developing your project. <a href="http://www.symfony-project.org/reference/1_4/en/15-Events" target="_blank">Read more</a> about events in the 1.4 documentation.</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/post/2010/07/26/doctrine-mongodb-object-document-mapper-in">Doctrine MongoDB Object Document Mapper in Symfony2</a></h2>
-        </header>
-        <div>
-            <h1>MongoDB</h1>
-
-<p>The <a href="http://www.mongodb.org/" target="_blank">MongoDB</a> Object Document Mapper is much like the Doctrine2 ORM in the
-way it works and architecture. You only deal with plain PHP objects and they are persisted
-transparently without imposing on your domain model.</p>
-
-<blockquote>
-  <p><strong>TIP</strong>
-  You can read more about the Doctrine MongoDB Object Document Mapper on the
-  projects <a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/en" target="_blank">documentation</a>.</p>
-</blockquote>
-
-<h2>Configuration</h2>
-
-<p>To get started working with Doctrine and the MongoDB Object Document Mapper you just need
-to enable it:</p>
-
-<pre><code># config/config.yml
-doctrine_odm.mongodb: ~
-</code></pre>
-
-<p>The above YAML is the most simple example and uses all of the default values provided, if
-you need to customize more you can specify the complete configuration:</p>
-
-<pre><code># config/config.yml
-doctrine_odm.mongodb:
-  server: mongodb://localhost:27017
-  options:
-    connect: true
-  metadata_cache_driver: array # array, apc, xcache, memcache
-</code></pre>
-
-<p>If you wish to use memcache to cache your metadata and you need to configure the <code>Memcache</code> instance you can do the following:</p>
-
-<pre><code># config/config.yml
-doctrine_odm.mongodb:
-  server: mongodb://localhost:27017
-  options:
-    connect: true
-  metadata_cache_driver:
-    type: memcache
-    class: Doctrine\Common\Cache\MemcacheCache
-    host: localhost
-    port: 11211
-    instance_class: Memcache
-</code></pre>
-
-<h3>Multiple Connections</h3>
-
-<p>If you need multiple connections and document managers you can use the following syntax:</p>
-
-<pre><code>doctrine_odm.mongodb:
-  default_connection: conn2
-  default_document_manager: dm2
-  metadata_cache_driver: apc
-  connections:
-    conn1:
-      server: mongodb://localhost:27017
-      options:
-        connect: true
-    conn2:
-      server: mongodb://localhost:27017
-      options:
-        connect: true
-  document_managers:
-    dm1:
-      connection: conn1
-      metadata_cache_driver: xcache
-    dm2:
-      connection: conn2
-</code></pre>
-
-<p>Now you can retrieve the configured services connection services:</p>
-
-<pre><code>$conn1 = $container-&gt;getService('doctrine.odm.mongodb.conn1_connection');
-$conn2 = $container-&gt;getService('doctrine.odm.mongodb.conn2_connection');
-</code></pre>
-
-<p>And you can also retrieve the configured document manager services which utilize the above
-connection services:</p>
-
-<pre><code>$dm1 = $container-&gt;getService('doctrine.odm.mongodb.dm1_document_manager');
-$dm2 = $container-&gt;getService('doctrine.odm.mongodb.dm2_document_manager');
-</code></pre>
-
-<h3>XML</h3>
-
-<p>You can specify the same configuration via XML if you prefer that. Here are the same
-examples from above in XML.</p>
-
-<p>Simple Single Connection:</p>
-
-<pre><code>&lt;?xml version="1.0" ?&gt;
-
-&lt;container xmlns="http://www.symfony-project.org/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb"
-    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services <a href="http://www.symfony-project.org/schema/dic/services/services-1.0.xsd" target="_blank">http://www.symfony-project.org/schema/dic/services/services-1.0.xsd</a>
-                        <a href="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb" target="_blank">http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb</a> <a href="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd" target="_blank">http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd</a>"&gt;
-
-    &lt;doctrine:mongodb server="mongodb://localhost:27017"&gt;
-        &lt;metadata_cache_driver type="memcache"&gt;
-            &lt;class&gt;Doctrine\Common\Cache\MemcacheCache&lt;/class&gt;
-            &lt;host&gt;localhost&lt;/host&gt;
-            &lt;port&gt;11211&lt;/port&gt;
-            &lt;instance_class&gt;Memcache&lt;/instance_class&gt;
-        &lt;/metadata_cache_driver&gt;
-        &lt;options&gt;
-            &lt;connect&gt;true&lt;/connect&gt;
-        &lt;/options&gt;
-    &lt;/doctrine:mongodb&gt;
-&lt;/container&gt;
-</code></pre>
-
-<p>Multiple Connections:</p>
-
-<pre><code>&lt;?xml version="1.0" ?&gt;
-
-&lt;container xmlns="http://www.symfony-project.org/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb"
-    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services <a href="http://www.symfony-project.org/schema/dic/services/services-1.0.xsd" target="_blank">http://www.symfony-project.org/schema/dic/services/services-1.0.xsd</a>
-                        <a href="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb" target="_blank">http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb</a> <a href="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd" target="_blank">http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd</a>"&gt;
-
-    &lt;doctrine:mongodb
-            metadata_cache_driver="apc"
-            default_document_manager="dm2"
-            default_connection="dm2"
-            proxy_namespace="Proxies"
-            auto_generate_proxy_classes="true"
-        &gt;
-        &lt;doctrine:connections&gt;
-            &lt;doctrine:connection id="conn1" server="mongodb://localhost:27017"&gt;
-                &lt;options&gt;
-                    &lt;connect&gt;true&lt;/connect&gt;
-                &lt;/options&gt;
-            &lt;/doctrine:connection&gt;
-            &lt;doctrine:connection id="conn2" server="mongodb://localhost:27017"&gt;
-                &lt;options&gt;
-                    &lt;connect&gt;true&lt;/connect&gt;
-                &lt;/options&gt;
-            &lt;/doctrine:connection&gt;
-        &lt;/doctrine:connections&gt;
-        &lt;doctrine:document_managers&gt;
-            &lt;doctrine:document_manager id="dm1" server="mongodb://localhost:27017" metadata_cache_driver="xcache" connection="conn1" /&gt;
-            &lt;doctrine:document_manager id="dm2" server="mongodb://localhost:27017" connection="conn2" /&gt;
-        &lt;/doctrine:document_managers&gt;
-    &lt;/doctrine:mongodb&gt;
-&lt;/container&gt;
-</code></pre>
-
-<h2>Writing Document Classes</h2>
-
-<p>You can start writing document classes just how you normally would write some PHP classes.
-The only difference is that you must map the classes to the MongoDB ODM. You can provide
-the mapping information via xml, yaml or annotations. In this example, for simplicity and
-ease of reading we will use annotations.</p>
-
-<p>First, lets write a simple User class:</p>
-
-<pre><code>// src/Application/HelloBundle/Document/User.php
-
-namespace Application\HelloBundle\Document;
-
-class User
-{
-    protected $id;
-    protected $name;
-
-    public function getId()
-    {
-        return $this-&gt;id;
-    }
-
-    public function setName($name)
-    {
-        $this-&gt;name = $name;
-    }
-
-    public function getName()
-    {
-        return $this-&gt;name;
-    }
-}
-</code></pre>
-
-<p>This class can be used independent from any persistence layer as it is a regular PHP
-class and does not have any dependencies. Now we need to annotate the class so Doctrine
-can read the annotated mapping information from the doc blocks:</p>
-
-<pre><code>// ...
-
-/** @Document(collection="users") */
-class User
-{
-    /** @Id */
-    protected $id;
-
-    /** @String */
-    protected $name;
-
-    // ...
-}
-</code></pre>
-
-<h2>Using Documents</h2>
-
-<p>Now that you have a PHP class that has been mapped properly you can begin working with
-instances of that document persisting to and retrieving from MongoDB.</p>
-
-<p>From your controllers you can access the <code>DocumentManager</code> instances from the container:</p>
-
-<pre><code>class UserController extends Controller
-{
-    public function createAction()
-    {
-        $user = new User();
-        $user-&gt;setName('Jonathan H. Wage');
-
-        $dm = $this-&gt;container-&gt;getService('doctrine.odm.mongodb.document_manager');
-        $dm-&gt;persist($user);
-        $dm-&gt;flush();
-
-        // ...
-    }
-}
-</code></pre>
-
-<p>Later you can retrieve the persisted document by its id:</p>
-
-<pre><code>class UserController extends Controller
-{
-    public function editAction($id)
-    {
-        $dm = $this-&gt;container-&gt;getService('doctrine.odm.mongodb.document_manager');
-        $user = $dm-&gt;find('HelloBundle:User', $id);
-
-        // ...
-    }
-}
-</code></pre>
+<p>That is it! Now you have the ability to define rules that can be created with a user interface in your application and stored in a database. These rules get evaluated when certain events are dispatched within your application. When those rules evaluate to true you can dispatch other events that can give out credits, give free shipping, send e-mails, or do anything you can possibly imagine. Build up a repository of common actions as events and allow your business people to define new rules and rewards for promotional campaigns without having to involve a software engineer.</p>
 
         </div>
             </article>
 
     <nav>
         <a href="https://jwage.com/blog">Newer Posts</a><br />
-        <br />
+        <a href="https://jwage.com/blog/page/3.html">Older Posts</a><br />
     </nav>
                     </main>
 
