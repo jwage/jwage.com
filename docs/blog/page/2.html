@@ -62,287 +62,1363 @@
 
     <article>
         <header>
-            <h2><a href="https://jwage.com/posts/2014/10/18/forcing-https-for-all-traffic-with-f5-irules">Forcing HTTPS for all traffic with F5 iRules</a></h2>
+            <h2><a href="https://jwage.com/posts/2013/07/13/quotes-from-the-road-to-serfdom-by-friedrich-hayek">Quotes from The Road to Serfdom by Friedrich Hayek</a></h2>
         </header>
         <div>
-            <p>If you want to force all traffic to HTTPS you can do so pretty easily by adding a F5 iRule to the HTTP VIP.</p>
+            <p><strong>I recently finished reading <a href="http://www.amazon.com/The-Road-Serfdom-Intellectuals-Socialism/dp/0255365764" target="_blank">The Road to Serfdom</a> by Friedrich Hayek. Here are some parts that stood out to me.</strong></p>
 
-<pre><code>when HTTP_REQUEST {
-    HTTP::redirect "https://[HTTP::host][HTTP::uri]"
-}
-</code></pre>
+<p>&ldquo;We are ready to accept almost any explanation of the present crisis of our civilization except one: that the present state of the world may be the result of genuine error on our own part and that the pursuit of some of our most cherished ideals has apparently produced results utterly different from those which we expected.&rdquo;</p>
 
-<p>You should have two virtual servers configured in the F5, one for HTTP and one for HTTPS. By adding the redirect iRule to the HTTP virtual server it will only be executed for traffic that comes in without HTTPS. This means the iRule code above does not need any kind of conditional to check what the protocol is and only redirect when it is not HTTPS.</p>
+<p>“Democracy extends the sphere of individual freedom,” he said in 1848; “socialism restricts it. Democracy attaches all possible value to each man; socialism makes each man a mere agent, a mere number. Democracy and socialism have nothing in common but one word: equality. But notice the difference: while democracy seeks equality in liberty, socialism seeks equality in restraint and servitude.”</p>
 
-<p>If you wanted to wrap some other conditional around the redirect, say you don&rsquo;t want to redirect one particular section of your site, you can do this:</p>
+<p>&ldquo;While it is true, of course, that inventions have given us tremendous power, it is absurd to suggest that we must use this power to destroy our most precious inheritance: liberty. It does mean, however, that if we want to preserve it, we must guard it more jealously than ever and that we must be prepared to make sacrifices for it.&rdquo;</p>
 
-<pre><code>when HTTP_REQUEST {
-    if { not ([string tolower [HTTP::path]] starts_with "/non-secure-section") } {
-        HTTP::redirect "https://[HTTP::host][HTTP::uri]"
+<p>&ldquo;The “social goal,” or “common purpose,” for which society is to be organized is usually vaguely described as the “common good,” the “general welfare,” or the “general interest.” It does not need much reflection to see that these terms have no sufficiently definite meaning to determine a particular course of action. The welfare and the happiness of millions cannot be measured on a single scale of less and more. The welfare of a people, like the happiness of a man, depends on a great many things that can be provided in an infinite variety of combinations. It cannot be adequately expressed as a single end, but only as a hierarchy of ends, a comprehensive scale of values in which every need of every person is given its place.&rdquo;</p>
+
+<p>&ldquo;Although each individual might wish the state to act in some way, there will be almost as many views about what the government should do as there are different people.&rdquo;</p>
+
+<p>&ldquo;It is not difficult to see what must be the consequences when democracy embarks upon a course of planning which in its execution requires more agreement than in fact exists. The people may have agreed on adopting a system of directed economy because they have been convinced that it will produce great prosperity.&rdquo;</p>
+
+<p>&ldquo;But the democratic legislature will long hesitate to relinquish the decisions on really vital issues, and so long as it does so it makes it impossible for anyone else to provide the comprehensive plan. Yet agreement that planning is necessary, together with the inability of democratic assemblies to produce a plan, will evoke stronger and stronger demands that the government or some single individual should be given powers to act on their own responsibility.&rdquo;</p>
+
+<p>&ldquo;The belief is becoming more and more widespread that, if things are to get done, the responsible authorities must be freed from the fetters of democratic procedure.&rdquo;</p>
+
+<p>&ldquo;Hitler did not have to destroy democracy; he merely took advantage of the decay of democracy and at the critical moment obtained the support of many to whom, though they detested Hitler, he yet seemed the only man strong enough to get things done.&rdquo;</p>
+
+<p>&ldquo;Nothing distinguishes more clearly conditions in a free country from those in a country under arbitrary government than the observance in the former of the great principles known as the Rule of Law. Stripped of all technicalities, this means that government in all its actions is bound by rules fixed and announced beforehand—rules which make it possible to foresee with fair certainty how the authority will use its coercive powers in given circumstances and to plan one’s individual affairs on the basis of this knowledge.&rdquo;</p>
+
+<p>&ldquo;Hence the familiar fact that the more the state “plans,” the more difficult planning becomes for the individual.&rdquo;</p>
+
+<p>&ldquo;Those most immediately interested in a particular issue are not necessarily the best judges of the interests of society as a whole.&rdquo;</p>
+
+<p>&ldquo;The important thing is that the rule enables us to predict other people’s behavior correctly, and this requires that it should apply to all cases—even if in a particular instance we feel it to be unjust.&rdquo;</p>
+
+<p>&ldquo;Man is free if he needs to obey no person but solely the laws.&rdquo;</p>
+
+<p>&ldquo;The idea that there is no limit to the powers of the legislator is in part a result of popular sovereignty and democratic government. It has been strengthened by the belief that, so long as all actions of the state are duly authorized by legislation, the Rule of Law will be preserved. But this is completely to misconceive the meaning of the Rule of Law. This rule has little to do with the question whether all actions of government are legal in the juridical sense. They may well be and yet not conform to the Rule of Law.&rdquo;</p>
+
+<p>&ldquo;If the law says that such a board or authority may do what it pleases, anything that board or authority does is legal—but its actions are certainly not subject to the Rule of Law. By giving the government unlimited powers, the most arbitrary rule can be made legal; and in this way a democracy may set up the most complete despotism imaginable.&rdquo;</p>
+
+<p>&ldquo;Indeed, when security is understood in too absolute a sense, the general striving for it, far from increasing the chances of freedom, becomes the gravest threat to it.&rdquo;</p>
+
+<p>&ldquo;There is no reason why in a society which has reached the general level of wealth which ours has attained the first kind of security should not be guaranteed to all without endangering general freedom.&rdquo;</p>
+
+<p>&ldquo;We must here return for a moment to the position which precedes the suppression of democratic institutions and the creation of a totalitarian regime. In this stage it is the general demand for quick and determined government action that is the dominating element in the situation, dissatisfaction with the slow and cumbersome course of democratic procedure which makes action for action’s sake the goal. It is then the man or the party who seems strong and resolute enough “to get things done” who exercises the greatest appeal. “Strong” in this sense means not merely a numerical majority—it is the ineffectiveness of parliamentary majorities with which people are dissatisfied. What they will seek is somebody with such solid support as to inspire confidence that he can carry out whatever he wants. It is here that the new type of party, organized on military lines, comes in.&rdquo;</p>
+
+<p>&ldquo;That socialism can be put into practice only by methods which most socialists disapprove is, of course, a lesson learned by many social reformers in the past.&rdquo;</p>
+
+<p>&ldquo;It seems to be almost a law of human nature that it is easier for people to agree on a negative program—on the hatred of an enemy, on the envy of those better off— than on any positive task.&rdquo;</p>
+
+<p>&ldquo;The definitely antagonistic attitude which most planners take toward internationalism is further explained by the fact that in the existing world all outside contacts of a group are obstacles to their effectively planning the sphere in which they can attempt it. It is therefore no accident that, as the editor of one of the most comprehensive collective studies on planning has discovered to his chagrin, “most ‘planners’ are militant nationalists.”</p>
+
+<p>&quot;The desire to organize social life according to a unitary plan itself springs largely from a desire for power.&rdquo;</p>
+
+<p>&ldquo;We have seen before how the separation of economic and political aims is an essential guaranty of individual freedom and how it is consequently attacked by all collectivists. To this we must now add that the “substitution of political for economic power” now so often demanded means necessarily the substitution of power from which there is no escape for a power which is always limited. What is called economic power, while it can be an instrument of coercion, is, in the hands of private individuals, never exclusive or complete power, never power over the whole life of a person. But centralized as an instrument of political power it creates a degree of dependence scarcely distinguishable from slavery.&rdquo;</p>
+
+<p>&ldquo;It would, however, be highly unjust to regard the masses of the totalitarian people as devoid of moral fervor because they give unstinted support to a system which to us seems a denial of most moral values. For the great majority of them the opposite is probably true: the intensity of the moral emotions behind a movement like that of National Socialism or communism can probably be compared only to those of the great religious movements of history.&rdquo;</p>
+
+<p>&ldquo;Yet while there is little that is likely to induce men who are good by our standards to aspire to leading positions in the totalitarian machine, and much to deter them, there will be special opportunities for the ruthless and unscrupulous. There will be jobs to be done about the badness of which taken by themselves nobody has any doubt, but which have to be done in the service of some higher end, and which have to be executed with the same expertness and efficiency as any others. And as there will be need for actions which are bad in themselves, and which all those still influenced by traditional morals will be reluctant to perform, the readiness to do bad things becomes a path to promotion and power. The positions in a totalitarian society in which it is necessary to practice cruelty and intimidation, deliberate deception and spying, are numerous. Neither the Gestapo nor the administration of a concentration camp, neither the Ministry of Propaganda nor the SA or SS (or their Italian or Russian counterparts), are suitable places for the exercise of humanitarian feelings.13 Yet it is through positions like these that the road to the highest positions in the totalitarian state leads. It is only too true when a distinguished American economist concludes from a similar brief enumeration of the duties of the authorities of a collectivist state that “they would have to do these things whether they wanted to or not: and the probability of the people in power being individuals who would dislike the possession and exercise of power is on a level with the probability that an extremely tender-hearted person would get the job of whipping-master in a slave plantation.”</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2013/07/08/tracking-new-member-origination-with-symfony2">Tracking New Member Origination with Symfony2</a></h2>
+        </header>
+        <div>
+            <blockquote>
+  <p><strong>NOTE</strong>
+  The example code in this blog post has been simplified to make things more concise and easy to read.</p>
+</blockquote>
+
+<p>At <a href="http://www.opensky.com" target="_blank">OpenSky</a> it is important for us to track how a member joined so that we can determine causation between joining and any subsequent actions taken on the site, like an order.</p>
+
+<p>To get started create a new class called <code>OriginationManager</code> with a method named <code>updateHistory</code>. It will accept a <code>Request</code> object and record the query parameters from the current URL in the session.</p>
+
+<pre><code>&lt;?php class OriginationManager
+{
+    public function updateHistory(Request $request)
+    {
+        $session = $request-&gt;getSession();
+
+        $history = $session-&gt;get('user_origination_history', array());
+        $history[] = $request-&gt;query-&gt;all();
+
+        $session-&gt;set('user_origination_history', $history);
     }
 }
 </code></pre>
 
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2014/07/22/2014-vacation-books">2014 Vacation Books</a></h2>
-        </header>
-        <div>
-            <ul><li><p><a href="http://www.amazon.com/Five-Love-Languages-Heartfelt-Commitment-ebook/dp/B00F4KBJ8I" target="_blank">The Five Love Languages: How to Express Heartfelt Commitment to Your Mate</a></p></li>
-<li><p><a href="http://www.amazon.com/How-Win-Friends-Influence-People/dp/0671027034" target="_blank">How to Win Friends &amp; Influence People</a></p></li>
-<li><p><a href="http://www.amazon.com/Nikola-Tesla-Imagination-Invented-Century-ebook/dp/B00CATSONE/" target="_blank">Nikola Tesla: Imagination and the Man That Invented the 20th Century</a></p></li>
-<li><p><a href="http://www.amazon.com/My-Life-Work-Henry-Ford-ebook/dp/B0084AMXOY" target="_blank">My Life and Work (Henry Ford Autobiography)</a></p></li>
-<li><p>Started this but did not finish. <a href="http://www.amazon.com/Black-Swan-Impact-Highly-Improbable-ebook/dp/B00139XTG4" target="_blank">The Black Swan: Second Edition: The Impact of the Highly Improbable Fragility</a></p></li>
-</ul>
+<p>Now create an <code>OriginationListener</code> class that will listen to the <code>kernel.request</code> event and make use of the <code>OriginationManager::updateHistory()</code> API we just created.</p>
 
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2014/02/15/using-the-symfony-expression-language-for-a-reward">Using the Symfony Expression Language for a Reward Rules Engine</a></h2>
-        </header>
-        <div>
-            <p>We recently adopted the <a href="http://symfony.com/doc/current/components/expression_language/index.html" target="_blank">Symfony Expression Language</a> in the rules engine at <a href="http://www.opensky.com" target="_blank">OpenSky</a>. It has brought a new level of flexibility to our system and creating new logic has never been easier.</p>
+<pre><code>&lt;?php class OriginationListener
+{
+    // ...
 
-<p>Installing the expression language in your application is easy with composer. Just add the following to your <code>composer.json</code>:</p>
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        $request = $event-&gt;getRequest();
 
-<pre><code>"symfony/expression-language": "2.5.*@dev"
+        // Only process non-logged-in users
+        if ($token = $this-&gt;securityContext-&gt;getToken()) {
+            $user = $token-&gt;getUser();
+            if ($user instanceof User) {
+                return;
+            }
+        }
+
+        $this-&gt;originationManager-&gt;updateHistory($request);
+    }
+}
 </code></pre>
 
-<p>The expression language allows you to perform expressions that get evaluated with raw PHP code and return a single value. It can be any type of value and is not limited to boolean values. Here is a simple example:</p>
+<p>Now we are tracking the query parameters of logged out users on every request. We can make use of this information later when a user joins. First, lets define a new model that can be used to store the origination information along with the user (assume the model is persisted with <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a>). Each new <code>User</code> gets an <code>Originator</code> record when they join. It allows us to essentially see how a new user entered the site and what clicks they made before joining.</p>
 
-<pre><code>use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-
-$language = new ExpressionLanguage();
-
-$expression = 'user["isActive"] == true and product["price"] &gt; 20';
-$context = array(
-    'user' =&gt; array(
-        'isActive' =&gt; true
-    ),
-    'product' =&gt; array(
-        'price' =&gt; 30
-    ),
-);
-
-$return = $language-&gt;evaluate($expression, $context);
-
-var_export($return); // true
-</code></pre>
-
-<p>That is a very simple example on how to use the raw expression language. Now I will try to demonstrate how you could model a real implementation using <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a> to persist your rules to a database, the <a href="http://symfony.com/doc/current/components/event_dispatcher/introduction.html" target="_blank">Symfony Event Dispatcher</a> to evaluate your rules and execute actions when your expressions evaluate to true.</p>
-
-<p>To get started create a new <code>Rule</code> class and map it to a database using one of the Doctrine object mappers. For this example we will map it using the MongoDB ODM:</p>
-
-<pre><code>use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-
-/**
- * @ODM\Document
- */
-class Rule
+<pre><code>&lt;?php class Originator
 {
     /**
-     * @ODM\Id
+     * The raw array of request query data.
+     *
+     * @var array
+     */
+    protected $history = array();
+
+    /**
+     * The user that originated this member.
+     *
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * The value of the first osky_origin parameter we encounter.
+     *
+     * @var string
+     */
+    protected $origin;
+
+    /**
+     * The value of the first osky_source parameter we encounter.
+     *
+     * @var string
+     */
+    protected $source;
+
+    // ...
+}
+</code></pre>
+
+<p>Assume your application already notifies an event named <code>user.created</code>. In <code>OriginationListener</code> create an <code>onUserCreated</code> method that will listen to the <code>user.created</code> event.</p>
+
+<pre><code>&lt;?php
+
+class OriginationListener
+{
+    // ...
+
+    public function onUserCreated(UserCreatedEvent $event)
+    {
+        $user = $event-&gt;getUser();
+        $request = $event-&gt;getRequest();
+
+        $this-&gt;originationManager-&gt;assignUserOrigination($user, $request);
+    }
+}
+</code></pre>
+
+<p>Next, create the <code>OriginationManager::assignUserOrigination()</code> method. It will utilize the request query parameters we saved on the session earlier to create a new <code>Originator</code> record.</p>
+
+<pre><code>&lt;?php class OriginationManager
+{
+    public function assignUserOrigination(User $user, Request $request)
+    {
+        $session = $request-&gt;getSession();
+
+        $history = $session-&gt;get('user_origination_history', array());
+
+        $originator = new Originator();
+        $originator-&gt;setHistory($history);
+
+        foreach ($history as $query) {
+            if (!$originator-&gt;getOrigin() &amp;&amp; isset($query['osky_origin'])) {
+                $originator-&gt;setOrigin($query['osky_origin']);
+
+                if ($user = $this-&gt;userRepository-&gt;find($query['osky_origin'])) {
+                    $originator-&gt;setUser($user);
+                }
+            }
+
+            if (!$originator-&gt;getSource() &amp;&amp; isset($query['osky_source'])) {
+                $originator-&gt;setSource($query['osky_source']);
+            }
+        }
+
+        $user-&gt;setOriginator($originator);
+
+        $session-&gt;remove('user_origination_history');
+    }
+}
+</code></pre>
+
+<p>Now if a logged out user were to visit OpenSky with a parameter named <code>osky_origin</code> in the URL with another users id as the value, the <code>Originator</code> record that gets created for the new member will have a reference to that <code>User</code>. We can then utilize that information do whatever we want. In our case we give the user that got the new <code>User</code> to join a credit and a thank you. The <code>osky_source</code> parameter can be used as an arbitrary reporting variable to help with identifying marketing campaigns.</p>
+
+<p>Keep in mind that this is an example implementation and it omits many details specific to OpenSky for the sake of simplicity. The real implementation we use has dozens of other parameters that can be used to associate records together and assist with reporting. You can add to this implementation and check for custom parameters and standard ones like <code>utm_source</code>, <code>utm_campaign</code>, etc.</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2013/07/02/building-activity-streams">Building Activity Streams using Symfony2, Doctrine2 and MongoDB</a></h2>
+        </header>
+        <div>
+            <blockquote>
+  <p><strong>NOTE</strong>
+  The example code in this blog post has been simplified to make things more concise and easy to read.</p>
+</blockquote>
+
+<p>At <a href="http://www.opensky.com" target="_blank">OpenSky</a> we utilize <a href="http://symfony.com" target="_blank">Symfony2</a>, <a href="http://doctrine-project.org" target="_blank">Doctrine2</a> and <a href="http://www.mongodb.org/" target="_blank">MongoDB</a> for streams of activity across our site. We&rsquo;ve based our implementation on the <a href="http://activitystrea.ms/specs/json/1.0/" target="_blank">JSON Activity Streams 1.0</a> specification. This blog post demonstrates how you can easily setup your own activity streams.</p>
+
+<p>An activity item consists of a published date, actor, object, target and verb. It describes an action performed by an entity. Here is an example JSON document of what an activity item might look like:</p>
+
+<pre><code>{
+  "published": "2011-02-10T15:04:55Z",
+  "actor": {
+    "url": "http://example.org/martin",
+    "objectType" : "person",
+    "id": "tag:example.org,2011:martin",
+    "image": {
+      "url": "http://example.org/martin/image",
+      "width": 250,
+      "height": 250
+    },
+    "displayName": "Martin Smith"
+  },
+  "verb": "post",
+  "object" : {
+    "url": "http://example.org/blog/2011/02/entry",
+    "id": "tag:example.org,2011:abc123/xyz"
+  },
+  "target" : {
+    "url": "http://example.org/blog/",
+    "objectType": "blog",
+    "id": "tag:example.org,2011:abc123",
+    "displayName": "Martin's Blog"
+  }
+}
+</code></pre>
+
+<p>To get started implementing this let&rsquo;s define a base PHP class that we can use to represent an activity item.</p>
+
+<pre><code>&lt;?php
+
+namespace Project\Document;
+
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+
+/**
+ * @ODM\MappedSuperclass(collection="activity_items")
+ * @ODM\InheritanceType("SINGLE_COLLECTION")
+ * @ODM\DiscriminatorField(fieldName="verb")
+ * @ODM\DiscriminatorMap({
+ *     "love" = "Project\Document\LoveActivityItem"
+ * })
+ */
+abstract class AbstractActivityItem
+{
+    /** @ODM\Date */
+    protected $published;
+
+    protected $actor;
+    protected $object;
+    protected $target;
+
+    // ...
+}
+</code></pre>
+
+<p>For this blog post we&rsquo;re only going to implement one verb called <code>love</code>. On OpenSky you can love products and the action is pushed in to the feed of your followers. So let&rsquo;s get started implementing the <code>LoveActivityItem</code> class:</p>
+
+<pre><code>&lt;?php
+
+namespace Project\Document;
+
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Project\Document\Love;
+use Project\Document\Product;
+use Project\Document\User;
+
+/** @ODM\Document */
+class LoveActivityItem extends AbstractActivityItem
+{
+    /** @ODM\ReferenceOne(targetDocument="User") */
+    protected $actor;
+
+    /** @ODM\ReferenceOne(targetDocument="Love") */
+    protected $object;
+
+    /** @ODM\ReferenceOne(targetDocument="Product") */
+    protected $target;
+
+    public function __construct(
+        User $user, Love $love, Product $product
+    )
+    {
+        $this-&gt;actor = $user;
+        $this-&gt;object = $love;
+        $this-&gt;target = $product;
+    }
+
+    // ...
+}
+</code></pre>
+
+<p>Now that we have our basic model defined, let&rsquo;s implement the code that will wire everything up. Assume we already have a Symfony event in our application being notified called <code>user.love</code>. So setup a listener that listens to that event and records the activity item:</p>
+
+<pre><code>&lt;?php
+
+namespace Project/Listener;
+
+class ActivityListener
+{
+    /**
+     * @var Project\Activity\ActivityManager
+     */
+    private $activityManager;
+
+    /**
+     * Listens to the `user.love` event.
+     */
+    public function onUserLove(UserLoveEvent $event)
+    {
+        $this-&gt;activityManager-&gt;recordUserLove(
+            $event-&gt;getUser(),
+            $event-&gt;getLove()
+        );
+    }
+}
+</code></pre>
+
+<p>Now let&rsquo;s implement the <code>ActivityManager</code> class with the <code>recordUserLove</code> method:</p>
+
+<pre><code>&lt;?php
+
+namespace Project\Activity;
+
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Project\Document\LoveActivityItem;
+use Project\Document\Love;
+use Project\Document\User;
+
+class ActivityManager
+{
+    private $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        $this-&gt;dm = $dm;
+    }
+
+    public function recordUserLove(User $user, Love $love)
+    {
+        $this-&gt;dm-&gt;persist(
+            new LoveActivityItem($user, $love, $love-&gt;getProduct())
+        );
+    }
+}
+</code></pre>
+
+<p>The new activity item will get flushed to the database at the end of the action with the love since we flush in the controller where the <code>user.love</code> event is notified. Now it is possible to generate a feed of activity items for the whole site, a specific user or even a set of users:</p>
+
+<pre><code>&lt;?php
+
+$user = $dm-&gt;getRepository('Project\Document\User')-&gt;findOneByEmail('jonwage@gmail.com');
+
+$activityItems = $dm-&gt;getRepository('Project\Document\ActivityItem')
+    -&gt;createQueryBuilder()
+    -&gt;field('actor')-&gt;references($user)
+    -&gt;getQuery()
+    -&gt;execute();
+</code></pre>
+
+<p>That is it. You can easily add new verbs to the model and add code to the listener and manager to record new activities. Good luck! I hope this was helpful for someone!</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2013/02/11/sunshinephp-miami">SunshinePHP Miami</a></h2>
+        </header>
+        <div>
+            <p>This past weekend I attended <a href="http://sunshinephp.com/" target="_blank">SunshinePHP</a> in beautiful Miami, Florida. I was lucky enough to get to speak about our experiences building <a href="https://www.opensky.com" target="_blank">OpenSky</a> with <a href="http://www.symfony.com" target="_blank">Symfony</a>. The weather was perfect and I got to learn some new things as well. Below you can find the slides from my presentation.</p>
+
+<script async class="speakerdeck-embed" data-id="5d06e3e054690130178722000a1e8e84" data-ratio="1.2994923857868" src="//speakerdeck.com/assets/embed.js"></script>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2012/09/24/doctrine-common-library">Doctrine Common Library</a></h2>
+        </header>
+        <div>
+            <p><a href="http://doctrine-project.org" target="_blank">Doctrine</a> started as a library where all the internal components were coupled together. But as things have evolved the components have been decoupled and shared between the projects. This change also makes it possible for other people to use these pieces of Doctrine even if they don&rsquo;t use the ORM or any other project.</p>
+
+<p>The <a href="https://github.com/doctrine/common/tree/master/lib/Doctrine/Common" target="_blank">Doctrine\Common</a> namespace contains a few things like:</p>
+
+<ul><li><a href="https://github.com/doctrine/common/tree/master/lib/Doctrine/Common/Annotations" target="_blank">DocBlock Annotations Library</a> - annotations library used by <a href="http://symfony.com" target="_blank">Symfony</a>, <a href="http://drupal.org" target="_blank">Drupal</a> and other popular PHP projects.</li>
+<li><a href="https://github.com/doctrine/common/tree/master/lib/Doctrine/Common/Cache" target="_blank">Cache Drivers</a> - APC, Memcache, etc. cache drivers.</li>
+<li><a href="https://github.com/doctrine/common/tree/master/lib/Doctrine/Common/Persistence" target="_blank">Persistence</a> - Shared base classes and interfaces across the object mappers.</li>
+<li><a href="https://github.com/doctrine/common/blob/master/lib/Doctrine/Common/Lexer.php" target="_blank">Lexer Parser</a> - Base class for writing simple lexers, i.e. for creating small DSLs. I recently wrote a blog post about it <a href="http://jwage.com/post/31623163785/writing-a-parser-in-php-with-the-help-of-doctrine" target="_blank">here</a>.</li>
+</ul>
+
+<p><strong>DocBlock AnnotationsLibrary</strong></p>
+
+<p>With the annotations library you can parse information out of your DocBlocks in to PHP objects. The object mapper projects use this feature for specifying entity mapping information in the DocBlocks of your classes, properties and methods. Here is an example of what an entity looks like in the ORM:</p>
+
+<pre><code>namespace MyProject\Entities;
+
+use Doctrine\ORM\Mapping AS ORM;
+use Symfony\Component\Validation\Constraints AS Assert;
+
+/**
+ * @ORM\Entity
+ */
+class User
+{
+    /**
+     * @ORM\Id @ORM\Column @ORM\GeneratedValue
      */
     private $id;
 
     /**
-     * @ODM\Collection
+     * @ORM\Column(type="string")
+     * @Assert\NotEmpty
+     * @Assert\Email
      */
-    private $eventNames = array();
+    private $email;
+}
+</code></pre>
+
+<p><strong>Cache Drivers</strong></p>
+
+<p>The cache drivers provide a common interface to cache backends in PHP. Here are the supported drivers:</p>
+
+<ul><li>ApcCache</li>
+<li>ArrayCache</li>
+<li>FileCache</li>
+<li>FilesystemCache</li>
+<li>MemcacheCache</li>
+<li>MemcachedCache</li>
+<li>PhpFileCache</li>
+<li>RedisCache</li>
+<li>WinCacheCache</li>
+<li>XcacheCache</li>
+<li>ZendDataCache</li>
+</ul>
+
+<p>The interface is very simple:</p>
+
+<pre><code>function fetch($id);
+function contains($id);
+function save($id, $data, $lifeTime = 0);
+function delete($id);
+function getStats();
+</code></pre>
+
+<p><strong>Persistence Library</strong></p>
+
+<p>The persistence interfaces are implemented by the object mapper libraries. They provide the common base classes and interfaces that a Doctrine object persistence library should implement, such as:</p>
+
+<p><strong>ObjectManager</strong></p>
+
+<pre><code>function find($className, $id);
+function persist($object);
+function remove($object);
+function merge($object);
+function clear($objectName = null);
+function detach($object);
+function refresh($object);
+function flush();
+function getRepository($className);
+function getClassMetadata($className);
+function getMetadataFactory();
+function initializeObject($obj);
+function contains($object);
+</code></pre>
+
+<p><strong>ObjectRepository</strong></p>
+
+<pre><code>function find($id);
+function findAll();
+function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null);
+function findOneBy(array $criteria);
+function getClassName();
+</code></pre>
+
+<p><strong>ClassMetadataFactory</strong></p>
+
+<pre><code>function getAllMetadata();
+function getMetadataFor($className);
+function hasMetadataFor($className);
+function setMetadataFor($className, $class);
+function isTransient($className);
+</code></pre>
+
+<p><strong>ClassMetadata</strong></p>
+
+<pre><code>function getName();
+function getIdentifier();
+function getReflectionClass();
+function isIdentifier($fieldName);
+function hasField($fieldName);
+function hasAssociation($fieldName);
+function isSingleValuedAssociation($fieldName);
+function isCollectionValuedAssociation($fieldName);
+function getFieldNames();
+function getIdentifierFieldNames();
+function getAssociationNames();
+function getTypeOfField($fieldName);
+function getAssociationTargetClass($assocName);
+function isAssociationInverseSide($assocName);
+function getAssociationMappedByTargetField($assocName);
+function getIdentifierValues($object);
+</code></pre>
+
+<p>The <code>Doctrine\Common</code> namespace contains lots more than I have mentioned here. So if you want to learn more check it out on <a href="https://github.com/doctrine/common/tree/master/lib/Doctrine/Common" target="_blank"><code>GitHub</code></a> or read the <a href="http://docs.doctrine-project.org/projects/doctrine-common/en/latest/index.html" target="_blank">documentation</a>. It is not that complete yet but it has some useful information.</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2012/09/15/writing-a-parser-in-php-with-the-help-of-doctrine">Writing a parser in PHP with the help of Doctrine</a></h2>
+        </header>
+        <div>
+            <p>In the <a href="http://doctrine-project.org" target="_blank">Doctrine</a> project we have a SQL-like language called <a href="http://doctrine-orm.readthedocs.org/en/2.0.x/reference/dql-doctrine-query-language.html" target="_blank">DQL</a> for the ORM. In Doctrine1 the DQL language was not implemented with a true parser but in Doctrine2 the language was completely re-written with a true lexer parser. This lexer parser not only powers DQL but it also powers the <a href="http://jwage.com/post/30490186668/doctrine-annotations-library" target="_blank">Annotations</a> library in the <a href="http://www.doctrine-project.org/projects/common.html" target="_blank">Common</a> library.</p>
+
+<p>To write your own parser you just need to extend <a href="https://github.com/doctrine/common/blob/master/lib/Doctrine/Common/Lexer.php" target="_blank"><code>Doctrine\Common\Lexer</code></a> and implement the following three abstract methods. These methods define the <a href="http://en.wikipedia.org/wiki/Lexical_analysis" target="_blank">lexical</a> catchable and non-catchable patterns and a method for returning the type of a token and filtering the value if necessary.</p>
+
+<pre><code>/**
+ * Lexical catchable patterns.
+ *
+ * @return array
+ */
+abstract protected function getCatchablePatterns();
+
+/**
+ * Lexical non-catchable patterns.
+ *
+ * @return array
+ */
+abstract protected function getNonCatchablePatterns();
+
+/**
+ * Retrieve token type. Also processes the token value if necessary.
+ *
+ * @param string $value
+ * @return integer
+ */
+abstract protected function getType(&amp;$value);
+</code></pre>
+
+<p>Here is an example. The <a href="https://github.com/doctrine/doctrine2/blob/master/lib/Doctrine/ORM/Query/Lexer.php" target="_blank"><code>Doctrine\ORM\Query\Lexer</code></a> implementation for DQL looks like the following:</p>
+
+<pre><code>namespace Doctrine\ORM\Query;
+
+class Lexer extends \Doctrine\Common\Lexer
+{
+    // All tokens that are not valid identifiers must be &lt; 100
+    const T_NONE                = 1;
+    const T_INTEGER             = 2;
+    const T_STRING              = 3;
+    const T_INPUT_PARAMETER     = 4;
+    const T_FLOAT               = 5;
+    const T_CLOSE_PARENTHESIS   = 6;
+    const T_OPEN_PARENTHESIS    = 7;
+    const T_COMMA               = 8;
+    const T_DIVIDE              = 9;
+    const T_DOT                 = 10;
+    const T_EQUALS              = 11;
+    const T_GREATER_THAN        = 12;
+    const T_LOWER_THAN          = 13;
+    const T_MINUS               = 14;
+    const T_MULTIPLY            = 15;
+    const T_NEGATE              = 16;
+    const T_PLUS                = 17;
+    const T_OPEN_CURLY_BRACE    = 18;
+    const T_CLOSE_CURLY_BRACE   = 19;
+
+    // All tokens that are also identifiers should be &gt;= 100
+    const T_IDENTIFIER          = 100;
+    const T_ALL                 = 101;
+    const T_AND                 = 102;
+    const T_ANY                 = 103;
+    const T_AS                  = 104;
+    const T_ASC                 = 105;
+    const T_AVG                 = 106;
+    const T_BETWEEN             = 107;
+    const T_BOTH                = 108;
+    const T_BY                  = 109;
+    const T_CASE                = 110;
+    const T_COALESCE            = 111;
+    const T_COUNT               = 112;
+    const T_DELETE              = 113;
+    const T_DESC                = 114;
+    const T_DISTINCT            = 115;
+    const T_EMPTY               = 116;
+    const T_ESCAPE              = 117;
+    const T_EXISTS              = 118;
+    const T_FALSE               = 119;
+    const T_FROM                = 120;
+    const T_GROUP               = 121;
+    const T_HAVING              = 122;
+    const T_IN                  = 123;
+    const T_INDEX               = 124;
+    const T_INNER               = 125;
+    const T_INSTANCE            = 126;
+    const T_IS                  = 127;
+    const T_JOIN                = 128;
+    const T_LEADING             = 129;
+    const T_LEFT                = 130;
+    const T_LIKE                = 131;
+    const T_MAX                 = 132;
+    const T_MEMBER              = 133;
+    const T_MIN                 = 134;
+    const T_NOT                 = 135;
+    const T_NULL                = 136;
+    const T_NULLIF              = 137;
+    const T_OF                  = 138;
+    const T_OR                  = 139;
+    const T_ORDER               = 140;
+    const T_OUTER               = 141;
+    const T_SELECT              = 142;
+    const T_SET                 = 143;
+    const T_SIZE                = 144;
+    const T_SOME                = 145;
+    const T_SUM                 = 146;
+    const T_TRAILING            = 147;
+    const T_TRUE                = 148;
+    const T_UPDATE              = 149;
+    const T_WHEN                = 150;
+    const T_WHERE               = 151;
+    const T_WITH                = 153;
+    const T_PARTIAL             = 154;
+    const T_MOD                 = 155;
 
     /**
-     * @ODM\String
+     * Creates a new query scanner object.
+     *
+     * @param string $input a query string
      */
-    private $expression;
+    public function __construct($input)
+    {
+        $this-&gt;setInput($input);
+    }
 
     /**
-     * @ODM\Collection
+     * @inheritdoc
      */
-    private $actionEvents = array();
-
-    // ...
-}
-</code></pre>
-
-<p>Now imagine you already have an event named <code>user.add_to_cart</code> being notified in your application. It looks something like this:</p>
-
-<pre><code>use Symfony\Component\EventDispatcher\Event;
-
-class UserAddToCartEvent extends Event
-{
-    const onUserAddToCart = 'user.add_to_cart';
-
-    private $user;
-    private $product;
-
-    // ...
-}
-
-class AddToCartController
-{
-    // ...
-
-    public function addToCartAction($productId)
-    {
-        // ...
-
-        $this-&gt;dispatcher-&gt;dispatch(UserAddToCartEvent::onUserAddToCart, new UserAddToCartEvent($user, $product));
-    }
-}
-</code></pre>
-
-<p>Say you want to give a reward to users who add items to their cart when they have loved more than <code>20</code> items and the price of the product is greater than <code>50</code> dollars. The <code>Rule</code> model we created earlier allows us to define a rule that will be executed when <code>UserAddToCart::onUserAddToCart</code> is dispatched:</p>
-
-<pre><code>$rule = new Rule();
-
-// set the events this rule should be executed on.
-$rule-&gt;setEventNames(array(
-    UserAddToCartEvent::onUserAddToCart
-));
-
-// set the expression to evaluate when the rule is executed.
-// if the user has loved more than 20 items and the price of the product is more than 50 dollars.
-// the expression string will be evaluated by the Symfony expression language.
-$rule-&gt;setExpression('event.getUser().getNumLoves() &gt; 20 and event.getProduct().getPrice() &gt; 50');
-
-// set the action events to dispatch when the expression evaluates to true.
-$rule-&gt;setActionEvents(array(
-    array(
-        'eventName' =&gt; UserCreditRewardEvent::onUserCreditReward,
-        'recipientExpression' =&gt; 'event.getUser()',
-        'attributes' =&gt; array(
-            'amount' =&gt; 50
-        ),
-    )
-));
-
-$dm-&gt;persist($rule);
-$dm-&gt;flush();
-</code></pre>
-
-<p>The above example assumes you have a <code>UserCreditRewardEvent</code> setup and a listener setup to process the event to give the user a credit. Here is what the event would look like:</p>
-
-<pre><code>use Symfony\Component\EventDispatcher\Event;
-
-class UserCreditRewardEvent extends Event
-{
-    const onUserCreditReward = 'user.credit_reward';
-
-    private $user;
-    private $amount;
-
-    // ...
-}
-</code></pre>
-
-<p>And here is what the listener would look like to give the user the credit. This example assumes you already have a <code>CreditManager</code> service with an <code>issueCredit()</code> method you can use to give a user a credit for a dollar amount:</p>
-
-<pre><code>class UserCreditRewardListener
-{
-    private $creditManager;
-
-    // ...
-
-    public function onUserCreditReward(UserCreditRewardEvent $event)
-    {
-        $this-&gt;creditManager-&gt;issueCredit(
-            $event-&gt;getUser(),
-            $event-&gt;getAmount()
-        );
-    }
-}
-</code></pre>
-
-<p>Now to bring it all together we need a <code>RuleSubcriber</code> to lookup the <code>Rule</code> objects from the database when events occur in our application. This class will evaluate the rules and then dispatch the resulting action events when the expressions return true.</p>
-
-<pre><code>use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-class RuleSubcriber implements EventSubscriberInterface
-{
-    private $dm;
-    private $expressionLanguage;
-    private $actionEventFactory;
-
-    // ...
-
-    public static function getSubscribedEvents()
+    protected function getCatchablePatterns()
     {
         return array(
-            UserAddToCartEvent::onUserAddToCart =&gt; array('handleEvent', 0),
+            '[a-z_\\\][a-z0-9_\:\\\]*[a-z0-9_]{1}',
+            '(?:[0-9]+(?:[\.][0-9]+)*)(?:e[+-]?[0-9]+)?',
+            "'(?:[^']|'')*'",
+            '\?[0-9]*|:[a-z]{1}[a-z0-9_]{0,}'
         );
     }
 
-    public function handleEvent(Event $event)
+    /**
+     * @inheritdoc
+     */
+    protected function getNonCatchablePatterns()
     {
-        $rules = $this-&gt;findRulesByEventName($event-&gt;getName());
+        return array('\s+', '(.)');
+    }
 
-        foreach ($rules as $rule) {
-            if ($this-&gt;evaluateRule($rule, $event)) {
-                $this-&gt;dispatchActionEvents($rule, $event);
+    /**
+     * @inheritdoc
+     */
+    protected function getType(&amp;$value)
+    {
+        $type = self::T_NONE;
+
+        // Recognizing numeric values
+        if (is_numeric($value)) {
+            return (strpos($value, '.') !== false || stripos($value, 'e') !== false)
+                    ? self::T_FLOAT : self::T_INTEGER;
+        }
+
+        // Differentiate between quoted names, identifiers, input parameters and symbols
+        if ($value[0] === "'") {
+            $value = str_replace("''", "'", substr($value, 1, strlen($value) - 2));
+            return self::T_STRING;
+        } else if (ctype_alpha($value[0]) || $value[0] === '_') {
+            $name = 'Doctrine\ORM\Query\Lexer::T_' . strtoupper($value);
+
+            if (defined($name)) {
+                $type = constant($name);
+
+                if ($type &gt; 100) {
+                    return $type;
+                }
+            }
+
+            return self::T_IDENTIFIER;
+        } else if ($value[0] === '?' || $value[0] === ':') {
+            return self::T_INPUT_PARAMETER;
+        } else {
+            switch ($value) {
+                case '.': return self::T_DOT;
+                case ',': return self::T_COMMA;
+                case '(': return self::T_OPEN_PARENTHESIS;
+                case ')': return self::T_CLOSE_PARENTHESIS;
+                case '=': return self::T_EQUALS;
+                case '&gt;': return self::T_GREATER_THAN;
+                case '&lt;': return self::T_LOWER_THAN;
+                case '+': return self::T_PLUS;
+                case '-': return self::T_MINUS;
+                case '*': return self::T_MULTIPLY;
+                case '/': return self::T_DIVIDE;
+                case '!': return self::T_NEGATE;
+                case '{': return self::T_OPEN_CURLY_BRACE;
+                case '}': return self::T_CLOSE_CURLY_BRACE;
+                default:
+                    // Do nothing
+                    break;
             }
         }
-    }
 
-    private function findRulesByEventName($eventName)
-    {
-        return $this-&gt;dm-&gt;createQueryBuilder()
-            -&gt;field('eventNames')-&gt;equals($eventName)
-            -&gt;getQuery()
-            -&gt;execute();
-    }
-
-    private function evaluateRule(Rule $rule, Event $event)
-    {
-        return $this-&gt;expressionLanguage-&gt;evaluate($rule-&gt;getExpression(), array(
-            'event' =&gt; $event,
-        ));
-    }
-
-    private function dispatchActionEvents(Rule $rule, Event $event)
-    {
-        foreach ($rule-&gt;getActionEvents() as $action) {
-            $this-&gt;dispatchActionEvent($action, $rule, $event);
-        }
-    }
-
-    private function dispatchActionEvent(array $action, Rule $rule, Event $event)
-    {
-        $recipientUser = $this-&gt;expressionLanguage($action['recipientExpression'], array(
-            'event' =&gt; $event,
-        ));
-
-        $actionEvent = $this-&gt;actionEventFactory-&gt;createActionEvent(
-            $action,
-            $recipientUser,
-            $rule
-        );
-
-        $this-&gt;dispatcher-&gt;dispatch($action['eventName'], $actionEvent);
+        return $type;
     }
 }
 </code></pre>
 
-<p>The <code>ActionEventFactory</code> used in the above <code>RuleSubcriber</code> is a simple service used to create the action events we dispatch for our rules.</p>
+<p>The <code>Lexer</code> parser is responsible for giving you an API to walk across a string and analyze the type, value and position of each token in the string. The low level API of the lexer is pretty simple:</p>
 
-<pre><code>class ActionEventFactory
+<ul><li><strong>setInput($input)</strong> - Sets the input data to be tokenized. The Lexer is immediately reset and the new input tokenized.</li>
+<li><strong>reset()</strong> - Resets the lexer.</li>
+<li><strong>resetPeek()</strong> - Resets the peek pointer to 0.</li>
+<li><strong>resetPosition($position = 0)</strong> - Resets the lexer position on the input to the given position.</li>
+<li><strong>isNextToken($token)</strong> - Checks whether a given token matches the current lookahead.</li>
+<li><strong>isNextTokenAny(array $tokens)</strong> - Checks whether any of the given tokens matches the current lookahead.</li>
+<li><strong>moveNext()</strong> - Moves to the next token in the input string.</li>
+<li><strong>skipUntil($type)</strong> - Tells the lexer to skip input tokens until it sees a token with the given value.</li>
+<li><strong>isA($value, $token)</strong> - Checks if given value is identical to the given token.</li>
+<li><strong>peek()</strong> - Moves the lookahead token forward.</li>
+<li><strong>glimpse()</strong> - Peeks at the next token, returns it and immediately resets the peek.</li>
+</ul>
+
+<p>Put it all together and this is what you get. This is what the Doctrine ORM DQL parser implementation looks like:</p>
+
+<pre><code>class Parser
 {
-    public function createActionEvent(array $action, User $user, Rule $rule)
-    {
-        switch ($action['eventName']) {
-            // ...
+    private $lexer;
 
-            case UserCreditRewardEvent::onUserCreditReward:
-                return new UserCreditRewardEvent($user, $action['attributes']['amount']);
-        }
+    public function __construct($dql)
+    {
+        $this-&gt;lexer = new Lexer();
+        $this-&gt;lexer-&gt;setInput($dql);
     }
+
+    // ...
+
+    public function getAST()
+    {
+        // Parse &amp; build AST
+        $AST = $this-&gt;QueryLanguage();
+
+        // ...
+
+        return $AST;
+    }
+
+    public function QueryLanguage()
+    {
+        $this-&gt;lexer-&gt;moveNext();
+
+        switch ($this-&gt;lexer-&gt;lookahead['type']) {
+            case Lexer::T_SELECT:
+                $statement = $this-&gt;SelectStatement();
+                break;
+            case Lexer::T_UPDATE:
+                $statement = $this-&gt;UpdateStatement();
+                break;
+            case Lexer::T_DELETE:
+                $statement = $this-&gt;DeleteStatement();
+                break;
+            default:
+                $this-&gt;syntaxError('SELECT, UPDATE or DELETE');
+                break;
+        }
+
+        // Check for end of string
+        if ($this-&gt;lexer-&gt;lookahead !== null) {
+            $this-&gt;syntaxError('end of string');
+        }
+
+        return $statement;
+    }
+
+    // ...
+}
+
+$parser = new Parser('SELECT u FROM User u');
+$AST = $parser-&gt;getAST(); // returns \Doctrine\ORM\Query\AST\SelectStatement
+</code></pre>
+
+<p>What is an AST? AST stands for <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree" target="_blank">Abstract syntax tree</a>:</p>
+
+<blockquote>In computer science, an abstract syntax tree (AST), or just syntax tree, is a tree representation of the abstract syntactic structure of source code written in a programming language. Each node of the tree denotes a construct occurring in the source code.</blockquote>
+
+<p>Now the AST is used to transform the DQL query in to portable SQL for whatever relational database you are using! Cool!</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2012/09/10/tumblr-code-syntax-highlighting">Tumblr Code Syntax Highlighting</a></h2>
+        </header>
+        <div>
+            <p>Finally got around to adding code syntax highlighting to my tumblr blog. Thanks to this <a href="http://snippets-of-code.tumblr.com/post/6027484416/adding-syntax-highlighting-into-tumblr" target="_blank">post</a> it was really easy!</p>
+
+<p>In your head tag add the following javascript:</p>
+
+<pre><code>&lt;!-- For Syntax Highlighting --&gt;
+&lt;script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" type="text/css" href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css"&gt;&lt;/link&gt;  
+&lt;script src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"&gt;&lt;/script&gt;  
+&lt;script&gt;
+    function styleCode() {
+        if (typeof disableStyleCode != 'undefined') { return; }
+
+        var a = false;
+
+        $('pre').each(function() {
+            if (!$(this).hasClass('prettyprint')) {
+                $(this).addClass('prettyprint');
+                a = true;
+            }
+        });
+
+        if (a) { prettyPrint(); } 
+    }
+
+    $(function() {styleCode();});
+&lt;/script&gt;
+</code></pre>
+
+<p>Then in your add this css:</p>
+
+<pre><code>/* Pretty printing styles. Used with prettify.js. */
+/* Vim sunburst theme by David Leibovic */
+
+pre .str, code .str { color: #65B042; } /* string  - green */
+pre .kwd, code .kwd { color: #E28964; } /* keyword - dark pink */
+pre .com, code .com { color: #AEAEAE; font-style: italic; } /* comment - gray */
+pre .typ, code .typ { color: #89bdff; } /* type - light blue */
+pre .lit, code .lit { color: #3387CC; } /* literal - blue */
+pre .pun, code .pun { color: #fff; } /* punctuation - white */
+pre .pln, code .pln { color: #fff; } /* plaintext - white */
+pre .tag, code .tag { color: #89bdff; } /* html/xml tag    - light blue */
+pre .atn, code .atn { color: #bdb76b; } /* html/xml attribute name  - khaki */
+pre .atv, code .atv { color: #65B042; } /* html/xml attribute value - green */
+pre .dec, code .dec { color: #3387CC; } /* decimal - blue */
+
+pre.prettyprint, code.prettyprint {
+        background-color: #000;
+        -moz-border-radius: 8px;
+        -webkit-border-radius: 8px;
+        -o-border-radius: 8px;
+        -ms-border-radius: 8px;
+        -khtml-border-radius: 8px;
+        border-radius: 8px;
+}
+
+pre.prettyprint {
+        width: 95%;
+        margin: 1em auto;
+        padding: 1em !important;
+        white-space: pre-wrap;
+}
+
+/* Specify class=linenums on a pre to get line numbering */
+ol.linenums { margin-top: 0; margin-bottom: 0; color: #AEAEAE; } /* IE indents via margin-left */
+li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8 { list-style-type: none }
+/* Alternate shading for lines */
+li.L1,li.L3,li.L5,li.L7,li.L9 { }
+
+@media print {
+  pre .str, code .str { color: #060; }
+  pre .kwd, code .kwd { color: #006; font-weight: bold; }
+  pre .com, code .com { color: #600; font-style: italic; }
+  pre .typ, code .typ { color: #404; font-weight: bold; }
+  pre .lit, code .lit { color: #044; }
+  pre .pun, code .pun { color: #440; }
+  pre .pln, code .pln { color: #000; }
+  pre .tag, code .tag { color: #006; font-weight: bold; }
+  pre .atn, code .atn { color: #404; }
+  pre .atv, code .atv { color: #060; }
 }
 </code></pre>
 
-<p>That is it! Now you have the ability to define rules that can be created with a user interface in your application and stored in a database. These rules get evaluated when certain events are dispatched within your application. When those rules evaluate to true you can dispatch other events that can give out credits, give free shipping, send e-mails, or do anything you can possibly imagine. Build up a repository of common actions as events and allow your business people to define new rules and rewards for promotional campaigns without having to involve a software engineer.</p>
+<p>That is it. I didn&rsquo;t think it would be that easy!</p>
+
+<p>You can find more themes <a href="http://google-code-prettify.googlecode.com/svn/trunk/styles/index.html" target="_blank">here</a>.</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2012/09/10/ruler-a-simple-stateless-production-rules-engine">Ruler: A simple stateless production rules engine for PHP 5.3+</a></h2>
+        </header>
+        <div>
+            <p><strong>What is ruler?</strong></p>
+
+<p><a href="https://github.com/bobthecow/ruler" target="_blank">Ruler</a> is a simple stateless production rules engine for PHP 5.3+ written by <a href="http://twitter.com/bobthecow" target="_blank">Justin Hileman (@bobthecow)</a>. Justin was previously employed at <a href="https://opensky.com" target="_blank">OpenSky</a> but these days you will find him hacking on a new startup named <a href="https://twitter.com/presentate" target="_blank">@presentate</a>.</p>
+
+<p><strong>What is a rules engine?</strong></p>
+
+<p>From <a href="http://martinfowler.com/bliki/RulesEngine.html" target="_blank">martinfowler.com</a>:</p>
+
+<blockquote>A rules engine is all about providing an alternative computational model. Instead of the usual imperative model, commands in sequence with conditionals and loops, it provides a list of production rules. Each rule has a condition and an action - simplistically you can think of it as a bunch of if-then statements.</blockquote>
+
+<p>From <a href="http://en.wikipedia.org/wiki/Business_rules_engine" target="_blank">wikipedia</a>:</p>
+
+<blockquote>A business rules engine is a software system that executes one or more business rules in a runtime production environment. The rules might come from legal regulation (&ldquo;An employee can be fired for any reason or no reason but not for an illegal reason&rdquo;), company policy (&ldquo;All customers that spend more than $100 at one time will receive a 10% discount&rdquo;), or other sources. A business rule system enables these company policies and other operational decisions to be defined, tested, executed and maintained separately from application code.</blockquote>
+
+<p><strong>What does Ruler usage look like?</strong></p>
+
+<p>Ruler has a nice and convenient DSL that is provided by <code>RuleBuilder</code>:</p>
+
+<pre><code>$rb = new RuleBuilder;
+$rule = $rb-&gt;create(
+    $rb-&gt;logicalAnd(
+        $rb['minAge']-&gt;greaterThan($rb['age']),
+        $rb['maxAge']-&gt;lessThan($rb['age'])
+    ),
+    function() {
+        echo 'Congratulations! You are between the ages of 18 and 25!';
+    }
+);
+
+$context = new Context(array(
+    'minAge' =&gt; 18,
+    'maxAge' =&gt; 25,
+    'age' =&gt; function() {
+        return 20;
+    },
+));
+
+$rule-&gt;execute($context); // "Congratulations! You are between the ages of 18 and 25!"
+</code></pre>
+
+<p>The full API is quite simple:</p>
+
+<pre><code>// These are Variables. They'll be replaced by terminal values during Rule evaluation.
+
+$a = $rb['a'];
+$b = $rb['b'];
+
+// Here are bunch of Propositions. They're not too useful by themselves, but they
+// are the building blocks of Rules, so you'll need 'em in a bit.
+
+$a-&gt;greaterThan($b);          // true if $a &gt; $b
+$a-&gt;greaterThanOrEqualTo($b); // true if $a &gt;= $b
+$a-&gt;lessThan($b);             // true if $a &lt; $b
+$a-&gt;lessThanOrEqualTo($b);    // true if $a &lt;= $b
+$a-&gt;equalTo($b);              // true if $a == $b
+$a-&gt;notEqualTo($b);           // true if $a != $b
+</code></pre>
+
+<p>You can combine things to create more complex rules:</p>
+
+<pre><code>// Create a Rule with an $a == $b condition
+$aEqualsB = $rb-&gt;create($a-&gt;equalTo($b));
+
+// Create another Rule with an $a != $b condition
+$aDoesNotEqualB = $rb-&gt;create($a-&gt;notEqualTo($b));
+
+// Now combine them for a tautology!
+// (Because Rules are also Propositions, they can be combined to make MEGARULES)
+$eitherOne = $rb-&gt;create($rb-&gt;logicalOr($aEqualsB, $aDoesNotEqualB));
+
+// Just to mix things up, we'll populate our evaluation context with completely
+// random values...
+$context = new Context(array(
+    'a' =&gt; rand(),
+    'b' =&gt; rand(),
+));
+
+// Hint: this is always true!
+$eitherOne-&gt;evaluate($context);
+</code></pre>
+
+<p>More complex examples:</p>
+
+<pre><code>$rb-&gt;logicalNot($aEqualsB);                  // The same as $aDoesNotEqualB :)
+$rb-&gt;logicalAnd($aEqualsB, $aDoesNotEqualB); // True if both conditions are true
+$rb-&gt;logicalOr($aEqualsB, $aDoesNotEqualB);  // True if either condition is true
+$rb-&gt;logicalXor($aEqualsB, $aDoesNotEqualB); // True if only one condition is true
+</code></pre>
+
+<p><strong>Full Examples</strong></p>
+
+<p>Check if user is logged in:</p>
+
+<pre><code>$context = new Context(array('username', function() {
+    return isset($_SESSION['username']) ? $_SESSION['username'] : null;
+}));
+
+$userIsLoggedIn = $rb-&gt;create($rb['username']-&gt;notEqualTo(null));
+
+if ($userIsLoggedIn-&gt;evaluate($context)) {
+    // Do something special for logged in users!
+}
+</code></pre>
+
+<p>If a Rule has an action, you can execute() it directly and save yourself a couple of lines of code.</p>
+
+<pre><code>$hiJustin = $rb-&gt;create(
+    $rb['userName']-&gt;equalTo('bobthecow'),
+    function() {
+        echo "Hi, Justin!";
+    }
+);
+
+$hiJustin-&gt;execute($context);  // "Hi, Justin!"
+</code></pre>
+
+<p><strong>What does <a href="https://opensky.com" target="_blank">OpenSky</a> use Ruler for?</strong></p>
+
+<p><a href="https://opensky.com" target="_blank">OpenSky</a> makes heavy use of Ruler. Below is a list of some of the conditions we have available in our application:</p>
+
+<ul><li><p>Joins OpenSky</p>
+
+<ul><li>Is Facebook Connected</li>
+<li>Number of friends is &gt;= n</li>
+<li>Number of friends is &lt;= n</li>
+<li>With certain origination parameters existing in URL</li>
+</ul></li>
+<li><p>Makes a Purchase</p>
+
+<ul><li>Within x days of joining</li>
+<li>Is first purchase</li>
+<li>Order amount is &gt;= n</li>
+</ul></li>
+<li><p>Loves an offer</p>
+
+<ul><li>Is first love of the day</li>
+</ul></li>
+<li><p>Visits OpenSky</p>
+
+<ul><li>Is Facebook Connected</li>
+<li>Number of friends is &gt;= n</li>
+<li>Number of friends is &lt;= n</li>
+<li>Users points are &gt;= n</li>
+</ul></li>
+</ul>
+
+<p>These are just some of the conditions we have available. Our application is setup in a way that we can easily create new rules via a backend GUI. We can mix and match conditions and rewards. Some of the rewards we have available are:</p>
+
+<ul><li>Issue n points</li>
+<li>New member level</li>
+<li>Credit</li>
+<li>Free shipping</li>
+</ul>
+
+<p>The benefit of this abstract setup is it allows us to combine different conditions, tweak the parameters of the conditions and issue rewards depending on the outcome of the condition all without requiring code changes and a deploy. You can imagine our business and marketing teams love this because they can change things all day long and without having to bother the tech team.</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2012/09/07/doctrine-dbal-php-database-abstraction-layer">Doctrine DBAL: PHP Database Abstraction Layer</a></h2>
+        </header>
+        <div>
+            <p>Most people think ORM when they hear the name <a href="http://doctrine-project.org" target="_blank">Doctrine</a>, but what most people don&rsquo;t know, or forget, is that Doctrine is built on top of a very powerful Database Abstraction Layer that has been under development for over a decade. It&rsquo;s history can be traced back to 1999 in a library named Metabase which was forked to create PEAR MDB, then MDB2, Zend_DB and finally Doctrine1. In Doctrine2 the DBAL was completely decoupled from the ORM, components re-written for PHP 5.3 and made a standalone library.</p>
+
+<p><strong>What does it support?</strong></p>
+
+<ul><li>Connection Abstraction</li>
+<li>Platform Abstraction</li>
+<li>Data Type Abstraction</li>
+<li>SQL Query Builder</li>
+<li>Transactions</li>
+<li>Schema Manager</li>
+<li>Schema Representation</li>
+<li>Events</li>
+<li>Prepared Statements</li>
+<li>Sharding</li>
+</ul>
+
+<p>Much more&hellip;</p>
+
+<p><strong>Creating a Connection</strong></p>
+
+<p>Creating connections is easy. It can be done by using the <code>DriverManager</code>:</p>
+
+<pre><code>&lt;?php
+$config = new \Doctrine\DBAL\Configuration();
+//..
+$connectionParams = array(
+    'dbname' =&gt; 'mydb',
+    'user' =&gt; 'user',
+    'password' =&gt; 'secret',
+    'host' =&gt; 'localhost',
+    'driver' =&gt; 'pdo_mysql',
+);
+$conn = DriverManager::getConnection($connectionParams, $config);
+</code></pre>
+
+<p>The <code>DriverManager</code> returns an instance of <code>Doctrine\DBAL\Connection</code> which is a wrapper around the underlying driver connection (which is often a PDO instance).</p>
+
+<p>By default we offer built-in support for many popular relational databases supported by PHP, such as:</p>
+
+<ul><li>pdo_mysql</li>
+<li>pdo_sqlite</li>
+<li>pdo_pgsql</li>
+<li>pdo_oci</li>
+<li>pdo_sqlsrv</li>
+<li>oci8</li>
+</ul>
+
+<p>If you need to do something custom, don&rsquo;t worry everything is abstracted so you can write your own drivers to communicate with any relational database you want. For example, recently work has <a href="https://github.com/doctrine/dbal/pull/191" target="_blank">begun</a> on integrating <a href="http://www.akiban.com/" target="_blank">Akiban SQL Server</a> with Doctrine.</p>
+
+<p><strong>How to work with your data</strong></p>
+
+<p>The <code>Doctrine\DBAL\Connection</code> object provides a convenient interface for retrieving and manipulating your data. You will find it is familiar and resembles PDO.</p>
+
+<pre><code>$sql = "SELECT * FROM articles";
+$stmt = $conn-&gt;query($sql);
+
+while ($row = $stmt-&gt;fetch()) {
+    echo $row['headline'];
+}
+</code></pre>
+
+<p>To send an update and return the affected rows you can do:</p>
+
+<pre><code>$count = $conn-&gt;executeUpdate('UPDATE user SET username = ? WHERE id = ?', array('jwage', 1));
+</code></pre>
+
+<p>It also provide a convenient <code>insert()</code> and <code>update()</code> method to make inserting and updating data easier:</p>
+
+<pre><code>$conn-&gt;insert('user', array('username' =&gt; 'jwage'));
+// INSERT INTO user (username) VALUES (?) (jwage)
+
+$conn-&gt;update('user', array('username' =&gt; 'jwage'), array('id' =&gt; 1));
+// UPDATE user (username) VALUES (?) WHERE id = ? (jwage, 1)
+</code></pre>
+
+<p><strong>Fluent Query Builder Interface</strong></p>
+
+<p>If you need a programatic way to build your SQL queries you can do so using the <code>QueryBuilder</code>. The <code>QueryBuilder</code> object has methods to add parts to a SQL statement. The API is roughly the same as that of the DQL Query Builder.</p>
+
+<p>To create a new query builder you can do so from your connection:</p>
+
+<pre><code>$qb = $conn-&gt;createQueryBuilder();
+</code></pre>
+
+<p>Now you can start to build your query:</p>
+
+<pre><code>$qb
+    -&gt;select('u')
+    -&gt;from('users', 'u')
+    -&gt;where($qb-&gt;expr()-&gt;eq('u.id', 1));
+</code></pre>
+
+<p>You can use named parameters:</p>
+
+<pre><code>$qb = $conn-&gt;createQueryBuilder()
+    -&gt;select('u')
+    -&gt;from('users', 'u')
+    -&gt;where('u.id = :user_id')
+    -&gt;setParameter(':user_id', 1);
+</code></pre>
+
+<p>It can handle joins:</p>
+
+<pre><code>$qb = $conn-&gt;createQueryBuilder()
+    -&gt;select('u.id')
+    -&gt;addSelect('p.id')
+    -&gt;from('users', 'u')
+    -&gt;leftJoin('u', 'phonenumbers', 'u.id = p.user_id');
+</code></pre>
+
+<p>Updates and deletes are no problem:</p>
+
+<pre><code>$qb = $conn-&gt;createQueryBuilder()
+    -&gt;update('users', 'u')
+    -&gt;set('u.password', md5('password'))
+    -&gt;where('u.id = ?');
+
+$qb = $conn-&gt;createQueryBuilder()
+    -&gt;delete('users', 'u')
+    -&gt;where('u.id = :user_id');
+    -&gt;setParameter(':user_id', 1);
+</code></pre>
+
+<p>If you want to inspect the SQL resulting from a <code>QueryBuilder</code>, that is no problem:</p>
+
+<pre><code>$qb = $em-&gt;createQueryBuilder()
+    -&gt;select('u')
+    -&gt;from('User', 'u')
+echo $qb-&gt;getSQL(); // SELECT u FROM User u
+</code></pre>
+
+<p>The interface has much more and handles most everything you can do when writing SQL manually. It instantly makes your queries reusable, extensible and easier to manage.</p>
+
+<p><strong>Managing your Schema</strong></p>
+
+<p>One of my favorite features of the Doctrine 2.x series is the schema management feature. A <code>SchemaManager</code> instance helps you with the abstraction of the generation of SQL assets such as Tables, Sequences, Foreign Keys and Indexes.</p>
+
+<p>To get a <code>SchemaManager</code> you can use the <code>getSchemaManager()</code> method on your connection:</p>
+
+<pre><code>$sm = $conn-&gt;getSchemaManager();
+</code></pre>
+
+<p>Now you can introspect your database with the API:</p>
+
+<pre><code>$databases = $sm-&gt;listDatabases();
+$sequences = $sm-&gt;listSequences('dbname');
+
+foreach ($sequences as $sequence) {
+    echo $sequence-&gt;getName() . "\n";
+}
+</code></pre>
+
+<p>List the columns in a table:</p>
+
+<pre><code>$columns = $sm-&gt;listTableColumns('user');
+foreach ($columns as $column) {
+    echo $column-&gt;getName() . ': ' . $column-&gt;getType() . "\n";
+}
+</code></pre>
+
+<p>You can even issue DDL statements from the <code>SchemaManager</code>:</p>
+
+<pre><code>$table-&gt;addColumn('email_address', 'string');
+</code></pre>
+
+<p><strong>Schema Representation</strong></p>
+
+<p>For a complete representation of the current database you can use the createSchema() method which returns an instance of <code>Doctrine\DBAL\Schema\Schema</code>, which you can use in conjunction with the <code>SchemaTool</code> or <code>SchemaComparator</code>.</p>
+
+<pre><code>$fromSchema = $sm-&gt;createSchema();
+
+$toSchema = clone $fromSchema;
+$toSchema-&gt;dropTable('user');
+$sql = $fromSchema-&gt;getMigrateToSql($toSchema, $conn-&gt;getDatabasePlatform());
+
+print_r($sql);
+
+/*
+array(
+  0 =&gt; 'DROP TABLE user'
+)
+*/
+</code></pre>
+
+<p>The <code>SchemaManager</code> allows for some nice functionality to be built for the <a href="http://www.doctrine-project.org/projects/orm.html" target="_blank">Doctrine ORM</a> project for reverse engineering databases in to Doctrine mapping files. This makes it easy to get started using the ORM with legacy databases. It is also used in the <a href="http://www.doctrine-project.org/projects/migrations.html" target="_blank">Doctrine Migrations</a> project to allow you to manage versions of your schema and easily deploy changes to production databases in a controlled and versioned fashion.</p>
+
+<p>The next time you need to access a relational database in PHP, whether it be in a proprietary or open source application, consider <a href="http://doctrine-project.org" target="_blank">Doctrine</a>. Take advantage of our community and team of developers so you can focus on your core competency and really excel in it.</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2012/09/07/deploying-opensky-with-fabric">Deploying OpenSky with Fabric</a></h2>
+        </header>
+        <div>
+            <p>At <a href="http://opensky.com" target="_blank">OpenSky</a> we use <a href="http://docs.fabfile.org/en/1.4.3/index.html" target="_blank">Fabric</a> to deploy new versions of software to our servers. We deploy dozens of times a day to our testing environments, and do daily deploys to production.</p>
+
+<p>Our production web nodes are split in to two groups, <strong>group1</strong> and <strong>group2</strong>. It is setup that way so we can easily pull out a group of web nodes from the load balancer for maintenance without disrupting the site.</p>
+
+<p>In this post I will take you through a hotfix scenario and the steps we take to deploy to production.</p>
+
+<p><strong>The Scenario</strong></p>
+
+<p>Imagine we just released <strong>v3.0.0</strong> to production and we discover a critical bug that must be hotfixed.</p>
+
+<p>First thing we need to do is create a hotfix branch. We use <a href="https://github.com/nvie/gitflow" target="_blank">gitflow</a> to assist with streamlining this process. I won&rsquo;t talk too much about it here so I will assume you already know what it is.</p>
+
+<p>Create the hotfix:</p>
+
+<pre><code>git flow hotfix start 3.0.1
+</code></pre>
+
+<p>Modify the <strong>opensky/config/version.ini</strong> file and bump the version number:</p>
+
+<pre><code>[parameters]
+opensky.version = 3.0.1
+</code></pre>
+
+<p>Add the changed file, commit it and push up the hotfix:</p>
+
+<pre><code>git add opensky/config/version.ini
+git commit -m"Bump version to 3.0.1"
+git push origin hotfix/3.0.1
+</code></pre>
+
+<p>Another developer who is responsible for fixing the bug will create a new branch based off of <strong>hotfix/3.0.1</strong> where the fix will be made:</p>
+
+<pre><code>git fetch
+git checkout -b fix-the-bug origin/hotfix/3.0.1
+</code></pre>
+
+<p>The developer makes some changes and pushes up the new branch:</p>
+
+<pre><code>git add src/changed/file
+git commit -m"Fixed nasty bug"
+git push origin fix-the-bug
+</code></pre>
+
+<p>We use <a href="http://github.com" target="_blank">GitHub</a> pull requests for all of our code changes to be as transparent as possible and maintain a high level of peer code review. The developer would create a pull request for the <strong>fix-the-bug</strong> branch and ask for a team mate to review. We have a special bot named <strong>@pr-nightmare</strong> that runs our tests against the branch to ensure stability before it is merged. Once the branch gets a +1 from @pr-nightmare the team mate can merge the branch in to <strong>hotfix/3.0.1</strong>.</p>
+
+<p>Once it is merged we are ready to finish the hotfix:</p>
+
+<pre><code>git pull origin hotfix/3.0.1
+git flow hotfix finish 3.0.1
+</code></pre>
+
+<p>The above command will merge <strong>hotfix/3.0.1</strong> in to <strong>production</strong> and <strong>develop</strong> and create a new tag named <strong>v3.0.1</strong> that can be deployed to production.</p>
+
+<p>Now push the finished hotfix up to git:</p>
+
+<pre><code>git push origin develop
+git push origin production
+git push --tags
+</code></pre>
+
+<p>We are all set and ready to go to production with the <strong>v3.0.1</strong> tag using fabric.</p>
+
+<p>First thing we need to do is pull out a group of nodes from the load balancer so that we can deploy <strong>v3.0.1</strong> to it. We will pull out <strong>group1</strong> and leave <strong>group2</strong> live:</p>
+
+<pre><code>fab prod proxy.group2
+</code></pre>
+
+<p>Now <strong>group2</strong> is live and <strong>group1</strong> is not receiving any traffic so we can deploy to it:</p>
+
+<pre><code>fab prod:out deploy:stable
+</code></pre>
+
+<p>The above command automatically determines what the latest stable tag to deploy is. In this case it will deploy <strong>v3.0.1</strong>.</p>
+
+<p>Once that is done we can flip <strong>group1</strong> live and pull out <strong>group2</strong>:</p>
+
+<pre><code>fab prod proxy.flip
+</code></pre>
+
+<p>Now <strong>group1</strong> is live with the hotfix and <strong>group2</strong> is out of rotation. To finish we run the same command as before and deploy the hotfix to <strong>group2</strong> as well:</p>
+
+<pre><code>fab prod:out deploy:stable
+</code></pre>
+
+<p>We can push both groups live again and we are done:</p>
+
+<pre><code>fab prod proxy.all
+</code></pre>
+
+<p>The process could be even more streamlined and we&rsquo;re actively working to remove steps and make it even easier to deploy to production!</p>
 
         </div>
             </article>

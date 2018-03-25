@@ -304,6 +304,901 @@ abstract class LazyService extends ContainerAware
 
         </div>
             </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2014/10/18/forcing-https-for-all-traffic-with-f5-irules">Forcing HTTPS for all traffic with F5 iRules</a></h2>
+        </header>
+        <div>
+            <p>If you want to force all traffic to HTTPS you can do so pretty easily by adding a F5 iRule to the HTTP VIP.</p>
+
+<pre><code>when HTTP_REQUEST {
+    HTTP::redirect "https://[HTTP::host][HTTP::uri]"
+}
+</code></pre>
+
+<p>You should have two virtual servers configured in the F5, one for HTTP and one for HTTPS. By adding the redirect iRule to the HTTP virtual server it will only be executed for traffic that comes in without HTTPS. This means the iRule code above does not need any kind of conditional to check what the protocol is and only redirect when it is not HTTPS.</p>
+
+<p>If you wanted to wrap some other conditional around the redirect, say you don&rsquo;t want to redirect one particular section of your site, you can do this:</p>
+
+<pre><code>when HTTP_REQUEST {
+    if { not ([string tolower [HTTP::path]] starts_with "/non-secure-section") } {
+        HTTP::redirect "https://[HTTP::host][HTTP::uri]"
+    }
+}
+</code></pre>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2014/07/22/2014-vacation-books">2014 Vacation Books</a></h2>
+        </header>
+        <div>
+            <ul><li><p><a href="http://www.amazon.com/Five-Love-Languages-Heartfelt-Commitment-ebook/dp/B00F4KBJ8I" target="_blank">The Five Love Languages: How to Express Heartfelt Commitment to Your Mate</a></p></li>
+<li><p><a href="http://www.amazon.com/How-Win-Friends-Influence-People/dp/0671027034" target="_blank">How to Win Friends &amp; Influence People</a></p></li>
+<li><p><a href="http://www.amazon.com/Nikola-Tesla-Imagination-Invented-Century-ebook/dp/B00CATSONE/" target="_blank">Nikola Tesla: Imagination and the Man That Invented the 20th Century</a></p></li>
+<li><p><a href="http://www.amazon.com/My-Life-Work-Henry-Ford-ebook/dp/B0084AMXOY" target="_blank">My Life and Work (Henry Ford Autobiography)</a></p></li>
+<li><p>Started this but did not finish. <a href="http://www.amazon.com/Black-Swan-Impact-Highly-Improbable-ebook/dp/B00139XTG4" target="_blank">The Black Swan: Second Edition: The Impact of the Highly Improbable Fragility</a></p></li>
+</ul>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2014/02/15/using-the-symfony-expression-language-for-a-reward">Using the Symfony Expression Language for a Reward Rules Engine</a></h2>
+        </header>
+        <div>
+            <p>We recently adopted the <a href="http://symfony.com/doc/current/components/expression_language/index.html" target="_blank">Symfony Expression Language</a> in the rules engine at <a href="http://www.opensky.com" target="_blank">OpenSky</a>. It has brought a new level of flexibility to our system and creating new logic has never been easier.</p>
+
+<p>Installing the expression language in your application is easy with composer. Just add the following to your <code>composer.json</code>:</p>
+
+<pre><code>"symfony/expression-language": "2.5.*@dev"
+</code></pre>
+
+<p>The expression language allows you to perform expressions that get evaluated with raw PHP code and return a single value. It can be any type of value and is not limited to boolean values. Here is a simple example:</p>
+
+<pre><code>use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
+$language = new ExpressionLanguage();
+
+$expression = 'user["isActive"] == true and product["price"] &gt; 20';
+$context = array(
+    'user' =&gt; array(
+        'isActive' =&gt; true
+    ),
+    'product' =&gt; array(
+        'price' =&gt; 30
+    ),
+);
+
+$return = $language-&gt;evaluate($expression, $context);
+
+var_export($return); // true
+</code></pre>
+
+<p>That is a very simple example on how to use the raw expression language. Now I will try to demonstrate how you could model a real implementation using <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a> to persist your rules to a database, the <a href="http://symfony.com/doc/current/components/event_dispatcher/introduction.html" target="_blank">Symfony Event Dispatcher</a> to evaluate your rules and execute actions when your expressions evaluate to true.</p>
+
+<p>To get started create a new <code>Rule</code> class and map it to a database using one of the Doctrine object mappers. For this example we will map it using the MongoDB ODM:</p>
+
+<pre><code>use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+
+/**
+ * @ODM\Document
+ */
+class Rule
+{
+    /**
+     * @ODM\Id
+     */
+    private $id;
+
+    /**
+     * @ODM\Collection
+     */
+    private $eventNames = array();
+
+    /**
+     * @ODM\String
+     */
+    private $expression;
+
+    /**
+     * @ODM\Collection
+     */
+    private $actionEvents = array();
+
+    // ...
+}
+</code></pre>
+
+<p>Now imagine you already have an event named <code>user.add_to_cart</code> being notified in your application. It looks something like this:</p>
+
+<pre><code>use Symfony\Component\EventDispatcher\Event;
+
+class UserAddToCartEvent extends Event
+{
+    const onUserAddToCart = 'user.add_to_cart';
+
+    private $user;
+    private $product;
+
+    // ...
+}
+
+class AddToCartController
+{
+    // ...
+
+    public function addToCartAction($productId)
+    {
+        // ...
+
+        $this-&gt;dispatcher-&gt;dispatch(UserAddToCartEvent::onUserAddToCart, new UserAddToCartEvent($user, $product));
+    }
+}
+</code></pre>
+
+<p>Say you want to give a reward to users who add items to their cart when they have loved more than <code>20</code> items and the price of the product is greater than <code>50</code> dollars. The <code>Rule</code> model we created earlier allows us to define a rule that will be executed when <code>UserAddToCart::onUserAddToCart</code> is dispatched:</p>
+
+<pre><code>$rule = new Rule();
+
+// set the events this rule should be executed on.
+$rule-&gt;setEventNames(array(
+    UserAddToCartEvent::onUserAddToCart
+));
+
+// set the expression to evaluate when the rule is executed.
+// if the user has loved more than 20 items and the price of the product is more than 50 dollars.
+// the expression string will be evaluated by the Symfony expression language.
+$rule-&gt;setExpression('event.getUser().getNumLoves() &gt; 20 and event.getProduct().getPrice() &gt; 50');
+
+// set the action events to dispatch when the expression evaluates to true.
+$rule-&gt;setActionEvents(array(
+    array(
+        'eventName' =&gt; UserCreditRewardEvent::onUserCreditReward,
+        'recipientExpression' =&gt; 'event.getUser()',
+        'attributes' =&gt; array(
+            'amount' =&gt; 50
+        ),
+    )
+));
+
+$dm-&gt;persist($rule);
+$dm-&gt;flush();
+</code></pre>
+
+<p>The above example assumes you have a <code>UserCreditRewardEvent</code> setup and a listener setup to process the event to give the user a credit. Here is what the event would look like:</p>
+
+<pre><code>use Symfony\Component\EventDispatcher\Event;
+
+class UserCreditRewardEvent extends Event
+{
+    const onUserCreditReward = 'user.credit_reward';
+
+    private $user;
+    private $amount;
+
+    // ...
+}
+</code></pre>
+
+<p>And here is what the listener would look like to give the user the credit. This example assumes you already have a <code>CreditManager</code> service with an <code>issueCredit()</code> method you can use to give a user a credit for a dollar amount:</p>
+
+<pre><code>class UserCreditRewardListener
+{
+    private $creditManager;
+
+    // ...
+
+    public function onUserCreditReward(UserCreditRewardEvent $event)
+    {
+        $this-&gt;creditManager-&gt;issueCredit(
+            $event-&gt;getUser(),
+            $event-&gt;getAmount()
+        );
+    }
+}
+</code></pre>
+
+<p>Now to bring it all together we need a <code>RuleSubcriber</code> to lookup the <code>Rule</code> objects from the database when events occur in our application. This class will evaluate the rules and then dispatch the resulting action events when the expressions return true.</p>
+
+<pre><code>use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class RuleSubcriber implements EventSubscriberInterface
+{
+    private $dm;
+    private $expressionLanguage;
+    private $actionEventFactory;
+
+    // ...
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            UserAddToCartEvent::onUserAddToCart =&gt; array('handleEvent', 0),
+        );
+    }
+
+    public function handleEvent(Event $event)
+    {
+        $rules = $this-&gt;findRulesByEventName($event-&gt;getName());
+
+        foreach ($rules as $rule) {
+            if ($this-&gt;evaluateRule($rule, $event)) {
+                $this-&gt;dispatchActionEvents($rule, $event);
+            }
+        }
+    }
+
+    private function findRulesByEventName($eventName)
+    {
+        return $this-&gt;dm-&gt;createQueryBuilder()
+            -&gt;field('eventNames')-&gt;equals($eventName)
+            -&gt;getQuery()
+            -&gt;execute();
+    }
+
+    private function evaluateRule(Rule $rule, Event $event)
+    {
+        return $this-&gt;expressionLanguage-&gt;evaluate($rule-&gt;getExpression(), array(
+            'event' =&gt; $event,
+        ));
+    }
+
+    private function dispatchActionEvents(Rule $rule, Event $event)
+    {
+        foreach ($rule-&gt;getActionEvents() as $action) {
+            $this-&gt;dispatchActionEvent($action, $rule, $event);
+        }
+    }
+
+    private function dispatchActionEvent(array $action, Rule $rule, Event $event)
+    {
+        $recipientUser = $this-&gt;expressionLanguage($action['recipientExpression'], array(
+            'event' =&gt; $event,
+        ));
+
+        $actionEvent = $this-&gt;actionEventFactory-&gt;createActionEvent(
+            $action,
+            $recipientUser,
+            $rule
+        );
+
+        $this-&gt;dispatcher-&gt;dispatch($action['eventName'], $actionEvent);
+    }
+}
+</code></pre>
+
+<p>The <code>ActionEventFactory</code> used in the above <code>RuleSubcriber</code> is a simple service used to create the action events we dispatch for our rules.</p>
+
+<pre><code>class ActionEventFactory
+{
+    public function createActionEvent(array $action, User $user, Rule $rule)
+    {
+        switch ($action['eventName']) {
+            // ...
+
+            case UserCreditRewardEvent::onUserCreditReward:
+                return new UserCreditRewardEvent($user, $action['attributes']['amount']);
+        }
+    }
+}
+</code></pre>
+
+<p>That is it! Now you have the ability to define rules that can be created with a user interface in your application and stored in a database. These rules get evaluated when certain events are dispatched within your application. When those rules evaluate to true you can dispatch other events that can give out credits, give free shipping, send e-mails, or do anything you can possibly imagine. Build up a repository of common actions as events and allow your business people to define new rules and rewards for promotional campaigns without having to involve a software engineer.</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2014/02/12/tailing-log-files-across-multiple-servers">Tailing Log Files Across Multiple Servers</a></h2>
+        </header>
+        <div>
+            <p>Install the utility named <code>dsh</code>:</p>
+
+<pre><code>apt-get install dsh
+brew install dsh
+</code></pre>
+
+<p>Add the list of servers you want to work with to <code>.dsh/machines.list</code> in your home directory. It might look something like this:</p>
+
+<pre><code>web1.prod.domain.com
+web2.prod.domain.com
+web3.prod.domain.com
+web4.prod.domain.com
+web5.prod.domain.com
+web6.prod.domain.com
+</code></pre>
+
+<p>Add this to your <code>.ssh/config</code>:</p>
+
+<pre><code>Host web*.prod.domain.com
+  User your_username
+</code></pre>
+
+<p>Now you can do things like this:</p>
+
+<pre><code>dsh -Mac -- "tail -f /var/log/some_log_file.log"
+</code></pre>
+
+<p>Combine that with grep to look for certain things that you are logging:</p>
+
+<pre><code>dsh -Mac -- "tail -f /var/log/some_log_file.log" | grep "look for something"
+</code></pre>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2014/01/18/doctrine-is-not-just-an-orm-for-relational">Doctrine is not just an ORM for Relational Databases</a></h2>
+        </header>
+        <div>
+            <p>In April of 2010 the <a href="https://github.com/doctrine/mongodb-odm/commit/92582ffe5facffa4d2379f176dbee539918db962" target="_blank">first commit</a> for the Doctrine MongoDB ODM project was made. I was experimenting with MongoDB at the time and I wanted to see how difficult it would be to build a version of Doctrine for MongoDB.</p>
+
+<p>Up until the MongoDB ODM, Doctrine was solely a project built around the DBAL/ORM and was advertised as such. In May of 2010 we decided to widen the scope of the project so that we could host libraries like the MongoDB ODM. This change led to a spur of new contributors and development and we now have several object mappers developed under Doctrine and things are more active than ever.</p>
+
+<p>Below is an overview of all the libraries underneath the Doctrine project.</p>
+
+<p><strong>Common Shared Libraries</strong></p>
+
+<p><strong><a href="http://github.com/doctrine/common" target="_blank">doctrine/common</a></strong></p>
+
+<p>Doctrine Common contains some base functionality and interfaces you need in order to create a Doctrine style object mapper. All of our mapper projects follow the same <code>Doctrine\Common\Persistence</code> interfaces. Here are the <code>ObjectManager</code> and <code>ObjectRepository</code> interfaces:</p>
+
+<pre><code>&lt;?php
+
+namespace Doctrine\Common\Persistence
+
+interface ObjectManager
+{
+    public function find($className, $id);
+    public function persist($object);
+    public function remove($object);
+    public function merge($object);
+    public function clear($objectName = null);
+    public function detach($object);
+    public function refresh($object);
+    public function flush();
+    public function getRepository($className);
+}
+
+interface ObjectRepository
+{
+    public function find($id);
+    public function findAll();
+    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null);
+    public function findOneBy(array $criteria);
+}
+</code></pre>
+
+<p><strong><a href="http://github.com/doctrine/collections" target="_blank">doctrine/collections</a></strong></p>
+
+<p>Doctrine Collections is a library that contains classes for working with arrays of data. Here is an example using the simple <code>Doctrine\Common\Collections\ArrayCollection</code> class:</p>
+
+<pre><code>&lt;?php
+
+$data = new \Doctrine\Common\Collections\ArrayCollection(array(1, 2, 3));
+$data = $data-&gt;filter(function($count) { return $count &gt; 1; });
+</code></pre>
+
+<p><strong><a href="http://github.com/doctrine/annotations" target="_blank">doctrine/annotations</a></strong></p>
+
+<p>Doctrine Annotations is a library that allows you to parse structured information out of a doc block.</p>
+
+<p>Imagine you have a class with a doc block like the following:</p>
+
+<pre><code>&lt;?php
+
+/** @Foo(bar="value") */
+class User
+{
+
+}
+</code></pre>
+
+<p>You can parse the information out of the doc block for <code>User</code> easily. Define a new annotation object:</p>
+
+<pre><code>&lt;?php
+
+/**
+ * @Annotation
+ * @Target("CLASS")
+ */
+class Foo
+{
+    /** @var string */
+    public $bar;
+}
+</code></pre>
+
+<p>Now you can get instances of <code>Foo</code> defined on the <code>User</code>:</p>
+
+<pre><code>&lt;?php
+
+$reflClass = new ReflectionClass('User');
+$reader = new \Doctrine\Common\Annotations\AnnotationReader();
+$classAnnotations = $reader-&gt;getClassAnnotations($reflClass);
+
+foreach ($classAnnotations AS $annot) {
+    if ($annot instanceof Foo) {
+        echo $annot-&gt;bar; // prints "value";
+    }
+}
+</code></pre>
+
+<p><strong><a href="http://github.com/doctrine/inflector" target="_blank">doctrine/inflector</a></strong></p>
+
+<p>Doctrine Inflector is a library that can perform string manipulations with regard to upper/lowercase and singular/plural forms of words.</p>
+
+<pre><code>&lt;?php
+
+$camelCase = 'camelCase';
+$table = \Doctrine\Common\Inflector::tableize($camelCase);
+echo $table; // camel_case
+</code></pre>
+
+<p><strong><a href="http://github.com/doctrine/lexer" target="_blank">doctrine/lexer</a></strong></p>
+
+<p>Doctrine Lexer is a library that can be used in Top-Down, Recursive Descent Parsers. This lexer is used in Doctrine Annotations and in Doctrine ORM (DQL).</p>
+
+<p>Here is what the <code>AbstractLexer</code> provided by Doctrine looks like:</p>
+
+<pre><code>&lt;?php
+
+namespace Doctrine\Common\Lexer;
+
+abstract class AbstractLexer
+{
+    public function setInput($input);
+    public function reset();
+    public function resetPeek();
+    public function resetPosition($position = 0);
+    public function isNextToken($token);
+    public function isNextTokenAny(array $tokens);
+    public function moveNext();
+    public function skipUntil($type);
+    public function isA($value, $token);
+    public function peek();
+    public function glimpse();
+    public function getLiteral($token);
+
+    abstract protected function getCatchablePatterns();
+    abstract protected function getNonCatchablePatterns();
+    abstract protected function getType(&amp;$value);
+}
+</code></pre>
+
+<p>To implement a lexer just extend the <code>Doctrine\Common\Lexer\AbstractParser</code> class and implement the <code>getCatchablePatterns</code>, <code>getNonCatchablePatterns</code>, and <code>getType</code> methods. Here is a very simple example lexer implementation named <code>CharacterTypeLexer</code>. It tokenizes a string to <code>T_UPPER</code>, <code>T_LOWER</code> and <code>T_NUMER</code>:</p>
+
+<pre><code>&lt;?php
+
+use Doctrine\Common\Lexer\AbstractParser;
+
+class CharacterTypeLexer extends AbstractLexer
+{
+    const T_UPPER =  1;
+    const T_LOWER =  2;
+    const T_NUMBER = 3;
+
+    protected function getCatchablePatterns()
+    {
+        return array(
+            '[a-bA-Z0-9]',
+        );
+    }
+
+    protected function getNonCatchablePatterns()
+    {
+        return array();
+    }
+
+    protected function getType(&amp;$value)
+    {
+        if (is_numeric($value)) {
+            return self::T_NUMBER;
+        }
+
+        if (strtoupper($value) === $value) {
+            return self::T_UPPER;
+        }
+
+        if (strtolower($value) === $value) {
+            return self::T_LOWER;
+        }
+    }
+}
+</code></pre>
+
+<p>Use <code>CharacterTypeLexer</code> to extract an array of upper case characters:</p>
+
+<pre><code>&lt;?php
+
+class UpperCaseCharacterExtracter
+{
+    private $lexer;
+
+    public function __construct(CharacterTypeLexer $lexer)
+    {
+        $this-&gt;lexer = $lexer;
+    }
+
+    public function getUpperCaseCharacters($string)
+    {
+        $this-&gt;lexer-&gt;setInput($string);
+        $this-&gt;lexer-&gt;moveNext();
+
+        $upperCaseChars = array();
+        while (true) {
+            if (!$this-&gt;lexer-&gt;lookahead) {
+                break;
+            }
+
+            $this-&gt;lexer-&gt;moveNext();
+
+            if ($this-&gt;lexer-&gt;token['type'] === CharacterTypeLexer::T_UPPER) {
+                $upperCaseChars[] = $this-&gt;lexer-&gt;token['value'];
+            }
+        }
+
+        return $upperCaseChars;
+    }
+}
+
+$upperCaseCharacterExtractor = new UpperCaseCharacterExtracter(new CharacterTypeLexer());
+$upperCaseCharacters = $upperCaseCharacterExtractor-&gt;getUpperCaseCharacters('1aBcdEfgHiJ12');
+
+print_r($upperCaseCharacters);
+</code></pre>
+
+<p>The variable <code>$upperCaseCharacters</code> contains all of the upper case characters:</p>
+
+<pre><code>Array
+(
+    [0] =&gt; B
+    [1] =&gt; E
+    [2] =&gt; H
+    [3] =&gt; J
+)
+</code></pre>
+
+<p><strong><a href="http://github.com/doctrine/cache" target="_blank">doctrine/cache</a></strong></p>
+
+<p>Doctrine Cache is a library that provides an interface for caching data. It comes with implementations for some of the most popular caching data stores. Here is what the <code>Cache</code> interface looks like:</p>
+
+<pre><code>&lt;?php
+
+namespace Doctrine\Common\Cache;
+
+interface Cache
+{
+    function fetch($id);
+    function contains($id);
+    function save($id, $data, $lifeTime = 0);
+    function delete($id);
+    function getStats();
+}
+</code></pre>
+
+<p>Here is an example using memcache:</p>
+
+<pre><code>&lt;?php
+
+$memcache = new \Memcache();
+$cache = new \Doctrine\Common\Cache\MemcacheCache();
+$cache-&gt;setMemcache($memcache);
+
+$cache-&gt;set('key', 'value');
+
+echo $cache-&gt;get('key') // prints "value"
+</code></pre>
+
+<p>Other supported drivers are:</p>
+
+<ul><li>APC</li>
+<li>Couchbase</li>
+<li>Filesystem</li>
+<li>Memcached</li>
+<li>MongoDB</li>
+<li>PhpFile</li>
+<li>Redis</li>
+<li>Riak</li>
+<li>WinCache</li>
+<li>Xcache</li>
+<li>ZendData</li>
+</ul>
+
+<p><strong>Database Abstraction Layers</strong></p>
+
+<p><strong><a href="http://github.com/doctrine/dbal" target="_blank">doctrine/dbal</a></strong></p>
+
+<p>Doctrine DBAL is a library that provides an abstraction layer for relational databases in PHP. Read <a href="http://jwage.com/post/31080076112/doctrine-dbal-php-database-abstraction-layer" target="_blank">Doctrine DBAL: PHP Database Abstraction Layer</a> blog post for more information on the DBAL.</p>
+
+<p><strong><a href="http://github.com/doctrine/mongodb" target="_blank">doctrine/mongodb</a></strong></p>
+
+<p>Doctrine MongoDB is a library that provides an abstraction layer on top of the PHP MongoDB PECL extension. It provides some additional functionality and abstractions to make working with MongoDB easier.</p>
+
+<p><strong><a href="http://github.com/doctrine/couchdb-client" target="_blank">doctrine/couchdb-client</a></strong></p>
+
+<p>Doctrine CouchDB Client is a library that provides a connection abstraction to CouchDB by wrapping around the CouchDB HTTP API.</p>
+
+<pre><code>&lt;?php
+
+$client = \Doctrine\CouchDB\CouchDBClient::create();
+
+array($id, $rev) = $client-&gt;postDocument(array('foo' =&gt; 'bar'));
+$client-&gt;putDocument(array('foo' =&gt; 'baz'), $id, $rev);
+
+$doc = $client-&gt;findDocument($id);
+</code></pre>
+
+<p><strong>Object Mappers</strong></p>
+
+<p>The object mappers are where all the pieces come together. The object mappers provide transparent persistence for PHP objects. As mentioned above, they all implement the common interfaces from <code>Doctrine\Common</code> so working with each of them is generally the same. You have an <code>ObjectManager</code> to manage the persistent state of your domain objects:</p>
+
+<pre><code>&lt;?php
+
+$user = new User();
+$user-&gt;setId(1);
+$user-&gt;setUsername('jwage');
+
+$om = $this-&gt;getYourObjectManager();
+$om-&gt;persist($user);
+$om-&gt;flush(); // insert the new document
+</code></pre>
+
+<p>Then you can find that object later and modify it:</p>
+
+<pre><code>&lt;?php
+
+$user = $om-&gt;find('User', 1);
+echo $user-&gt;getUsername(); // prints "jwage"
+
+$user-&gt;setUsername('jonwage'); // change the obj in memory
+
+$om-&gt;flush(); // updates the object in the database
+</code></pre>
+
+<p>You can find more information about the supported object mappers below:</p>
+
+<p><strong><a href="http://github.com/doctrine/doctrine2" target="_blank">doctrine/orm</a></strong></p>
+
+<p>Doctrine ORM provides persistence for PHP objects to relational database.</p>
+
+<p><strong><a href="http://github.com/doctrine/couchdb-odm" target="_blank">doctrine/couchdb-odm</a></strong></p>
+
+<p>Doctrine CouchDB ODM provides persistence for PHP objects to CouchDB.</p>
+
+<p><strong><a href="http://github.com/doctrine/phpcr-odm" target="_blank">doctrine/phpcr-odm</a></strong></p>
+
+<p>Doctrine PHPCR (Content Repository) ODM provides persistence to a backend like Jackalope or Midgard2. This is a specialized object mapper for dealing with data designed for building content websites. Think of this like a backend for a CMS (Content Management System).</p>
+
+<p><strong><a href="http://github.com/doctrine/mongodb-odm" target="_blank">doctrine/mongodb-odm</a></strong></p>
+
+<p>Doctrine MongoDB ODM provides persistence for PHP objects to MongoDB. You can read more about the MongoDB ODM <a href="http://jwage.com/post/30490170860/doctrine-mongodb-object-document-mapper-in-symfony2" target="_blank">here</a>.</p>
+
+<p><strong><a href="http://github.com/doctrine/orientdb-odm" target="_blank">doctrine/orientdb-odm</a></strong></p>
+
+<p>Doctrine OrientDB ODM provides persistence for PHP objects to OrientDB.</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2013/12/23/sending-safari-push-notifications-with-php">Sending Safari Push Notifications with PHP</a></h2>
+        </header>
+        <div>
+            <p>When OSX Mavericks was released, I was excited to see that push notifications were supported within Safari. So now, just like iOS, we can send push notifications to Safari regardless of whether the browser is open or not. This post gives overview of how to get them working from PHP using the <a href="http://github.com/jwage/php-apns" target="_blank">PHP APNS</a> library.</p>
+
+<h3>Registering with Apple and Generating Certificates</h3>
+
+<p>This post assumes you have read <a href="https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html#//apple_ref/doc/uid/TP40013225-CH3-SW1" target="_blank">this</a> article from Apple and have already generated your security certificates.</p>
+
+<h3>PHP APNS Library</h3>
+
+<p>The PHP APNS (Apple Push Notification Service) library makes it extremely easy to get Safari push notifications working on your website. Just install it with composer to get started:</p>
+
+<h3>Installation</h3>
+
+<pre><code>composer require jwage/php-apns
+composer install
+</code></pre>
+
+<h3>Push Package</h3>
+
+<p>Once you have the package installed you can start integrating it with your website. The first thing we need to do is create a base push package for your website. From Apple&rsquo;s website:</p>
+
+<blockquote>
+  <p>When a user is asked for permission to receive push notifications, Safari asks your web server for a package. The package contains data that is used by the notification UI, such as your website name and icon, as well as a cryptographic signature. The signature verifies that your notification hasn’t been intercepted by a man-in-the-middle attack and that it is indeed coming from a trusted source: you.</p>
+</blockquote>
+
+<p>You can find a sample base push package within the PHP APNS library <a href="https://github.com/jwage/php-apns/tree/master/data/safariPushPackage.base" target="_blank">here</a>. Copy this somewhere in your application and customize the icons in the icon.iconset folder and the website.json:</p>
+
+<pre><code>{
+    "websiteName": "WebsiteName",
+    "websitePushID": "web.com.domain",
+    "allowedDomains": ["http://", "https://"],
+    "urlFormatString": "http:///%@",
+    "authenticationToken": "",
+    "webServiceURL": "https:///safari_push_notifications/"
+}
+</code></pre>
+
+<h3>Web Service Endpoints</h3>
+
+<p>Now it is time to setup some endpoints in your web application for Safari to communicate with. You need endpoints to do the following:</p>
+
+<ul><li>Generate a push package for an individual user.</li>
+<li>Register a users device token.</li>
+<li>Deregister a users device token.</li>
+<li>Record log data sent by Safari when errors occur.</li>
+</ul>
+
+<p>Here is a pseudo controller demonstrating what each endpoint needs to do:</p>
+
+<pre><code>&lt;?php
+
+namespace App\Controller;
+
+use JWage\APNS\Certificate;
+use JWage\APNS\Safari\PackageGenerator;
+
+class SafariPushNotificationsController
+{
+    public function packageAction($userId)
+    {
+        // Send push notification package to browser when Safari asks user for permission to send you notifications.
+
+        $certificate = new Certificate(file_get_contents('apns.p12'), 'certpassword');
+        $packageGenerator = new PackageGenerator(
+            $certificate, '/path/to/base/pushPackage/path', 'yourhost.com'
+        );
+
+        // returns JWage\APNS\Safari\Package instance
+        $package = $packageGenerator-&gt;createPushPackageForUser('userid');
+
+        // send $package-&gt;getZipPath() to the browser
+    }
+
+    public function registerAction($userId, $deviceToken)
+    {
+        // store $deviceToken on the $userId so you can use it later to send pushes
+    }
+
+    public function deregisterAction($userId, $deviceToken)
+    {
+        // remove $deviceToken from $userId
+    }
+
+    public function logAction($userId)
+    {
+        // log information sent for debugging purposes
+    }
+}
+</code></pre>
+
+<h3>Requesting Permission</h3>
+
+<p>Requesting permission to send a user notifications in Safari can be done using this little snippet of javascript on your website:</p>
+
+<pre><code>if ('safari' in window &amp;&amp; 'pushNotification' in window.safari) {
+    var checkRemotePermission = function (permissionData) {
+        if (permissionData.permission === 'default') {
+            window.safari.pushNotification.requestPermission(
+                'http://domain.com/safari_push_notifications/',
+                'web.com.domain',
+                {
+                    'userId': 
+                },
+                checkRemotePermission
+            );
+        } else if (permissionData.permission === 'denied') {
+            // do something when permission is denied
+        } else if (permissionData.permission === 'granted') {
+            // do something when permission is granted
+        }
+    };
+
+    // Ensure that the user can receive Safari Push Notifications.
+    var permissionData = window.safari.pushNotification.permission('web.com.domain');
+    checkRemotePermission(permissionData);
+}
+</code></pre>
+
+<p>When a user visits your website with Safari in OSX Mavericks it will hit your web services endpoint, download the push package and ask the user if they want to receive notifications from your website.</p>
+
+<h3>Sending Push Notifications</h3>
+
+<p>Once you have done all of the above, you should be ready to send push notifications. The PHP APNS library makes this extremely easy. Here is an example:</p>
+
+<pre><code>use JWage\APNS\Certificate;
+use JWage\APNS\Client;
+use JWage\APNS\Sender;
+use JWage\APNS\SocketClient;
+
+$certificate = new Certificate(file_get_contents('apns.pem'));
+$socketClient = new SocketClient($certificate, 'gateway.push.apple.com', 2195);
+$client = new Client($socketClient);
+$sender = new Sender($client);
+
+$sender-&gt;send('devicetoken', 'Title of push', 'Body of push', 'http://deeplink.com');
+</code></pre>
+
+<p>You can create an easy to use service in your application for sending push notifications to an instance of <code>User</code>, assuming it implements a <code>getSafariDeviceToken()</code> method:</p>
+
+<pre><code>class SafariPushNotificationSender
+{
+    private $sender;
+
+    public function __construct(Sender $sender)
+    {
+        $this-&gt;sender = $sender;
+    }
+
+    public function sendToUser(User $user, $title, $body, $link)
+    {
+        return $this-&gt;sender-&gt;send($user-&gt;getSafariDeviceToken(), $title, $body, $link);
+    }
+}
+</code></pre>
+
+<p>Now it is as simple as the following:</p>
+
+<pre><code>$safariPushNotificationSender = new SafariPushNotificationSender($sender);
+$safariPushNotificationSender-&gt;sendToUser($user, 'Title of push', 'Body of push', 'http://deeplink.com');
+</code></pre>
+
+<p>I hope this was helpful! If you have any questions please leave them in the comments. Enjoy!</p>
+
+        </div>
+            </article>
+    <article>
+        <header>
+            <h2><a href="https://jwage.com/posts/2013/07/16/mongodb-php-mongodate-tricks">MongoDB PHP MongoDate Tricks</a></h2>
+        </header>
+        <div>
+            <p>Here are a few tricks I&rsquo;ve learned working with MongoDB and PHP.</p>
+
+<p><strong>Create DateTime from MongoId</strong></p>
+
+<p>Because MongoDB identifiers contain the date you can easily create a <code>DateTime</code> instance from them.</p>
+
+<pre><code>public function getDateTimeFromMongoId(MongoId $mongoId)
+{
+    $dateTime = new DateTime('@'.$mongoId-&gt;getTimestamp());
+    $dateTime-&gt;setTimezone(new DateTimeZone(date_default_timezone_get()));
+    return $dateTime;
+}
+</code></pre>
+
+<p>This is useful when you don&rsquo;t want to create an additional field to store the date a document was created. You can also use the _id index that already exists to paginate and filter/sort by date.</p>
+
+<p><strong>Create MongoId with Date in the Past</strong></p>
+
+<p>For the same reason as above, you can create a MongoId instance with a date in the past. This was copied from a <a href="http://stackoverflow.com/questions/14370143/create-mongodb-objectid-from-date-in-the-past-using-php-driver/14380093#14380093" target="_blank">stackoverflow answer</a> by <a href="http://derickrethans.nl/" target="_blank">Derek Rethans</a>.</p>
+
+<pre><code>public createMongoIdFromTimestamp($timestamp)
+{
+    $ts = pack('N', $timestamp);
+    $m = substr(md5(gethostname()), 0, 3);
+    $pid = pack('n', posix_getpid());
+    $trail = substr(pack('N', $this-&gt;inc++), 1, 3);
+
+    $bin = sprintf('%s%s%s%s', $ts, $m, $pid, $trail);
+
+    $id = '';
+    for ($i = 0; $i &lt; 12; $i++ ) {
+        $id .= sprintf('%02X', ord($bin[$i]));
+    }
+
+    return new \MongoID($id);
+}
+</code></pre>
+
+<p>This was useful when migrating legacy data in to a collection where we utilize the _id for pagination and displaying a created date. If we simply created identifiers with todays date then it would show old records with all the same date and pagination/sorting would be broken.</p>
+
+        </div>
+            </article>
 
     <nav>
         <br />
