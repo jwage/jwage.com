@@ -133,11 +133,12 @@ body {
     color: #EDEFF1 !important;
 }
 .footer-bottom {
-    background: #E3E3E3;
+    background: #333333;
     border-top: 1px solid #DDDDDD;
     padding-top: 10px;
     padding-bottom: 10px;
     min-height: 50px;
+    color: white;
 }
 .footer-bottom p.pull-left {
     padding-top: 6px;
