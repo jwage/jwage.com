@@ -73,1213 +73,261 @@
 
     <article>
         <header>
-            <h2><a href="https://jwage.com/posts/2010/07/31/array-dereferencing-in-php-trunk">Array dereferencing in PHP trunk</a></h2>
+            <h2><a href="https://jwage.com/posts/2013/07/16/mongodb-php-mongodate-tricks">MongoDB PHP MongoDate Tricks</a></h2>
         </header>
         <div>
-            <p>Today I was reading an <a href="http://schlueters.de/blog/archives/138-Features-in-PHP-trunk-Array-dereferencing.html" target="_blank">article</a> about array dereferencing in PHP trunk. It is an awesome new feature added to PHP! Imagine you had some code like this:</p>
+            <p>Here are a few tricks I&rsquo;ve learned working with MongoDB and PHP.</p>
 
-<pre><code>class Foo
+<p><strong>Create DateTime from MongoId</strong></p>
+
+<p>Because MongoDB identifiers contain the date you can easily create a <code>DateTime</code> instance from them.</p>
+
+<pre><code>public function getDateTimeFromMongoId(MongoId $mongoId)
 {
-    public function bar()
-    {
+    $dateTime = new DateTime('@'.$mongoId-&gt;getTimestamp());
+    $dateTime-&gt;setTimezone(new DateTimeZone(date_default_timezone_get()));
+    return $dateTime;
+}
+</code></pre>
+
+<p>This is useful when you don&rsquo;t want to create an additional field to store the date a document was created. You can also use the _id index that already exists to paginate and filter/sort by date.</p>
+
+<p><strong>Create MongoId with Date in the Past</strong></p>
+
+<p>For the same reason as above, you can create a MongoId instance with a date in the past. This was copied from a <a href="http://stackoverflow.com/questions/14370143/create-mongodb-objectid-from-date-in-the-past-using-php-driver/14380093#14380093" target="_blank">stackoverflow answer</a> by <a href="http://derickrethans.nl/" target="_blank">Derek Rethans</a>.</p>
+
+<pre><code>public createMongoIdFromTimestamp($timestamp)
+{
+    $ts = pack('N', $timestamp);
+    $m = substr(md5(gethostname()), 0, 3);
+    $pid = pack('n', posix_getpid());
+    $trail = substr(pack('N', $this-&gt;inc++), 1, 3);
+
+    $bin = sprintf('%s%s%s%s', $ts, $m, $pid, $trail);
+
+    $id = '';
+    for ($i = 0; $i &lt; 12; $i++ ) {
+        $id .= sprintf('%02X', ord($bin[$i]));
     }
-}
 
-function func()
-{
-    return new Foo();
+    return new \MongoID($id);
 }
 </code></pre>
 
-<p>Previous to this addition in PHP you had to do something like this:</p>
-
-<pre><code>$foo = func();
-$foo-&gt;bar();
-</code></pre>
-
-<p>Now it is possible to just call bar() directly without having to set the return of func() to a variable temporarily:</p>
-
-<pre><code>func()-&gt;bar();
-</code></pre>
-
-<p>You can also now access arrays when they are the return of a method:</p>
-
-<pre><code>function foo()
-{
-    return array(1, 2, 3);
-}
-echo foo()[2]; // prints 3
-</code></pre>
-
-<p>This greatly improves the syntax of PHP and I am very happy to see this committed!</p>
+<p>This was useful when migrating legacy data in to a collection where we utilize the _id for pagination and displaying a created date. If we simply created identifiers with todays date then it would show old records with all the same date and pagination/sorting would be broken.</p>
 
         </div>
             </article>
     <article>
         <header>
-            <h2><a href="https://jwage.com/posts/2010/07/30/doctrine-mongodb-odm-schema-migrations">Doctrine MongoDB ODM Schema Migrations</a></h2>
+            <h2><a href="https://jwage.com/posts/2013/07/13/quotes-from-the-road-to-serfdom-by-friedrich-hayek">Quotes from The Road to Serfdom by Friedrich Hayek</a></h2>
         </header>
         <div>
-            <p><a href="http://www.mongodb.org" target="_blank">MongoDB</a> is a schema-less database so as your domain model changes in Doctrine, you&rsquo;ll have newer documents with different fields than older documents. Since we don&rsquo;t have a way to rename a field internally in MongoDB, <a href="http://jira.mongodb.org/browse/SERVER-394" target="_blank">yet</a>, the only other option is to fetch all the documents and rename it in your application and update the document. This could take a really long time depending on how big your database is and will require downtime.</p>
+            <p><strong>I recently finished reading <a href="http://www.amazon.com/The-Road-Serfdom-Intellectuals-Socialism/dp/0255365764" target="_blank">The Road to Serfdom</a> by Friedrich Hayek. Here are some parts that stood out to me.</strong></p>
 
-<p>Doctrine provides ways for you to &ldquo;eventually&rdquo; migrate all your documents at application run-time. You have several options for working with database schema changes and this blog post will try and demonstrate them!</p>
+<p>&ldquo;We are ready to accept almost any explanation of the present crisis of our civilization except one: that the present state of the world may be the result of genuine error on our own part and that the pursuit of some of our most cherished ideals has apparently produced results utterly different from those which we expected.&rdquo;</p>
 
-<h2>Renaming a Field</h2>
+<p>“Democracy extends the sphere of individual freedom,” he said in 1848; “socialism restricts it. Democracy attaches all possible value to each man; socialism makes each man a mere agent, a mere number. Democracy and socialism have nothing in common but one word: equality. But notice the difference: while democracy seeks equality in liberty, socialism seeks equality in restraint and servitude.”</p>
 
-<p>Imagine you have a document in your domain named Person and it looked like this:</p>
+<p>&ldquo;While it is true, of course, that inventions have given us tremendous power, it is absurd to suggest that we must use this power to destroy our most precious inheritance: liberty. It does mean, however, that if we want to preserve it, we must guard it more jealously than ever and that we must be prepared to make sacrifices for it.&rdquo;</p>
 
-<pre><code>/** @Document */
-class Person
-{
-    /** @Id */
-    public $id;
+<p>&ldquo;The “social goal,” or “common purpose,” for which society is to be organized is usually vaguely described as the “common good,” the “general welfare,” or the “general interest.” It does not need much reflection to see that these terms have no sufficiently definite meaning to determine a particular course of action. The welfare and the happiness of millions cannot be measured on a single scale of less and more. The welfare of a people, like the happiness of a man, depends on a great many things that can be provided in an infinite variety of combinations. It cannot be adequately expressed as a single end, but only as a hierarchy of ends, a comprehensive scale of values in which every need of every person is given its place.&rdquo;</p>
 
-    /** @String */
-    public $name;
-}
-</code></pre>
+<p>&ldquo;Although each individual might wish the state to act in some way, there will be almost as many views about what the government should do as there are different people.&rdquo;</p>
 
-<p>Then imagine later you decide you want to rename $name to $fullName like this:</p>
+<p>&ldquo;It is not difficult to see what must be the consequences when democracy embarks upon a course of planning which in its execution requires more agreement than in fact exists. The people may have agreed on adopting a system of directed economy because they have been convinced that it will produce great prosperity.&rdquo;</p>
 
-<pre><code>/** @Document */
-class Person
-{
-    /** @Id */
-    public $id;
+<p>&ldquo;But the democratic legislature will long hesitate to relinquish the decisions on really vital issues, and so long as it does so it makes it impossible for anyone else to provide the comprehensive plan. Yet agreement that planning is necessary, together with the inability of democratic assemblies to produce a plan, will evoke stronger and stronger demands that the government or some single individual should be given powers to act on their own responsibility.&rdquo;</p>
 
-    /** @String */
-    public $fullName;
-}
-</code></pre>
+<p>&ldquo;The belief is becoming more and more widespread that, if things are to get done, the responsible authorities must be freed from the fetters of democratic procedure.&rdquo;</p>
 
-<p>All documents from now on will be created with a fullName property but you&rsquo;ll still have old documents with the name field. You can use the @AlsoLoad annotation here to also load another fields value in that property if it exists:</p>
+<p>&ldquo;Hitler did not have to destroy democracy; he merely took advantage of the decay of democracy and at the critical moment obtained the support of many to whom, though they detested Hitler, he yet seemed the only man strong enough to get things done.&rdquo;</p>
 
-<pre><code>/** @Document */
-class Person
-{
-    /** @Id */
-    public $id;
+<p>&ldquo;Nothing distinguishes more clearly conditions in a free country from those in a country under arbitrary government than the observance in the former of the great principles known as the Rule of Law. Stripped of all technicalities, this means that government in all its actions is bound by rules fixed and announced beforehand—rules which make it possible to foresee with fair certainty how the authority will use its coercive powers in given circumstances and to plan one’s individual affairs on the basis of this knowledge.&rdquo;</p>
 
-    /**
-     * @String
-     * @AlsoLoad("name")
-     */
-    public $fullName;
-}
-</code></pre>
+<p>&ldquo;Hence the familiar fact that the more the state “plans,” the more difficult planning becomes for the individual.&rdquo;</p>
 
-<h2>Transforming Data</h2>
+<p>&ldquo;Those most immediately interested in a particular issue are not necessarily the best judges of the interests of society as a whole.&rdquo;</p>
 
-<p>Another situation might be you want to load the name and fullName fields in to individual first and last name fields. We can handle this using the @AlsoLoad annotation on a method:</p>
+<p>&ldquo;The important thing is that the rule enables us to predict other people’s behavior correctly, and this requires that it should apply to all cases—even if in a particular instance we feel it to be unjust.&rdquo;</p>
 
-<pre><code>/** @Document */
-class Person
-{
-    /** @Id */
-    public $id;
+<p>&ldquo;Man is free if he needs to obey no person but solely the laws.&rdquo;</p>
 
-    /** @String */
-    public $firstName;
+<p>&ldquo;The idea that there is no limit to the powers of the legislator is in part a result of popular sovereignty and democratic government. It has been strengthened by the belief that, so long as all actions of the state are duly authorized by legislation, the Rule of Law will be preserved. But this is completely to misconceive the meaning of the Rule of Law. This rule has little to do with the question whether all actions of government are legal in the juridical sense. They may well be and yet not conform to the Rule of Law.&rdquo;</p>
 
-    /** @String */
-    public $lastName;
+<p>&ldquo;If the law says that such a board or authority may do what it pleases, anything that board or authority does is legal—but its actions are certainly not subject to the Rule of Law. By giving the government unlimited powers, the most arbitrary rule can be made legal; and in this way a democracy may set up the most complete despotism imaginable.&rdquo;</p>
 
-    /** @AlsoLoad({"name", "fullName"}) */
-    public function populateFirstAndLastName($fullName)
-    {
-        $e = explode(' ', $fullName);
-        $this-&gt;firstName = $e[0];
-        $this-&gt;lastName = $e[1];
-    }
-}
-</code></pre>
+<p>&ldquo;Indeed, when security is understood in too absolute a sense, the general striving for it, far from increasing the chances of freedom, becomes the gravest threat to it.&rdquo;</p>
 
-<p>So when a document has a field named name, or fullName it will execute the populateFirstAndLastName() method to handle the change when the document is loaded.</p>
+<p>&ldquo;There is no reason why in a society which has reached the general level of wealth which ours has attained the first kind of security should not be guaranteed to all without endangering general freedom.&rdquo;</p>
 
-<h2>Moving Fields</h2>
+<p>&ldquo;We must here return for a moment to the position which precedes the suppression of democratic institutions and the creation of a totalitarian regime. In this stage it is the general demand for quick and determined government action that is the dominating element in the situation, dissatisfaction with the slow and cumbersome course of democratic procedure which makes action for action’s sake the goal. It is then the man or the party who seems strong and resolute enough “to get things done” who exercises the greatest appeal. “Strong” in this sense means not merely a numerical majority—it is the ineffectiveness of parliamentary majorities with which people are dissatisfied. What they will seek is somebody with such solid support as to inspire confidence that he can carry out whatever he wants. It is here that the new type of party, organized on military lines, comes in.&rdquo;</p>
 
-<p>You also have a few other options for dealing with changes in your model:</p>
+<p>&ldquo;That socialism can be put into practice only by methods which most socialists disapprove is, of course, a lesson learned by many social reformers in the past.&rdquo;</p>
 
-<ul><li>@PostLoad - execute code after all fields have been loaded.</li>
-<li>@PrePersist - execute code before your document gets saved.</li>
-<li>@NotSaved - load values into fields without saving them again.</li>
-</ul>
+<p>&ldquo;It seems to be almost a law of human nature that it is easier for people to agree on a negative program—on the hatred of an enemy, on the envy of those better off— than on any positive task.&rdquo;</p>
 
-<p>Imagine you have some address fields on a Person document:</p>
+<p>&ldquo;The definitely antagonistic attitude which most planners take toward internationalism is further explained by the fact that in the existing world all outside contacts of a group are obstacles to their effectively planning the sphere in which they can attempt it. It is therefore no accident that, as the editor of one of the most comprehensive collective studies on planning has discovered to his chagrin, “most ‘planners’ are militant nationalists.”</p>
 
-<pre><code>/** @Document(collection="people") */
-class Person
-{
-    /** @Id */
-    public $id;
+<p>&quot;The desire to organize social life according to a unitary plan itself springs largely from a desire for power.&rdquo;</p>
 
-    /** @String */
-    public $name;
+<p>&ldquo;We have seen before how the separation of economic and political aims is an essential guaranty of individual freedom and how it is consequently attacked by all collectivists. To this we must now add that the “substitution of political for economic power” now so often demanded means necessarily the substitution of power from which there is no escape for a power which is always limited. What is called economic power, while it can be an instrument of coercion, is, in the hands of private individuals, never exclusive or complete power, never power over the whole life of a person. But centralized as an instrument of political power it creates a degree of dependence scarcely distinguishable from slavery.&rdquo;</p>
 
-    /** @String */
-    public $street;
+<p>&ldquo;It would, however, be highly unjust to regard the masses of the totalitarian people as devoid of moral fervor because they give unstinted support to a system which to us seems a denial of most moral values. For the great majority of them the opposite is probably true: the intensity of the moral emotions behind a movement like that of National Socialism or communism can probably be compared only to those of the great religious movements of history.&rdquo;</p>
 
-    /** @String */
-    public $city;
-}
-</code></pre>
-
-<p>Then later you want to store a persons address in another object as an embedded document:</p>
-
-<pre><code>/** @EmbeddedDocument */
-class Address
-{
-    /** @String */
-    public $street;
-
-    /** @String */
-    public $city;
-
-    public function __construct($street, $city)
-    {
-        $this-&gt;street = $street;
-        $this-&gt;city = $city;
-    }
-}
-
-/**
- * @Document(collection="people")
- * @HasLifecycleCallbacks
- */
-class Person
-{
-    /** @Id */
-    public $id;
-
-    /** @String */
-    public $name;
-
-    /** @NotSaved */
-    public $street;
-
-    /** @NotSaved */
-    public $city;
-
-    /** @EmbedOne(targetDocument="Address") */
-    public $address;
-
-    /** @PostLoad */
-    public function postLoad()
-    {
-        if ($this-&gt;street !== null || $this-&gt;city !== null)
-        {
-            $this-&gt;address = new Address($this-&gt;street, $this-&gt;city);
-        }
-    }
-}
-</code></pre>
-
-<p>The above will change the document each time it is loaded. If you want to change it permanently in the database you can do it when the document is being updated:</p>
-
-<pre><code>/**
-  * @Document(collection="people")
-  * @HasLifecycleCallbacks
-  */
-class Person
-{
-    // ...
-
-    /** @PreUpdate */
-    public function preUpdate()
-    {
-        if ($this-&gt;street !== null || $this-&gt;city !== null)
-        {
-            $this-&gt;address = new Address($this-&gt;street, $this-&gt;city);
-        }
-    }
-}
-</code></pre>
+<p>&ldquo;Yet while there is little that is likely to induce men who are good by our standards to aspire to leading positions in the totalitarian machine, and much to deter them, there will be special opportunities for the ruthless and unscrupulous. There will be jobs to be done about the badness of which taken by themselves nobody has any doubt, but which have to be done in the service of some higher end, and which have to be executed with the same expertness and efficiency as any others. And as there will be need for actions which are bad in themselves, and which all those still influenced by traditional morals will be reluctant to perform, the readiness to do bad things becomes a path to promotion and power. The positions in a totalitarian society in which it is necessary to practice cruelty and intimidation, deliberate deception and spying, are numerous. Neither the Gestapo nor the administration of a concentration camp, neither the Ministry of Propaganda nor the SA or SS (or their Italian or Russian counterparts), are suitable places for the exercise of humanitarian feelings.13 Yet it is through positions like these that the road to the highest positions in the totalitarian state leads. It is only too true when a distinguished American economist concludes from a similar brief enumeration of the duties of the authorities of a collectivist state that “they would have to do these things whether they wanted to or not: and the probability of the people in power being individuals who would dislike the possession and exercise of power is on a level with the probability that an extremely tender-hearted person would get the job of whipping-master in a slave plantation.”</p>
 
         </div>
             </article>
     <article>
         <header>
-            <h2><a href="https://jwage.com/posts/2010/07/28/setting-entitydocument-references-without-hitting">Setting Entity/Document references without hitting the database</a></h2>
+            <h2><a href="https://jwage.com/posts/2013/07/08/tracking-new-member-origination-with-symfony2">Tracking New Member Origination with Symfony2</a></h2>
         </header>
         <div>
-            <p>In <a href="http://www.doctrine-project.org/projects/orm/1.2/docs/en" target="_blank">Doctrine 1</a> when you want to specify a reference you have two options, you can set the foreign key manually:</p>
-
-<pre><code>$user-&gt;setProfileId($profileId);
-$user-&gt;save();
-</code></pre>
-
-<p>The problem here is that the profile_id is set in the object but the reference to a Profile instance is not set. The next option is to actually set the object reference:</p>
-
-<pre><code>$profile = Doctrine_Core::getTable('Profile')-&gt;find($profileId);
-$user-&gt;setProfile($profile);
-$user-&gt;save();
-</code></pre>
-
-<p>Here the reference is set properly but the downside to this approach is that it requires us to load the entire Profile object just to set the reference. It is silly! Thanks to the <a href="http://www.doctrine-project.org/projects/orm" target="_blank">Doctrine2 ORM</a> and <a href="http://www.doctrine-project.org/projects/mongodb_odm" target="_blank">MongoDB ODM</a> you have the ability to retrieve a reference to an object without having to hit the database. Here is an example:</p>
-
-<pre><code>$profile = $em-&gt;getReference('Profile', $profileId);
-$user-&gt;setProfile($profile);
-$em-&gt;flush();
-</code></pre>
-
-<p>Or the same thing with the MongoDB ODM:</p>
-
-<pre><code>$profile = $dm-&gt;getReference('Profile', $profileId);
-$user-&gt;setProfile($profile);
-$dm-&gt;flush();
-</code></pre>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2010/07/28/inheritance-and-mapped-super-classes-in-doctrine">Inheritance and Mapped Super Classes in Doctrine</a></h2>
-        </header>
-        <div>
-            <p><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/inheritance-mapping/en#single-collection-inheritance" target="_blank">Single Collection Inheritance</a> in the <a href="http://www.doctrine-project.org/projects/mongodb_odm" target="_blank">Doctrine MongoDB ODM</a> allows you to map multiple classes in an inheritance hierarchy to a single collection in <a href="http://www.mongodb.org" target="_blank">MongoDB</a>. An example might be in a CMS where you have several different content types like the base Node, Page and BlogPost which all extends an abstract ContentType class.</p>
-
-<p>First define the ContentType class that is a @MappedSuperclass:</p>
-
-<pre><code>/**
- * @MappedSuperclass
- * @HasLifecycleCallbacks
- */
-abstract class ContentType
-{
-    /** @Id */
-    protected $id;
-
-    /** @Date */
-    protected $createdAt;
-
-    /** @Date */
-    protected $updatedAt;
-
-    public function getId()
-    {
-        return $this-&gt;id;
-    }
-
-    /** @PreUpdate */
-    public function preUpdate()
-    {
-        $this-&gt;updatedAt = new DateTime();
-    }
-
-    /** @PrePersist */
-    public function prePersist()
-    {
-        $this-&gt;createdAt = new DateTime();
-        $this-&gt;updatedAt = new DateTime();
-    }
-}
-</code></pre>
-
-<p>Now we can define our base Node content type:</p>
-
-<pre><code>/**
- * @Document(collection="pages")
- * @InheritanceType("SINGLE_COLLECTION")
- * @DiscriminatorField(fieldName="type")
- * @DiscriminatorMap({
- *   "node"="Node",
- *   "page"="Page",
- *   "blog_post"="BlogPost"
- * })
- */
-class Node extends ContentType
-{
-    /** @String */
-    protected $title;
-
-    public function getTitle()
-    {
-        return $this-&gt;title;
-    }
-
-    public function setTitle($title)
-    {
-        $this-&gt;title = $title;
-    }
-}
-</code></pre>
-
-<p>This gives us our base content type node functionality that we can extend to create the Page document which adds a body field for the page:</p>
-
-<pre><code>/** @Document */
-class Page extends Node
-{
-    /** @String */
-    protected $body;
-
-    public function getBody()
-    {
-        return $this-&gt;body;
-    }
-
-    public function setBody($body)
-    {
-        $this-&gt;body = $body;
-    }
-}
-</code></pre>
-
-<p>And the BlogPost document is a custom type of page that adds some additional fields related to blog posts like an excerpt and tags:</p>
-
-<pre><code>/** @Document */
-class BlogPost extends Page
-{
-    /** @Collection */
-    private $tags = array();
-
-    /** @String */
-    private $excerpt;
-
-    public function getExcerpt()
-    {
-        return $this-&gt;excerpt;
-    }
-
-    public function setExcerpt($excerpt)
-    {
-        $this-&gt;excerpt = $excerpt;
-    }
-
-    public function addTag($tag)
-    {
-        $this-&gt;tags[] = $tag;
-    }
-
-    public function removeTag($tag)
-    {
-        $key = array_search($tag, $this-&gt;tags);
-        if ($key !== false) {
-            unset($this-&gt;tags[$key]);
-        }
-    }
-
-    public function getTags()
-    {
-        return $this-&gt;tags;
-    }
-}
-</code></pre>
-
-<p>You can easily add new content types by mapping a document class that extends the base Node. All your documents will be stored in a single collection and a discriminator field will be used to discriminate which class created each document.</p>
-
-<p>Now we can use our document classes and create new instances and persist them. Here is an example where we create a new blog post:</p>
-
-<pre><code>$post = new BlogPost();
-$post-&gt;setTitle('Test');
-$post-&gt;setExcerpt('Testing');
-$post-&gt;setBody('w00t');
-$post-&gt;addTag('test');
-$dm-&gt;persist($post);
-$dm-&gt;flush();
-</code></pre>
-
-<p>The above would result in a document like the following in MongoDB:</p>
-
-<pre><code>Array
-(
-    [_id] =&gt; 4c4f38978ead0ef23f000000
-    [createdAt] =&gt; MongoDate Object
-        (
-            [sec] =&gt; 1280260247
-            [usec] =&gt; 0
-        )
-
-    [updatedAt] =&gt; MongoDate Object
-        (
-            [sec] =&gt; 1280260247
-            [usec] =&gt; 0
-        )
-
-    [title] =&gt; Test
-    [body] =&gt; w00t
-    [tags] =&gt; Array
-        (
-            [0] =&gt; test
-        )
-
-    [excerpt] =&gt; Testing
-    [type] =&gt; blog_post
-)
-</code></pre>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2010/07/27/using-yql-to-get-geo-location-information-for-an">Using YQL to get geo location information for an IP address</a></h2>
-        </header>
-        <div>
-            <p>The <a href="http://developer.yahoo.com/yql/" target="_blank">Yahoo! YQL API</a> has the ability to provide geo location information for IP addresses. Using this in PHP is dead simple. Here is a barebones example demonstrating how you can use PHP and YQL for this:</p>
-
-<pre><code>$ipAddress = '76.22.200.69';
-$query = sprintf("select * from ip.location where ip='%s'", $ipAddress);
-$queryUrl = "http://query.yahooapis.com/v1/public/yql?q=" . urlencode($query)."&amp;format=json&amp;env=".urlencode("store://datatables.org/alltableswithkeys");
-$json = file_get_contents($queryUrl);
-$data = json_decode($json);
-print_r($data);
-</code></pre>
-
-<p>The above code would output the following:</p>
-
-<pre><code>stdClass Object
-(
-    [query] =&gt; stdClass Object
-        (
-            [count] =&gt; 1
-            [created] =&gt; 2010-07-27T04:27:20Z
-            [lang] =&gt; en-US
-            [results] =&gt; stdClass Object
-                (
-                    [Response] =&gt; stdClass Object
-                        (
-                            [Ip] =&gt; 76.22.200.69
-                            [Status] =&gt; OK
-                            [CountryCode] =&gt; US
-                            [CountryName] =&gt; United States
-                            [RegionCode] =&gt; 47
-                            [RegionName] =&gt; Tennessee
-                            [City] =&gt; Nashville
-                            [ZipPostalCode] =&gt; 37205
-                            [Latitude] =&gt; 36.1121
-                            [Longitude] =&gt; -86.863
-                            [Timezone] =&gt; 0
-                            [Gmtoffset] =&gt; 0
-                            [Dstoffset] =&gt; 0
-                        )
-
-                )
-
-        )
-
-)
-</code></pre>
-
-<p>I took this a step further and built a little abstraction layer on top of this functionality. Now, retrieving geo location information for IP addresses using the YQL API is easier than ever using the PHP YQL Geo Locator library. You can get the code on <a href="http://github.com/jwage/php-yql-geo-locator" target="_blank">github</a>. Continue reading to learn how to get started!</p>
-
-<p>First, clone the git repository:</p>
-
-<pre><code>$ git clone git://github.com/jwage/php-yql-geo-locator.git
-</code></pre>
-
-<p>Now you need to setup your code to use the library:</p>
-
-<pre><code>use GeoLocator\Locator;
-use GeoLocator\Location;
-use GeoLocator\GoogleMapImage;
-
-require 'php-yql-geo-locator/lib/GeoLocator/Location.php';
-require 'php-yql-geo-locator/lib/GeoLocator/Locator.php';
-require 'php-yql-geo-locator/lib/GeoLocator/GoogleMapImage.php';
-</code></pre>
-
-<p>After setting everything up you are ready to start working with geo locations
-using the locator API:</p>
-
-<ul><li>getGeoLocation($ip)</li>
-<li>getGoogleMapImageForIps(array $ips)</li>
-<li>getGoogleMapImageForIp($ip)</li>
-</ul>
-
-<p>Here is an example using the getGeoLocation() method:</p>
-
-<pre><code>$geoLocation = $locator-&gt;getGeoLocation('76.22.200.69');
-</code></pre>
-
-<p>It returns an instance of GeoLocator\Location and has a simple public API for retrieving the geo location information for the IP address:</p>
-
-<pre><code>echo $geoLocation-&gt;getLatitude();
-</code></pre>
-
-<p>You can also export all the information to a PHP array using the toArray() method:</p>
-
-<pre><code>print_r($geoLocation-&gt;toArray());
-</code></pre>
-
-<p>It would result in an array that looks like this:</p>
-
-<pre><code>Array
-(
-    [ip] =&gt; 76.22.200.69
-    [countryCode] =&gt; US
-    [countryName] =&gt; United States
-    [regionCode] =&gt; 47
-    [regionName] =&gt; Tennessee
-    [city] =&gt; Nashville
-    [zipPostalCode] =&gt; 37205
-    [latitude] =&gt; 36.1121
-    [longitude] =&gt; -86.863
-    [timezone] =&gt; 0
-    [gmtOffset] =&gt; 0
-    [dstOffset] =&gt; 0
-)
-</code></pre>
-
-<p>Get a google map that plots multiple IP addresses:</p>
-
-<pre><code>$image = $locator-&gt;getGoogleMapImageForIps(array(
-    '76.22.200.69',
-    '74.125.65.106'
-));
-</code></pre>
-
-<p>The above method returns an instance of GoogleMapImage and has the following API:</p>
-
-<ul><li>setWidth($width)</li>
-<li>setHeight($height)</li>
-<li>setMaptype($maptype)</li>
-<li>setSensor($sensor)</li>
-<li>setZoom($zoom)</li>
-<li>addLocation(Location $location)</li>
-<li>getUrl()</li>
-<li>getHTMLImageTag()</li>
-<li>__toString()</li>
-</ul>
-
-<p>Now you can just echo the $image to get the HTML image:</p>
-
-<pre><code>echo $image;
-</code></pre>
-
-<p>The above would result in an image tag that looks like the following:</p>
-
-<pre><code>&lt;img src="http://maps.google.com/maps/api/staticmap?zoom=&amp;size=550x550&amp;maptype=roadmap&amp;sensor=false&amp;markers=color:blue|label:76.22.200.69|36.1121,-86.863&amp;markers=color:blue|label:74.125.65.106|37.4192,-122.057" width="550" height="550" /&gt;
-</code></pre>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2010/07/27/storing-files-with-mongodb-gridfs">Storing Files with MongoDB GridFS</a></h2>
-        </header>
-        <div>
-            <p>The <a href="http://www.php.net/mongo" target="_blank">PHP MongoDB</a> extension provides a nice and convenient way to store files in chunks of data with the <a href="http://us.php.net/manual/en/class.mongogridfs.php" target="_blank">MongoDB GridFS</a>. It uses two database collections, one to store the metadata for the file, and another to store the contents of the file. The contents are stored in chunks to avoid going over the maximum allowed size of a MongoDB document.</p>
-
-<p>You can easily setup a Document that is stored using the MongoDB GridFS by using the @File annotation:</p>
-
-<pre><code>namespace Documents;
-
-/** @Document(collection="files") */
-class Image
-{
-    /** @Id */
-    private $id;
-
-    /** @String */
-    private $name;
-
-    /** @File */
-    private $file;
-
-    private function getId()
-    {
-        return $this-&gt;id;
-    }
-
-    private function setName($name)
-    {
-        $this-&gt;name = $name;
-    }
-
-    private function getName()
-    {
-        return $this-&gt;name;
-    }
-
-    private function getFile()
-    {
-        return $this-&gt;file;
-    }
-
-    private function setFile($file)
-    {
-        $this-&gt;file = $file;
-    }
-}
-</code></pre>
-
-<p>Notice the $file property with @File annotation, it tells the Document that it is is to be stored using the MongoGridFS and the <a href="http://www.php.net/MongoGridFSFile" target="_blank">MongoGridFSFile</a> instance is placed in the $file property for you.</p>
-
-<p>Now you can create a new Image setting the path to a file and persist it:</p>
-
-<pre><code>$image = new Image();
-$image-&gt;setName('Test image');
-$image-&gt;setFile('/path/to/image.png');
-
-$dm-&gt;persist($image);
-$dm-&gt;flush();
-</code></pre>
-
-<p>Then later you can retrieve that image and render it:</p>
-
-<pre><code>$image = $dm-&gt;createQuery('Documents\Image')
-    -&gt;field('name')
-    -&gt;equals('Test image')
-    -&gt;getSingleResult();
-
-header('Content-type: image/png;');
-echo $image-&gt;getFile()-&gt;getBytes();
-</code></pre>
-
-<p>You can of course make references to this Image document from another document.
-Imagine you had a Profile document and you wanted every Profile to have a profile
-image:</p>
-
-<pre><code>namespace Documents;
-
-/** @Document(collection="profiles") */
-class Profile
-{
-    /** @Id */
-    private $id;
-
-    /** @String */
-    private $name;
-
-    /** @ReferenceOne(targetDocument="Documents\Image") */
-    private $image;
-
-    private function getId()
-    {
-      return $this-&gt;id;
-    }
-
-    private function getName()
-    {
-        return $this-&gt;name;
-    }
-
-    private function setName($name)
-    {
-        $this-&gt;name = $name;
-    }
-
-    private function getImage()
-    {
-        return $this-&gt;image;
-    }
-
-    private function setImage(Image $image)
-    {
-        $this-&gt;image = $image;
-    }
-}
-</code></pre>
-
-<p>Now you can create a new Profile and give it an Image:</p>
-
-<pre><code>$image = new Image();
-$image-&gt;setName('Test image');
-$image-&gt;setFile('/path/to/image.png');
-
-$profile = new Profile();
-$profile-&gt;setName('Jonathan H. Wage');
-$profile-&gt;setImage($image);
-
-$dm-&gt;persist($profile);
-$dm-&gt;flush();
-</code></pre>
-
-<p>If you want to query for the Profile and load the Image reference in a query
-you can use:</p>
-
-<pre><code>$profile = $dm-&gt;createQuery('Profile')
-    -&gt;field('name')-&gt;equals('Jonathan H. Wage')
-    -&gt;getSingleResult();
-
-$image = $profile-&gt;getImage();
-
-header('Content-type: image/png;');
-echo $image-&gt;getFile()-&gt;getBytes();
-</code></pre>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2010/07/27/multiple-levels-of-embedded-documents-in-mongodb">Multiple levels of Embedded Documents in MongoDB</a></h2>
-        </header>
-        <div>
-            <p>One of the greatest things about <a href="http://www.mongodb.org" target="_blank">MongoDB</a> is the fact that it is schema-less. It makes for a very flexible domain model persistence layer. For example it is possible to have multiple levels of embedded documents. A useful example might be where you have many profiles and each profile has many addresses. In the <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a> MongoDB <a href="http://www.doctrine-project.org/projects/odm" target="_blank">ODM</a> mapping this is trivial.</p>
-
-<p>First create your top level <code>User</code> document:</p>
-
-<pre><code>/** @Document(collection="users") */
-class User
-{
-    /** @Id */
-    private $id;
-
-    /** @String */
-    private $username;
-
-    /** @EmbedMany(targetDocument="Profile") */
-    private $profiles = array();
-
-    public function setUsername($username)
-    {
-        $this-&gt;username = $username;
-    }
-
-    public function addProfile(Profile $profile)
-    {
-        $this-&gt;profiles[] = $profile;
-    }
-}
-</code></pre>
-
-<p>As you can see we embed another document class named Profile so lets define that as an embedded document:</p>
-
-<pre><code>/** @EmbeddedDocument */
-class Profile
-{
-    /** @String */
-    private $name;
-
-    /** @EmbedMany(targetDocument="Address") */
-    private $addresses = array();
-
-    public function setName($name)
-    {
-        $this-&gt;name = $name;
-    }
-
-    public function addAddress(Address $address)
-    {
-        $this-&gt;addresses[] = $address;
-    }
-}
-</code></pre>
-
-<p>Finally, we&rsquo;ve embedded a document in Profile named Address so lets define it:</p>
-
-<pre><code>/** @EmbeddedDocument */
-class Address
-{
-    /** @String */
-    private $number;
-
-    /** @String */
-    private $street;
-
-    /** @String */
-    private $city;
-
-    /** @String */
-    private $state;
-
-    /** @String */
-    private $zipcode;
-
-    public function setNumber($number)
-    {
-        $this-&gt;number = $number;
-    }
-
-    public function setStreet($street)
-    {
-        $this-&gt;street = $street;
-    }
-
-    public function setCity($city)
-    {
-        $this-&gt;city = $city;
-    }
-
-    public function setState($state)
-    {
-        $this-&gt;state = $state;
-    }
-
-    public function setZipcode($zipcode)
-    {
-        $this-&gt;zipcode = $zipcode;
-    }
-}
-</code></pre>
-
-<p>Now you can start working with the PHP objects just like you would if no persistence layer was present at all and persist the objects transparently when you are ready to have the state of the objects managed by Doctrine:</p>
-
-<pre><code>$user = new User();
-$user-&gt;setUsername('jwage');
-
-$profile = new Profile();
-$profile-&gt;setName('Profile #1');
-
-$user-&gt;addProfile($profile);
-
-$address = new Address();
-$address-&gt;setNumber('6512');
-$address-&gt;setStreet('Mercomatic');
-$address-&gt;setCity('Nashville');
-$address-&gt;setState('Tennessee');
-$address-&gt;setZipcode('37209');
-
-$profile-&gt;addAddress($address);
-
-$profile = new Profile();
-$profile-&gt;setName('Profile #2');
-
-$user-&gt;addProfile($profile);
-
-$address = new Address();
-$address-&gt;setNumber('475');
-$address-&gt;setStreet('Buckhead Ave');
-$address-&gt;setCity('Atlanta');
-$address-&gt;setState('Georgia');
-$address-&gt;setZipcode('30303');
-
-$profile-&gt;addAddress($address);
-
-$dm-&gt;persist($user);
-$dm-&gt;flush();
-</code></pre>
-
-<p>The above would result in an array being stored in MongoDB like the following:</p>
-
-<pre><code>Array
-(
-    [_id] =&gt; MongoId Object
-        (
-        )
-    [username] =&gt; jwage
-    [profiles] =&gt; Array
-        (
-            [0] =&gt; Array
-                (
-                    [name] =&gt; Profile #1
-                    [addresses] =&gt; Array
-                        (
-                            [0] =&gt; Array
-                                (
-                                    [number] =&gt; 6512
-                                    [street] =&gt; Mercomatic
-                                    [city] =&gt; Nashville
-                                    [state] =&gt; Tennessee
-                                    [zipcode] =&gt; 37209
-                                )
-                        )
-                )
-            [1] =&gt; Array
-                (
-                    [name] =&gt; Profile #2
-                    [addresses] =&gt; Array
-                        (
-                            [0] =&gt; Array
-                                (
-                                    [number] =&gt; 475
-                                    [street] =&gt; Buckhead Ave
-                                    [city] =&gt; Atlanta
-                                    [state] =&gt; Georgia
-                                    [zipcode] =&gt; 30303
-                                )
-                        )
-                )
-        )
-)
-</code></pre>
-
-<p>We can then later retrieve the documents from MongoDB and our object domain model will be reconstructed as you have mapped it:</p>
-
-<pre><code>$user = $dm-&gt;findOne('User', array('username' =&gt; 'jwage'));
-</code></pre>
-
-<p>You can see the complete working script for this blog post as a gist on <a href="http://gist.github.com/492509" target="_blank">github</a>.</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2010/07/26/executing-sql-after-loading-your-data-fixtures-in">Executing SQL after loading your data fixtures in symfony 1.4</a></h2>
-        </header>
-        <div>
-            <p>Sometimes you may need to execute some SQL after your data fixtures are loaded in <a href="http://www.symfony-project.org" target="_blank">symfony</a> 1.4 if you need to do something that is specific to your RDBMS that is not supported by <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a> or <a href="http://www.propelorm.org" target="_blank">Propel</a>. Thankfully symfony 1.4 has many well placed events which allow you to hook in to core functionality and execute your own code when certain actions are performed.</p>
-
-<p>Here is an example where you execute some manually SQL statements after the doctrine:data-load task:</p>
-
-<pre><code>class ProjectConfiguration extends sfProjectConfiguration
-{
-  public function setup()
-  {
-    // ...
-    $this-&gt;dispatcher-&gt;connect('command.post_command', array(
-      $this, 'listenToCommandPostCommandEvent'
-    ));
-  }
-
-  public function listenToCommandPostCommandEvent(sfEvent $event)
-  {
-    $invoker = $event-&gt;getSubject();
-    if ($invoker instanceof sfDoctrineDataLoadTask)
-    {
-      $conn = Doctrine_Manager::connection();
-      $conn-&gt;exec(// ...);
-    }
-  }
-}
-</code></pre>
-
-<p>Symfony 1.4 has many events that you can use to customize things when developing your project. <a href="http://www.symfony-project.org/reference/1_4/en/15-Events" target="_blank">Read more</a> about events in the 1.4 documentation.</p>
-
-        </div>
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2010/07/26/doctrine-mongodb-object-document-mapper-in">Doctrine MongoDB Object Document Mapper in Symfony2</a></h2>
-        </header>
-        <div>
-            <h1>MongoDB</h1>
-
-<p>The <a href="http://www.mongodb.org/" target="_blank">MongoDB</a> Object Document Mapper is much like the Doctrine2 ORM in the
-way it works and architecture. You only deal with plain PHP objects and they are persisted
-transparently without imposing on your domain model.</p>
-
-<blockquote>
-  <p><strong>TIP</strong>
-  You can read more about the Doctrine MongoDB Object Document Mapper on the
-  projects <a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/en" target="_blank">documentation</a>.</p>
+            <blockquote>
+  <p><strong>NOTE</strong>
+  The example code in this blog post has been simplified to make things more concise and easy to read.</p>
 </blockquote>
 
-<h2>Configuration</h2>
+<p>At <a href="http://www.opensky.com" target="_blank">OpenSky</a> it is important for us to track how a member joined so that we can determine causation between joining and any subsequent actions taken on the site, like an order.</p>
 
-<p>To get started working with Doctrine and the MongoDB Object Document Mapper you just need
-to enable it:</p>
+<p>To get started create a new class called <code>OriginationManager</code> with a method named <code>updateHistory</code>. It will accept a <code>Request</code> object and record the query parameters from the current URL in the session.</p>
 
-<pre><code># config/config.yml
-doctrine_odm.mongodb: ~
-</code></pre>
-
-<p>The above YAML is the most simple example and uses all of the default values provided, if
-you need to customize more you can specify the complete configuration:</p>
-
-<pre><code># config/config.yml
-doctrine_odm.mongodb:
-  server: mongodb://localhost:27017
-  options:
-    connect: true
-  metadata_cache_driver: array # array, apc, xcache, memcache
-</code></pre>
-
-<p>If you wish to use memcache to cache your metadata and you need to configure the <code>Memcache</code> instance you can do the following:</p>
-
-<pre><code># config/config.yml
-doctrine_odm.mongodb:
-  server: mongodb://localhost:27017
-  options:
-    connect: true
-  metadata_cache_driver:
-    type: memcache
-    class: Doctrine\Common\Cache\MemcacheCache
-    host: localhost
-    port: 11211
-    instance_class: Memcache
-</code></pre>
-
-<h3>Multiple Connections</h3>
-
-<p>If you need multiple connections and document managers you can use the following syntax:</p>
-
-<pre><code>doctrine_odm.mongodb:
-  default_connection: conn2
-  default_document_manager: dm2
-  metadata_cache_driver: apc
-  connections:
-    conn1:
-      server: mongodb://localhost:27017
-      options:
-        connect: true
-    conn2:
-      server: mongodb://localhost:27017
-      options:
-        connect: true
-  document_managers:
-    dm1:
-      connection: conn1
-      metadata_cache_driver: xcache
-    dm2:
-      connection: conn2
-</code></pre>
-
-<p>Now you can retrieve the configured services connection services:</p>
-
-<pre><code>$conn1 = $container-&gt;getService('doctrine.odm.mongodb.conn1_connection');
-$conn2 = $container-&gt;getService('doctrine.odm.mongodb.conn2_connection');
-</code></pre>
-
-<p>And you can also retrieve the configured document manager services which utilize the above
-connection services:</p>
-
-<pre><code>$dm1 = $container-&gt;getService('doctrine.odm.mongodb.dm1_document_manager');
-$dm2 = $container-&gt;getService('doctrine.odm.mongodb.dm2_document_manager');
-</code></pre>
-
-<h3>XML</h3>
-
-<p>You can specify the same configuration via XML if you prefer that. Here are the same
-examples from above in XML.</p>
-
-<p>Simple Single Connection:</p>
-
-<pre><code>&lt;?xml version="1.0" ?&gt;
-
-&lt;container xmlns="http://www.symfony-project.org/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb"
-    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services <a href="http://www.symfony-project.org/schema/dic/services/services-1.0.xsd" target="_blank">http://www.symfony-project.org/schema/dic/services/services-1.0.xsd</a>
-                        <a href="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb" target="_blank">http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb</a> <a href="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd" target="_blank">http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd</a>"&gt;
-
-    &lt;doctrine:mongodb server="mongodb://localhost:27017"&gt;
-        &lt;metadata_cache_driver type="memcache"&gt;
-            &lt;class&gt;Doctrine\Common\Cache\MemcacheCache&lt;/class&gt;
-            &lt;host&gt;localhost&lt;/host&gt;
-            &lt;port&gt;11211&lt;/port&gt;
-            &lt;instance_class&gt;Memcache&lt;/instance_class&gt;
-        &lt;/metadata_cache_driver&gt;
-        &lt;options&gt;
-            &lt;connect&gt;true&lt;/connect&gt;
-        &lt;/options&gt;
-    &lt;/doctrine:mongodb&gt;
-&lt;/container&gt;
-</code></pre>
-
-<p>Multiple Connections:</p>
-
-<pre><code>&lt;?xml version="1.0" ?&gt;
-
-&lt;container xmlns="http://www.symfony-project.org/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb"
-    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services <a href="http://www.symfony-project.org/schema/dic/services/services-1.0.xsd" target="_blank">http://www.symfony-project.org/schema/dic/services/services-1.0.xsd</a>
-                        <a href="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb" target="_blank">http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb</a> <a href="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd" target="_blank">http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd</a>"&gt;
-
-    &lt;doctrine:mongodb
-            metadata_cache_driver="apc"
-            default_document_manager="dm2"
-            default_connection="dm2"
-            proxy_namespace="Proxies"
-            auto_generate_proxy_classes="true"
-        &gt;
-        &lt;doctrine:connections&gt;
-            &lt;doctrine:connection id="conn1" server="mongodb://localhost:27017"&gt;
-                &lt;options&gt;
-                    &lt;connect&gt;true&lt;/connect&gt;
-                &lt;/options&gt;
-            &lt;/doctrine:connection&gt;
-            &lt;doctrine:connection id="conn2" server="mongodb://localhost:27017"&gt;
-                &lt;options&gt;
-                    &lt;connect&gt;true&lt;/connect&gt;
-                &lt;/options&gt;
-            &lt;/doctrine:connection&gt;
-        &lt;/doctrine:connections&gt;
-        &lt;doctrine:document_managers&gt;
-            &lt;doctrine:document_manager id="dm1" server="mongodb://localhost:27017" metadata_cache_driver="xcache" connection="conn1" /&gt;
-            &lt;doctrine:document_manager id="dm2" server="mongodb://localhost:27017" connection="conn2" /&gt;
-        &lt;/doctrine:document_managers&gt;
-    &lt;/doctrine:mongodb&gt;
-&lt;/container&gt;
-</code></pre>
-
-<h2>Writing Document Classes</h2>
-
-<p>You can start writing document classes just how you normally would write some PHP classes.
-The only difference is that you must map the classes to the MongoDB ODM. You can provide
-the mapping information via xml, yaml or annotations. In this example, for simplicity and
-ease of reading we will use annotations.</p>
-
-<p>First, lets write a simple User class:</p>
-
-<pre><code>// src/Application/HelloBundle/Document/User.php
-
-namespace Application\HelloBundle\Document;
-
-class User
+<pre><code>&lt;?php class OriginationManager
 {
-    protected $id;
-    protected $name;
-
-    public function getId()
+    public function updateHistory(Request $request)
     {
-        return $this-&gt;id;
-    }
+        $session = $request-&gt;getSession();
 
-    public function setName($name)
-    {
-        $this-&gt;name = $name;
-    }
+        $history = $session-&gt;get('user_origination_history', array());
+        $history[] = $request-&gt;query-&gt;all();
 
-    public function getName()
-    {
-        return $this-&gt;name;
+        $session-&gt;set('user_origination_history', $history);
     }
 }
 </code></pre>
 
-<p>This class can be used independent from any persistence layer as it is a regular PHP
-class and does not have any dependencies. Now we need to annotate the class so Doctrine
-can read the annotated mapping information from the doc blocks:</p>
+<p>Now create an <code>OriginationListener</code> class that will listen to the <code>kernel.request</code> event and make use of the <code>OriginationManager::updateHistory()</code> API we just created.</p>
 
-<pre><code>// ...
-
-/** @Document(collection="users") */
-class User
+<pre><code>&lt;?php class OriginationListener
 {
-    /** @Id */
-    protected $id;
+    // ...
 
-    /** @String */
-    protected $name;
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        $request = $event-&gt;getRequest();
+
+        // Only process non-logged-in users
+        if ($token = $this-&gt;securityContext-&gt;getToken()) {
+            $user = $token-&gt;getUser();
+            if ($user instanceof User) {
+                return;
+            }
+        }
+
+        $this-&gt;originationManager-&gt;updateHistory($request);
+    }
+}
+</code></pre>
+
+<p>Now we are tracking the query parameters of logged out users on every request. We can make use of this information later when a user joins. First, lets define a new model that can be used to store the origination information along with the user (assume the model is persisted with <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a>). Each new <code>User</code> gets an <code>Originator</code> record when they join. It allows us to essentially see how a new user entered the site and what clicks they made before joining.</p>
+
+<pre><code>&lt;?php class Originator
+{
+    /**
+     * The raw array of request query data.
+     *
+     * @var array
+     */
+    protected $history = array();
+
+    /**
+     * The user that originated this member.
+     *
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * The value of the first osky_origin parameter we encounter.
+     *
+     * @var string
+     */
+    protected $origin;
+
+    /**
+     * The value of the first osky_source parameter we encounter.
+     *
+     * @var string
+     */
+    protected $source;
 
     // ...
 }
 </code></pre>
 
-<h2>Using Documents</h2>
+<p>Assume your application already notifies an event named <code>user.created</code>. In <code>OriginationListener</code> create an <code>onUserCreated</code> method that will listen to the <code>user.created</code> event.</p>
 
-<p>Now that you have a PHP class that has been mapped properly you can begin working with
-instances of that document persisting to and retrieving from MongoDB.</p>
+<pre><code>&lt;?php
 
-<p>From your controllers you can access the <code>DocumentManager</code> instances from the container:</p>
-
-<pre><code>class UserController extends Controller
+class OriginationListener
 {
-    public function createAction()
+    // ...
+
+    public function onUserCreated(UserCreatedEvent $event)
     {
-        $user = new User();
-        $user-&gt;setName('Jonathan H. Wage');
+        $user = $event-&gt;getUser();
+        $request = $event-&gt;getRequest();
 
-        $dm = $this-&gt;container-&gt;getService('doctrine.odm.mongodb.document_manager');
-        $dm-&gt;persist($user);
-        $dm-&gt;flush();
-
-        // ...
+        $this-&gt;originationManager-&gt;assignUserOrigination($user, $request);
     }
 }
 </code></pre>
 
-<p>Later you can retrieve the persisted document by its id:</p>
+<p>Next, create the <code>OriginationManager::assignUserOrigination()</code> method. It will utilize the request query parameters we saved on the session earlier to create a new <code>Originator</code> record.</p>
 
-<pre><code>class UserController extends Controller
+<pre><code>&lt;?php class OriginationManager
 {
-    public function editAction($id)
+    public function assignUserOrigination(User $user, Request $request)
     {
-        $dm = $this-&gt;container-&gt;getService('doctrine.odm.mongodb.document_manager');
-        $user = $dm-&gt;find('HelloBundle:User', $id);
+        $session = $request-&gt;getSession();
 
-        // ...
+        $history = $session-&gt;get('user_origination_history', array());
+
+        $originator = new Originator();
+        $originator-&gt;setHistory($history);
+
+        foreach ($history as $query) {
+            if (!$originator-&gt;getOrigin() &amp;&amp; isset($query['osky_origin'])) {
+                $originator-&gt;setOrigin($query['osky_origin']);
+
+                if ($user = $this-&gt;userRepository-&gt;find($query['osky_origin'])) {
+                    $originator-&gt;setUser($user);
+                }
+            }
+
+            if (!$originator-&gt;getSource() &amp;&amp; isset($query['osky_source'])) {
+                $originator-&gt;setSource($query['osky_source']);
+            }
+        }
+
+        $user-&gt;setOriginator($originator);
+
+        $session-&gt;remove('user_origination_history');
     }
 }
 </code></pre>
+
+<p>Now if a logged out user were to visit OpenSky with a parameter named <code>osky_origin</code> in the URL with another users id as the value, the <code>Originator</code> record that gets created for the new member will have a reference to that <code>User</code>. We can then utilize that information do whatever we want. In our case we give the user that got the new <code>User</code> to join a credit and a thank you. The <code>osky_source</code> parameter can be used as an arbitrary reporting variable to help with identifying marketing campaigns.</p>
+
+<p>Keep in mind that this is an example implementation and it omits many details specific to OpenSky for the sake of simplicity. The real implementation we use has dozens of other parameters that can be used to associate records together and assist with reporting. You can add to this implementation and check for custom parameters and standard ones like <code>utm_source</code>, <code>utm_campaign</code>, etc.</p>
 
         </div>
             </article>
 
     <nav>
         <a href="https://jwage.com/blog/page/3.html">Newer Posts</a><br />
-        <br />
+        <a href="https://jwage.com/blog/page/5.html">Older Posts</a><br />
     </nav>
                     </main>
 
