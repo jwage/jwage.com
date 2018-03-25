@@ -9,7 +9,7 @@ title: About
     <a href="https://www.sourcesellship.com"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/opensky-logo.svg?{{ site.cacheBuster }}" alt="OpenSky" /></a>
     <div class="card-body">
         <h5 class="card-title">OpenSky</h5>
-        <p class="card-text">Jonathan is currently employed as CTO of Marketplaces at <a href="https://www.sourcesellship.com" target="_blank">The OpenSky Project, Inc.</a></p>
+        <p class="card-text">Currently employed as CTO of Marketplaces at <a href="https://www.sourcesellship.com" target="_blank">The OpenSky Project, Inc.</a></p>
     </div>
     <div class="card-header border-top font-weight-bold">What is OpenSky?</div>
     <ul class="list-group list-group-flush">
