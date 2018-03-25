@@ -13,7 +13,7 @@ title: Home
 <h2 class="display-4 mb-4">Where do I work?</h2>
 
 <div class="card mb-3">
-    <a href="https://www.sourcesellship.com"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/opensky-logo.svg" alt="OpenSky" /></a>
+    <a href="https://www.sourcesellship.com"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/opensky-logo.svg?{{ site.cacheBuster }}" alt="OpenSky" /></a>
     <div class="card-body">
         <h5 class="card-title">OpenSky</h5>
         <p class="card-text">Jonathan is currently employed as CTO of Marketplaces at <a href="https://www.sourcesellship.com" target="_blank">The OpenSky Project, Inc.</a></p>
@@ -30,7 +30,7 @@ title: Home
 <h2 class="display-4 mb-4">What do I work with?</h2>
 
 <div class="card mb-3">
-    <a href="http://www.doctrine-project.org"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/php-logo.svg" alt="Doctrine" /></a>
+    <a href="http://www.doctrine-project.org"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/php-logo.svg?{{ site.cacheBuster }}" alt="Doctrine" /></a>
     <div class="card-body">
         <h5 class="card-title">PHP</h5>
         <p class="card-text">PHP is a popular general-purpose scripting language that is especially suited to web development.</p>
@@ -39,7 +39,7 @@ title: Home
 </div>
 
 <div class="card mb-3">
-    <a href="http://www.doctrine-project.org"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/doctrine-logo.svg" alt="Doctrine" /></a>
+    <a href="http://www.doctrine-project.org"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/doctrine-logo.svg?{{ site.cacheBuster }}" alt="Doctrine" /></a>
     <div class="card-body">
         <h5 class="card-title">Doctrine</h5>
         <p class="card-text">The Doctrine Project is the home to several PHP libraries primarily focused on database storage and object mapping.</p>
@@ -48,7 +48,7 @@ title: Home
 </div>
 
 <div class="card mb-3">
-    <a href="https://symfony.com"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/symfony-logo.svg" alt="Symfony" /></a>
+    <a href="https://symfony.com"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/symfony-logo.svg?{{ site.cacheBuster }}" alt="Symfony" /></a>
     <div class="card-body">
         <h5 class="card-title">Symfony</h5>
         <p class="card-text">Symfony is a collection of more than 50 stand-alone PHP components available for your own applications.</p>
@@ -65,9 +65,9 @@ title: Home
                 Social Media
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><a href="https://twitter.com/jwage" target="_blank"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/twitter-logo.jpg" /> https://twitter.com/jwage</a></li>
-                <li class="list-group-item"><a href="https://facebook.com/jwage" target="_blank"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/facebook-logo.jpg" /> https://facebook.com/jwage</a></li>
-                <li class="list-group-item"><a href="https://www.instagram.com/jonhwage" target="_blank"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/instagram-logo.jpg" /> https://www.instagram.com/jonhwage</a></li>
+                <li class="list-group-item"><a href="https://twitter.com/jwage" target="_blank"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/twitter-logo.jpg?{{ site.cacheBuster }}" /> https://twitter.com/jwage</a></li>
+                <li class="list-group-item"><a href="https://facebook.com/jwage" target="_blank"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/facebook-logo.jpg?{{ site.cacheBuster }}" /> https://facebook.com/jwage</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/jonhwage" target="_blank"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/instagram-logo.jpg?{{ site.cacheBuster }}" /> https://www.instagram.com/jonhwage</a></li>
             </ul>
         </div>
     </div>
@@ -90,8 +90,8 @@ title: Home
                 Open Source
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><a href="https://github.com/jwage"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg" /> https://github.com/jwage</a></li>
-                <li class="list-group-item"><a href="https://github.com/jwage"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg" /> https://github.com/doctrine</a></li>
+                <li class="list-group-item"><a href="https://github.com/jwage"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg?{{ site.cacheBuster }}" /> https://github.com/jwage</a></li>
+                <li class="list-group-item"><a href="https://github.com/jwage"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg?{{ site.cacheBuster }}" /> https://github.com/doctrine</a></li>
             </ul>
         </div>
     </div>
