@@ -12,7 +12,7 @@ title: Four o four
     <img src="{{ site.url }}/images/kubota/kubota-l210-2.jpg" />
 {% endblock %}
 
-{% block head_scripts %}
+{% block scripts_after %}
     <script type="text/javascript">
         var redirects = {
             "/post/31292541379/ruler-a-simple-stateless-production-rules-engine/": "/posts/2012/09/10/ruler-a-simple-stateless-production-rules-engine/",
@@ -55,6 +55,12 @@ title: Four o four
             "/post/30490188201/new-doctrine-mongodb-odm-documentation/": "/posts/2010/08/19/new-doctrine-mongodb-odm-documentation/",
             "/post/92557031766/2014-vacation-books/": "/posts/2014/07/22/2014-vacation-books/"
         };
+
+        var currentPath = window.location.pathname;
+
+        if (!currentPath.match(/\/$/)) {
+            currentPath = currentPath + '/';
+        }
 
         if (redirects.hasOwnProperty(window.location.pathname)) {
             window.location.href = redirects[window.location.pathname];
