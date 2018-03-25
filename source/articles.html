@@ -11,6 +11,8 @@ pagination:
 
 <h1><i class="fa fa-newspaper"></i> Articles</h1>
 
+<p class="lead">Articles about PHP, Symfony, Doctrine and other technology related topics.</p>
+
 {% for post in page.pagination.items %}
     {% if page.category in post.categories %}
         <article>
