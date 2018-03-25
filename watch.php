@@ -21,10 +21,10 @@ while (true) {
             echo sprintf("%s was changed. Building...\n", $file);
 
             echo shell_exec($buildScriptPath)."\n";
+
+            file_put_contents(__DIR__.'/docs/changed', time());
         }
     }
-
-    sleep(.5);
 }
 
 function recursiveGlob(array $paths)

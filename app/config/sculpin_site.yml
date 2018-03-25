@@ -4,7 +4,7 @@
 cacheBuster: 1
 title: jwage.com
 subtitle: I am Jonathan H. Wage
-url: http://lcl.jwage.com
+url: http://lcl.jwage.com:8080
 
 
 # Insert your disqus shortname
