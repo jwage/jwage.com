@@ -66,8 +66,8 @@ title: Home
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/twitter-logo.jpg?{{ site.cacheBuster }}" /> <a href="https://twitter.com/jwage" target="_blank">https://twitter.com/jwage</a></li>
-                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/facebook-logo.jpg?{{ site.cacheBuster }}" /><a href="https://facebook.com/jwage" target="_blank">https://facebook.com/jwage</a></li>
-                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/instagram-logo.jpg?{{ site.cacheBuster }}" /><a href="https://www.instagram.com/jonhwage" target="_blank">https://www.instagram.com/jonhwage</a></li>
+                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/facebook-logo.jpg?{{ site.cacheBuster }}" /> <a href="https://facebook.com/jwage" target="_blank">https://facebook.com/jwage</a></li>
+                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/instagram-logo.jpg?{{ site.cacheBuster }}" /> <a href="https://www.instagram.com/jonhwage" target="_blank">https://www.instagram.com/jonhwage</a></li>
             </ul>
         </div>
     </div>
