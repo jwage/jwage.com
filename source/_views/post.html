@@ -9,6 +9,11 @@
         <header>
             <h2>{{ page.title }} <small>post</small></h2>
         </header>
+
+        <p class="lead">Posted on {{ page.date|date('Y-m-d') }} by jwage</p>
+
+        <hr />
+
         <div>
             {{ page.blocks.content|raw }}
         </div>
