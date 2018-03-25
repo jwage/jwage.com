@@ -3,7 +3,7 @@ layout: default
 title: Kubota L210
 ---
 
-<h1 class="display-4">Kubota L210</h1>
+<h1><i class="fa fa-truck"></i> Kubota L210</h1>
 
 <div class="row">
     <div class="col">

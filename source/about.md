@@ -3,7 +3,7 @@ layout: default
 title: About
 
 ---
-<h2 class="display-4 mb-4">Where do I work?</h2>
+<h2><i class="fa fa-briefcase"></i> Where do I work?</h2>
 
 <div class="card mb-3">
     <a href="https://www.sourcesellship.com"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/opensky-logo.svg?{{ site.cacheBuster }}" alt="OpenSky" /></a>
@@ -20,7 +20,7 @@ title: About
     </ul>
 </div>
 
-<h2 class="display-4 mb-4">What do I work with?</h2>
+<h2 class="mb-4"><i class="fa fa-wrench"></i> What do I work with?</h2>
 
 <div class="card mb-3">
     <a href="http://www.doctrine-project.org"><img class="card-img-top w-25 p-4 mx-auto d-block" src="{{ site.url }}/images/php-logo.svg?{{ site.cacheBuster }}" alt="Doctrine" /></a>
@@ -49,7 +49,7 @@ title: About
     </div>
 </div>
 
-<h2 class="display-4 mb-4">How to find me</h2>
+<h2 class="mb-4"><i class="fa fa-comment-alt"></i> How to find me</h2>
 
 <div class="row">
     <div class="col">

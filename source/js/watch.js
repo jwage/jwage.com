@@ -39,4 +39,4 @@ var watchCallback = function(timestamp) {
 
 setInterval(function() {
     $.get(changedUrl, watchCallback);
-});
+}, 500);
