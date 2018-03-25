@@ -73,6 +73,78 @@
 
     <article>
         <header>
+            <h2><a href="https://jwage.com/posts/2010/08/02/doctrine-annotations-library">Doctrine Annotations Library</a></h2>
+        </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
+        <div>
+            <p>The Doctrine Annotations library was born from a need in the Doctrine2 ORM to allow the mapping information to be specified inside the doc-blocks of classes, properties and methods. The library is independent and can be used in your own libraries to implement doc block annotations.</p>
+
+<h2>Setup and Configuration</h2>
+
+<p>To use the annotations library is simple, you just need to create a new <code>AnnotationReader</code>
+instance:</p>
+
+<pre><code>$reader = new \Doctrine\Common\Annotations\AnnotationReader();
+</code></pre>
+
+<h2>Usage</h2>
+
+<p>Using the library API is simple. Imagine you had some annotation classes that looked like the following:</p>
+
+<pre><code>namespace MyCompany\Annotations;
+
+class Foo extends \Doctrine\Common\Annotations\Annotation
+{
+    public $bar;
+}
+
+class Bar extends \Doctrine\Common\Annotations\Annotation
+{
+    public $foo;
+}
+</code></pre>
+
+<p>Now to use the annotations you would just need to do the following:</p>
+
+<pre><code>/**
+ * @MyCompany\Annotations\Foo(bar="test")
+ * @MyCompany\Annotations\Bar(foo="test")
+ */
+class User
+{
+}
+</code></pre>
+
+<p>Now we can write a script to get the annotations above:</p>
+
+<pre><code>$reflClass = new ReflectionClass('User');
+$classAnnotations = $reader-&gt;getClassAnnotations($reflClass);
+echo $classAnnotations['MyCompany\Annotations\Foo']-&gt;bar; // prints foo
+echo $classAnnotations['MyCompany\Annotations\Foo']-&gt;foo; // prints bar
+</code></pre>
+
+<p>You have a complete API for retrieving annotation class instances from a class, property
+or method docblock:</p>
+
+<ul><li>getClassAnnotations(ReflectionClass $class)</li>
+<li>getClassAnnotation(ReflectionClass $class, $annotation)</li>
+<li>getPropertyAnnotations(ReflectionProperty $property)</li>
+<li>getPropertyAnnotation(ReflectionProperty $property, $annotation)</li>
+<li>getMethodAnnotations(ReflectionMethod $method)</li>
+<li>getMethodAnnotation(ReflectionMethod $method, $annotation)</li>
+</ul>
+
+<p>Read the full <a href="http://www.doctrine-project.org/projects/common/2.0/docs/reference/annotations/en" target="_blank">documentation</a> to learn more about how to use the Doctrine annotations library!</p>
+
+        </div>
+
+            </article>
+    <article>
+        <header>
             <h2><a href="https://jwage.com/posts/2010/07/31/array-dereferencing-in-php-trunk">Array dereferencing in PHP trunk</a></h2>
         </header>
 
@@ -304,46 +376,6 @@ class Person
         }
     }
 }
-</code></pre>
-
-        </div>
-
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2010/07/28/setting-entitydocument-references-without-hitting">Setting Entity/Document references without hitting the database</a></h2>
-        </header>
-
-        <p class="lead">Posted on 2018-03-25 by jwage</p>
-
-        <hr />
-
-        <div>
-            <p>In <a href="http://www.doctrine-project.org/projects/orm/1.2/docs/en" target="_blank">Doctrine 1</a> when you want to specify a reference you have two options, you can set the foreign key manually:</p>
-
-<pre><code>$user-&gt;setProfileId($profileId);
-$user-&gt;save();
-</code></pre>
-
-<p>The problem here is that the profile_id is set in the object but the reference to a Profile instance is not set. The next option is to actually set the object reference:</p>
-
-<pre><code>$profile = Doctrine_Core::getTable('Profile')-&gt;find($profileId);
-$user-&gt;setProfile($profile);
-$user-&gt;save();
-</code></pre>
-
-<p>Here the reference is set properly but the downside to this approach is that it requires us to load the entire Profile object just to set the reference. It is silly! Thanks to the <a href="http://www.doctrine-project.org/projects/orm" target="_blank">Doctrine2 ORM</a> and <a href="http://www.doctrine-project.org/projects/mongodb_odm" target="_blank">MongoDB ODM</a> you have the ability to retrieve a reference to an object without having to hit the database. Here is an example:</p>
-
-<pre><code>$profile = $em-&gt;getReference('Profile', $profileId);
-$user-&gt;setProfile($profile);
-$em-&gt;flush();
-</code></pre>
-
-<p>Or the same thing with the MongoDB ODM:</p>
-
-<pre><code>$profile = $dm-&gt;getReference('Profile', $profileId);
-$user-&gt;setProfile($profile);
-$dm-&gt;flush();
 </code></pre>
 
         </div>

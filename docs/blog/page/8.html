@@ -73,6 +73,128 @@
 
     <article>
         <header>
+            <h2><a href="https://jwage.com/posts/2012/07/10/testing-query-counts-in-functional-web-tests-with">Testing query counts in functional web tests with Symfony2 and PHPUnit</a></h2>
+        </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
+        <div>
+            <p>At <a href="https://opensky.com" target="_blank">OpenSky</a> we were faced with a challenge of being able to evolve functionality fast without having the overhead of developers constantly watching for changes in performance, or the number of queries required for a request. To help solve part of this problem we integrated the Symfony2 profiler with our functional web tests to assert that a request required a certain number of database queries.</p>
+
+<p>First in order to accomplish this we need to create a special test environment named <strong>test_logging</strong> that will be the same as the normal test environment except profiling and logging is enabled. We don&rsquo;t want this enabled for all of our tests as it does add some overhead to the request and will slow things down a little bit.</p>
+
+<pre><code>imports:
+    - { resource: config_test.yml }
+
+doctrine:
+    dbal:
+        connections:
+            default:
+                logging: true
+
+doctrine_mongodb:
+    document_managers:
+        default:
+            logging: true
+</code></pre>
+
+<p>Now in your PHPUnit functional tests you can issue requests with the <strong>test_logging</strong> environment client and run assertions afterwards to make sure the request executed the queries you expected.</p>
+
+<pre><code>namespace OpenSky\Bundle\MainBundle\Tests\Functional;
+
+use OpenSky\Bundle\MainBundle\Tests\WebTestCase;
+
+class TestSomeQueryCounts extends WebTestCase
+{
+    // ...
+
+    public function testQueryCounts()
+    {
+        $client = static::createClient(array(
+            'environment' =&gt; 'test_logging'
+        ), array(
+            'PHP_AUTH_USER' =&gt; 'foobar',
+            'PHP_AUTH_PW'   =&gt; 'foobar',
+        ));
+
+        $client-&gt;request('GET', '/some_page');
+        $response = $client-&gt;getResponse();
+        $profile = $this-&gt;getContainer()-&gt;get('profiler')-&gt;loadProfileFromResponse($response);
+
+        $numMysqlQueries = $profile-&gt;getCollector('db')-&gt;getQueryCount();
+        $numMongoQueries = $profile-&gt;getCollector('mongodb')-&gt;getQueryCount();
+
+        $this-&gt;assertEquals($numMysqlQueries, 1);
+        $this-&gt;assertEquals($numMongoQueries, 1);
+    }
+}
+</code></pre>
+
+<p>You can abstract this a little bit and add some convenience methods in your base WebTestCase class that would clean this up and make it more reusable. Here is an example:</p>
+
+<pre><code>// ...
+class WebTestCase
+{
+    // ...
+    protected function assertResponseQueryCounts(Response $response, $expectedMysql, $expectedMongo)  
+    {
+        $profile = $this-&gt;getContainer()-&gt;get('profiler')-&gt;loadProfileFromResponse($response);
+
+        $numMysqlQueries = $profile-&gt;getCollector('db')-&gt;getQueryCount();
+        $numMongoQueries = $profile-&gt;getCollector('mongodb')-&gt;getQueryCount();
+
+        if ($expectedMysql !== $numMysqlQueries) {
+            print_r($profile-&gt;getCollector('db')-&gt;getQueries());
+        }
+        $this-&gt;assertEquals($expectedMysql, $numMysqlQueries);
+        if ($expectedMongo !== $numMongoQueries) {
+            print_r($profile-&gt;getCollector('mongodb')-&gt;getQueries());
+        }
+        $this-&gt;assertEquals($expectedMongo, $numMongoQueries);
+    }
+
+    protected function assertRequestQueryCounts($client, $url, $method, $expectedMysql, $expectedMongo)
+    {
+        if ($client-&gt;getKernel()-&gt;getEnvironment() !== 'test_logging') {
+            throw new \InvalidArgumentException(
+                'You must pass a client created with createClient(array("environment" =&gt; "test_logging"))'
+            );
+        }
+        $client-&gt;request($method, $url);
+        $this-&gt;assertResponseQueryCounts($client-&gt;getResponse(), $expectedMysql, $expectedMongo);
+    }
+}
+</code></pre>
+
+<p>Now the example functional test we showed in the beginning can be cleaned up quite a bit to use the convenience methods we created above:</p>
+
+<pre><code>// ...
+class TestSomeQueryCounts extends WebTestCase
+{
+    // ...
+    public function testQueryCounts()
+    {
+        $client = static::createClient(array(
+            'environment' =&gt; 'test_logging'
+        ), array(
+            'PHP_AUTH_USER' =&gt; 'foobar',
+            'PHP_AUTH_PW'   =&gt; 'foobar',
+        ));
+
+        $this-&gt;assertRequestQueryCounts($client, '/some_page', 'GET', 1, 1);
+    }
+}
+</code></pre>
+
+<p>I hope this is a helpful tip for someone else.</p>
+
+        </div>
+
+            </article>
+    <article>
+        <header>
             <h2><a href="https://jwage.com/posts/2012/07/10/asynchronous-events-with-php-and-symfony2">Asynchronous Events with PHP and Symfony2</a></h2>
         </header>
 
@@ -274,135 +396,6 @@ class ExplainerListener
 </code></pre>
 
 <p>The traceAsString field is a string representation of the trace that led up to the query so you can easily identify what triggered the query in your application.</p>
-
-        </div>
-
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2011/10/29/a-cool-script-for-running-phpunit-tests-in">A cool script for running PHPUnit tests in parallel processes</a></h2>
-        </header>
-
-        <p class="lead">Posted on 2018-03-25 by jwage</p>
-
-        <hr />
-
-        <div>
-            <p>At <a href="http://opensky.com" target="_blank">OpenSky</a> we&rsquo;re exploring options for getting better build times. We came across this script found <a href="http://pebblesinthesand.wordpress.com/2008/05/22/a-srcipt-for-running-processes-in-parallel-in-bash/" target="_blank">here</a> for executing commands and running the processes in parallel.</p>
-
-<pre><code>#!/bin/bash
-NUM=0
-QUEUE=""
-MAX_NPROC=2 # default
-REPLACE_CMD=0 # no replacement by default
-USAGE="A simple wrapper for running processes in parallel.
-Usage: `basename $0` [-h] [-r] [-j nb_jobs] command arg_list
-    -h      Shows this help
-    -r      Replace asterix * in the command string with argument
-    -j nb_jobs  Set number of simultanious jobs [2]
- Examples:
-    `basename $0` somecommand arg1 arg2 arg3
-    `basename $0` -j 3 \"somecommand -r -p\" arg1 arg2 arg3
-    `basename $0` -j 6 -r \"convert -scale 50% * small/small_*\" *.jpg"
-
-function queue {
-    QUEUE="$QUEUE $1"
-    NUM=$(($NUM+1))
-}
-
-function regeneratequeue {
-    OLDREQUEUE=$QUEUE
-    QUEUE=""
-    NUM=0
-    for PID in $OLDREQUEUE
-    do
-        if [ -d /proc/$PID  ] ; then
-            QUEUE="$QUEUE $PID"
-            NUM=$(($NUM+1))
-        fi
-    done
-}
-
-function checkqueue {
-    OLDCHQUEUE=$QUEUE
-    for PID in $OLDCHQUEUE
-    do
-        if [ ! -d /proc/$PID ] ; then
-            regeneratequeue # at least one PID has finished
-            break
-        fi
-    done
-}
-
-# parse command line
-if [ $# -eq 0 ]; then #  must be at least one arg
-    echo "$USAGE" &gt;&amp;2
-    exit 1
-fi
-
-while getopts j:rh OPT; do # "j:" waits for an argument "h" doesnt
-    case $OPT in
-    h)  echo "$USAGE"
-        exit 0 ;;
-    j)  MAX_NPROC=$OPTARG ;;
-    r)  REPLACE_CMD=1 ;;
-    \?) # getopts issues an error message
-        echo "$USAGE" &gt;&amp;2
-        exit 1 ;;
-    esac
-done
-
-# Main program
-echo Using $MAX_NPROC parallel threads
-shift `expr $OPTIND - 1` # shift input args, ignore processed args
-COMMAND=$1
-shift
-
-for INS in $* # for the rest of the arguments
-do
-    # DEFINE COMMAND
-    if [ $REPLACE_CMD -eq 1 ]; then
-        CMD=${COMMAND//"*"/$INS}
-    else
-        CMD="$COMMAND $INS" #append args
-    fi
-    echo "Running $CMD"
-
-    $CMD &amp;
-    # DEFINE COMMAND END
-
-    PID=$!
-    queue $PID
-
-    while [ $NUM -ge $MAX_NPROC ]; do
-        checkqueue
-        sleep 0.4
-    done
-done
-wait # wait for all processes to finish before exit
-</code></pre>
-
-<p>Here is a <a href="https://gist.github.com/30055f607fedf2f384d7" target="_blank">gist</a> of the code. Save the above file to a script named parallel and make it executable.</p>
-
-<p>We can now easily use this with PHPUnit to run our tests in parallel processes. If you were to setup 10 groups of tests like this:</p>
-
-<pre><code>/**
- * @group group1
- */
-class MyTest
-{
-    // ...
-}
-</code></pre>
-
-<p>You could run the groups in parallel processes like this:</p>
-
-<pre><code>$ ./parallel -j 10 -r "phpunit -c opensky --group=*" group1 group2 group3 group4 group5 group6 group7 group8 group9 group10
-</code></pre>
-
-<p>So if each group took ~1 minute to run, running them all together would take ~10 minutes, but if you ran it with this script you could get them all done in ~1 minute!</p>
-
-<p>One caveat is we have to figure out a way for each test run inside parallel to use a different configuration, database, etc. so that the tests do not walk on each other and are isolated.</p>
 
         </div>
 

@@ -73,6 +73,51 @@
 
     <article>
         <header>
+            <h2><a href="https://jwage.com/posts/2011/02/28/tips-on-being-successful-in-open-source">Tips on Being Successful in Open Source</a></h2>
+        </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
+        <div>
+            <p>This morning I got an e-mail from someone asking for some pointers on how to build a successul open source project. It&rsquo;s a difficult question to answer. In the end I think it comes down to a lot of things, but mainly it is being consistent and active. I responded to him with some of my thoughts and when I was done I practically had a blog post so I decided flesh it out a little more and post it here.</p>
+
+<h2>Identity</h2>
+
+<p>First, it is extremely important for your project to have a <strong>name</strong> and an <strong>identity</strong>. Just pick a word, anything, something is better than nothing. Then pick some colors and slice up a logo in Photoshop.</p>
+
+<h2>Source Control</h2>
+
+<p>You <strong>must</strong> use some kind of source control. I recommend using <a href="http://www.github.com" target="_blank">GitHub</a> as it will help to build the <strong>community</strong> around your project and <strong>generate contributions</strong>.</p>
+
+<h2>Mailing Lists &amp; IRC</h2>
+
+<p>Next, setup a <strong>mailing list</strong> using <a href="http://google.com/groups" target="_blank">Google Groups</a> and create an <strong>IRC channel</strong> on the irc.freenode.net network. Now you have a way to communicate with your users and contributors!</p>
+
+<h2>Setup a Website</h2>
+
+<p>Once you have your identity, your code publicly available and a way to communicate with your users you need a <strong>website</strong> to organize all the information about your project. I recommend a blog, documentation, information about your community, how to contribute, how to download your code, release/download information, etc.</p>
+
+<h2>Social Networking</h2>
+
+<p>I think leveraging social networking is also a big part of connecting with your users. Create a Twitter account for your project and announce updates there. When you are developing and working on your project, be sure to let your users know what you are up to. Be active and passionate about what you do and your users will more likely connect with you and help contribute to building a great open source project.</p>
+
+<h2>Release Early and Release Often</h2>
+
+<p>In the early days of an open source project you need to release early and release often. The project is new, and the users know that so the project needs to show that it is active and moving fast in order for developers to consider using your project. As your project matures, and you have stable versions users can rely on, then you can consider throttling down the frequency of releases. Get your users new stuff fast!</p>
+
+<h2>Maintenance</h2>
+
+<p>After you have your project ground work done, you need to maintain your project and stay active. If you do not maintain your project, then it will die a slow death. Frequently write blog posts about new developments, new versions, updates to documentation, use cases and example tutorials, etc. This will get your users coming back to your site and seeing the new stuff you are working on and will be more likely to use and or contribute to your library.</p>
+
+<p>I hope this helps someone with getting a new open source project off the ground or sparks someones interest to open source something today!</p>
+
+        </div>
+
+            </article>
+    <article>
+        <header>
             <h2><a href="https://jwage.com/posts/2010/08/25/blending-the-doctrine-orm-and-mongodb-odm">Blending the Doctrine ORM and MongoDB ODM</a></h2>
         </header>
 
@@ -279,78 +324,6 @@ echo "Order Title: " . $product-&gt;getTitle();
 </ul>
 
 <p>I hope it is helpful to someone! :)</p>
-
-        </div>
-
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2010/08/02/doctrine-annotations-library">Doctrine Annotations Library</a></h2>
-        </header>
-
-        <p class="lead">Posted on 2018-03-25 by jwage</p>
-
-        <hr />
-
-        <div>
-            <p>The Doctrine Annotations library was born from a need in the Doctrine2 ORM to allow the mapping information to be specified inside the doc-blocks of classes, properties and methods. The library is independent and can be used in your own libraries to implement doc block annotations.</p>
-
-<h2>Setup and Configuration</h2>
-
-<p>To use the annotations library is simple, you just need to create a new <code>AnnotationReader</code>
-instance:</p>
-
-<pre><code>$reader = new \Doctrine\Common\Annotations\AnnotationReader();
-</code></pre>
-
-<h2>Usage</h2>
-
-<p>Using the library API is simple. Imagine you had some annotation classes that looked like the following:</p>
-
-<pre><code>namespace MyCompany\Annotations;
-
-class Foo extends \Doctrine\Common\Annotations\Annotation
-{
-    public $bar;
-}
-
-class Bar extends \Doctrine\Common\Annotations\Annotation
-{
-    public $foo;
-}
-</code></pre>
-
-<p>Now to use the annotations you would just need to do the following:</p>
-
-<pre><code>/**
- * @MyCompany\Annotations\Foo(bar="test")
- * @MyCompany\Annotations\Bar(foo="test")
- */
-class User
-{
-}
-</code></pre>
-
-<p>Now we can write a script to get the annotations above:</p>
-
-<pre><code>$reflClass = new ReflectionClass('User');
-$classAnnotations = $reader-&gt;getClassAnnotations($reflClass);
-echo $classAnnotations['MyCompany\Annotations\Foo']-&gt;bar; // prints foo
-echo $classAnnotations['MyCompany\Annotations\Foo']-&gt;foo; // prints bar
-</code></pre>
-
-<p>You have a complete API for retrieving annotation class instances from a class, property
-or method docblock:</p>
-
-<ul><li>getClassAnnotations(ReflectionClass $class)</li>
-<li>getClassAnnotation(ReflectionClass $class, $annotation)</li>
-<li>getPropertyAnnotations(ReflectionProperty $property)</li>
-<li>getPropertyAnnotation(ReflectionProperty $property, $annotation)</li>
-<li>getMethodAnnotations(ReflectionMethod $method)</li>
-<li>getMethodAnnotation(ReflectionMethod $method, $annotation)</li>
-</ul>
-
-<p>Read the full <a href="http://www.doctrine-project.org/projects/common/2.0/docs/reference/annotations/en" target="_blank">documentation</a> to learn more about how to use the Doctrine annotations library!</p>
 
         </div>
 

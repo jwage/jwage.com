@@ -25,10 +25,6 @@ var lastTimestamp = getCookie('lastTimestamp');
 
 var watchCallback = function(timestamp) {
     if (lastTimestamp != timestamp) {
-        console.log('Changed');
-        console.log("LAST: " + lastTimestamp);
-        console.log("NOW: " + timestamp);
-
         lastTimestamp = timestamp;
 
         setCookie('lastTimestamp', lastTimestamp, 1);

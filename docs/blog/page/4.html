@@ -73,6 +73,181 @@
 
     <article>
         <header>
+            <h2><a href="https://jwage.com/posts/2013/12/23/sending-safari-push-notifications-with-php">Sending Safari Push Notifications with PHP</a></h2>
+        </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
+        <div>
+            <p>When OSX Mavericks was released, I was excited to see that push notifications were supported within Safari. So now, just like iOS, we can send push notifications to Safari regardless of whether the browser is open or not. This post gives overview of how to get them working from PHP using the <a href="http://github.com/jwage/php-apns" target="_blank">PHP APNS</a> library.</p>
+
+<h3>Registering with Apple and Generating Certificates</h3>
+
+<p>This post assumes you have read <a href="https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html#//apple_ref/doc/uid/TP40013225-CH3-SW1" target="_blank">this</a> article from Apple and have already generated your security certificates.</p>
+
+<h3>PHP APNS Library</h3>
+
+<p>The PHP APNS (Apple Push Notification Service) library makes it extremely easy to get Safari push notifications working on your website. Just install it with composer to get started:</p>
+
+<h3>Installation</h3>
+
+<pre><code>composer require jwage/php-apns
+composer install
+</code></pre>
+
+<h3>Push Package</h3>
+
+<p>Once you have the package installed you can start integrating it with your website. The first thing we need to do is create a base push package for your website. From Apple&rsquo;s website:</p>
+
+<blockquote>
+  <p>When a user is asked for permission to receive push notifications, Safari asks your web server for a package. The package contains data that is used by the notification UI, such as your website name and icon, as well as a cryptographic signature. The signature verifies that your notification hasn’t been intercepted by a man-in-the-middle attack and that it is indeed coming from a trusted source: you.</p>
+</blockquote>
+
+<p>You can find a sample base push package within the PHP APNS library <a href="https://github.com/jwage/php-apns/tree/master/data/safariPushPackage.base" target="_blank">here</a>. Copy this somewhere in your application and customize the icons in the icon.iconset folder and the website.json:</p>
+
+<pre><code>{
+    "websiteName": "WebsiteName",
+    "websitePushID": "web.com.domain",
+    "allowedDomains": ["http://", "https://"],
+    "urlFormatString": "http:///%@",
+    "authenticationToken": "",
+    "webServiceURL": "https:///safari_push_notifications/"
+}
+</code></pre>
+
+<h3>Web Service Endpoints</h3>
+
+<p>Now it is time to setup some endpoints in your web application for Safari to communicate with. You need endpoints to do the following:</p>
+
+<ul><li>Generate a push package for an individual user.</li>
+<li>Register a users device token.</li>
+<li>Deregister a users device token.</li>
+<li>Record log data sent by Safari when errors occur.</li>
+</ul>
+
+<p>Here is a pseudo controller demonstrating what each endpoint needs to do:</p>
+
+<pre><code>&lt;?php
+
+namespace App\Controller;
+
+use JWage\APNS\Certificate;
+use JWage\APNS\Safari\PackageGenerator;
+
+class SafariPushNotificationsController
+{
+    public function packageAction($userId)
+    {
+        // Send push notification package to browser when Safari asks user for permission to send you notifications.
+
+        $certificate = new Certificate(file_get_contents('apns.p12'), 'certpassword');
+        $packageGenerator = new PackageGenerator(
+            $certificate, '/path/to/base/pushPackage/path', 'yourhost.com'
+        );
+
+        // returns JWage\APNS\Safari\Package instance
+        $package = $packageGenerator-&gt;createPushPackageForUser('userid');
+
+        // send $package-&gt;getZipPath() to the browser
+    }
+
+    public function registerAction($userId, $deviceToken)
+    {
+        // store $deviceToken on the $userId so you can use it later to send pushes
+    }
+
+    public function deregisterAction($userId, $deviceToken)
+    {
+        // remove $deviceToken from $userId
+    }
+
+    public function logAction($userId)
+    {
+        // log information sent for debugging purposes
+    }
+}
+</code></pre>
+
+<h3>Requesting Permission</h3>
+
+<p>Requesting permission to send a user notifications in Safari can be done using this little snippet of javascript on your website:</p>
+
+<pre><code>if ('safari' in window &amp;&amp; 'pushNotification' in window.safari) {
+    var checkRemotePermission = function (permissionData) {
+        if (permissionData.permission === 'default') {
+            window.safari.pushNotification.requestPermission(
+                'http://domain.com/safari_push_notifications/',
+                'web.com.domain',
+                {
+                    'userId': 
+                },
+                checkRemotePermission
+            );
+        } else if (permissionData.permission === 'denied') {
+            // do something when permission is denied
+        } else if (permissionData.permission === 'granted') {
+            // do something when permission is granted
+        }
+    };
+
+    // Ensure that the user can receive Safari Push Notifications.
+    var permissionData = window.safari.pushNotification.permission('web.com.domain');
+    checkRemotePermission(permissionData);
+}
+</code></pre>
+
+<p>When a user visits your website with Safari in OSX Mavericks it will hit your web services endpoint, download the push package and ask the user if they want to receive notifications from your website.</p>
+
+<h3>Sending Push Notifications</h3>
+
+<p>Once you have done all of the above, you should be ready to send push notifications. The PHP APNS library makes this extremely easy. Here is an example:</p>
+
+<pre><code>use JWage\APNS\Certificate;
+use JWage\APNS\Client;
+use JWage\APNS\Sender;
+use JWage\APNS\SocketClient;
+
+$certificate = new Certificate(file_get_contents('apns.pem'));
+$socketClient = new SocketClient($certificate, 'gateway.push.apple.com', 2195);
+$client = new Client($socketClient);
+$sender = new Sender($client);
+
+$sender-&gt;send('devicetoken', 'Title of push', 'Body of push', 'http://deeplink.com');
+</code></pre>
+
+<p>You can create an easy to use service in your application for sending push notifications to an instance of <code>User</code>, assuming it implements a <code>getSafariDeviceToken()</code> method:</p>
+
+<pre><code>class SafariPushNotificationSender
+{
+    private $sender;
+
+    public function __construct(Sender $sender)
+    {
+        $this-&gt;sender = $sender;
+    }
+
+    public function sendToUser(User $user, $title, $body, $link)
+    {
+        return $this-&gt;sender-&gt;send($user-&gt;getSafariDeviceToken(), $title, $body, $link);
+    }
+}
+</code></pre>
+
+<p>Now it is as simple as the following:</p>
+
+<pre><code>$safariPushNotificationSender = new SafariPushNotificationSender($sender);
+$safariPushNotificationSender-&gt;sendToUser($user, 'Title of push', 'Body of push', 'http://deeplink.com');
+</code></pre>
+
+<p>I hope this was helpful! If you have any questions please leave them in the comments. Enjoy!</p>
+
+        </div>
+
+            </article>
+    <article>
+        <header>
             <h2><a href="https://jwage.com/posts/2013/07/16/mongodb-php-mongodate-tricks">MongoDB PHP MongoDate Tricks</a></h2>
         </header>
 
@@ -187,157 +362,6 @@
 <p>&ldquo;It would, however, be highly unjust to regard the masses of the totalitarian people as devoid of moral fervor because they give unstinted support to a system which to us seems a denial of most moral values. For the great majority of them the opposite is probably true: the intensity of the moral emotions behind a movement like that of National Socialism or communism can probably be compared only to those of the great religious movements of history.&rdquo;</p>
 
 <p>&ldquo;Yet while there is little that is likely to induce men who are good by our standards to aspire to leading positions in the totalitarian machine, and much to deter them, there will be special opportunities for the ruthless and unscrupulous. There will be jobs to be done about the badness of which taken by themselves nobody has any doubt, but which have to be done in the service of some higher end, and which have to be executed with the same expertness and efficiency as any others. And as there will be need for actions which are bad in themselves, and which all those still influenced by traditional morals will be reluctant to perform, the readiness to do bad things becomes a path to promotion and power. The positions in a totalitarian society in which it is necessary to practice cruelty and intimidation, deliberate deception and spying, are numerous. Neither the Gestapo nor the administration of a concentration camp, neither the Ministry of Propaganda nor the SA or SS (or their Italian or Russian counterparts), are suitable places for the exercise of humanitarian feelings.13 Yet it is through positions like these that the road to the highest positions in the totalitarian state leads. It is only too true when a distinguished American economist concludes from a similar brief enumeration of the duties of the authorities of a collectivist state that “they would have to do these things whether they wanted to or not: and the probability of the people in power being individuals who would dislike the possession and exercise of power is on a level with the probability that an extremely tender-hearted person would get the job of whipping-master in a slave plantation.”</p>
-
-        </div>
-
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2013/07/08/tracking-new-member-origination-with-symfony2">Tracking New Member Origination with Symfony2</a></h2>
-        </header>
-
-        <p class="lead">Posted on 2018-03-25 by jwage</p>
-
-        <hr />
-
-        <div>
-            <blockquote>
-  <p><strong>NOTE</strong>
-  The example code in this blog post has been simplified to make things more concise and easy to read.</p>
-</blockquote>
-
-<p>At <a href="http://www.opensky.com" target="_blank">OpenSky</a> it is important for us to track how a member joined so that we can determine causation between joining and any subsequent actions taken on the site, like an order.</p>
-
-<p>To get started create a new class called <code>OriginationManager</code> with a method named <code>updateHistory</code>. It will accept a <code>Request</code> object and record the query parameters from the current URL in the session.</p>
-
-<pre><code>&lt;?php class OriginationManager
-{
-    public function updateHistory(Request $request)
-    {
-        $session = $request-&gt;getSession();
-
-        $history = $session-&gt;get('user_origination_history', array());
-        $history[] = $request-&gt;query-&gt;all();
-
-        $session-&gt;set('user_origination_history', $history);
-    }
-}
-</code></pre>
-
-<p>Now create an <code>OriginationListener</code> class that will listen to the <code>kernel.request</code> event and make use of the <code>OriginationManager::updateHistory()</code> API we just created.</p>
-
-<pre><code>&lt;?php class OriginationListener
-{
-    // ...
-
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        $request = $event-&gt;getRequest();
-
-        // Only process non-logged-in users
-        if ($token = $this-&gt;securityContext-&gt;getToken()) {
-            $user = $token-&gt;getUser();
-            if ($user instanceof User) {
-                return;
-            }
-        }
-
-        $this-&gt;originationManager-&gt;updateHistory($request);
-    }
-}
-</code></pre>
-
-<p>Now we are tracking the query parameters of logged out users on every request. We can make use of this information later when a user joins. First, lets define a new model that can be used to store the origination information along with the user (assume the model is persisted with <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a>). Each new <code>User</code> gets an <code>Originator</code> record when they join. It allows us to essentially see how a new user entered the site and what clicks they made before joining.</p>
-
-<pre><code>&lt;?php class Originator
-{
-    /**
-     * The raw array of request query data.
-     *
-     * @var array
-     */
-    protected $history = array();
-
-    /**
-     * The user that originated this member.
-     *
-     * @var User
-     */
-    protected $user;
-
-    /**
-     * The value of the first osky_origin parameter we encounter.
-     *
-     * @var string
-     */
-    protected $origin;
-
-    /**
-     * The value of the first osky_source parameter we encounter.
-     *
-     * @var string
-     */
-    protected $source;
-
-    // ...
-}
-</code></pre>
-
-<p>Assume your application already notifies an event named <code>user.created</code>. In <code>OriginationListener</code> create an <code>onUserCreated</code> method that will listen to the <code>user.created</code> event.</p>
-
-<pre><code>&lt;?php
-
-class OriginationListener
-{
-    // ...
-
-    public function onUserCreated(UserCreatedEvent $event)
-    {
-        $user = $event-&gt;getUser();
-        $request = $event-&gt;getRequest();
-
-        $this-&gt;originationManager-&gt;assignUserOrigination($user, $request);
-    }
-}
-</code></pre>
-
-<p>Next, create the <code>OriginationManager::assignUserOrigination()</code> method. It will utilize the request query parameters we saved on the session earlier to create a new <code>Originator</code> record.</p>
-
-<pre><code>&lt;?php class OriginationManager
-{
-    public function assignUserOrigination(User $user, Request $request)
-    {
-        $session = $request-&gt;getSession();
-
-        $history = $session-&gt;get('user_origination_history', array());
-
-        $originator = new Originator();
-        $originator-&gt;setHistory($history);
-
-        foreach ($history as $query) {
-            if (!$originator-&gt;getOrigin() &amp;&amp; isset($query['osky_origin'])) {
-                $originator-&gt;setOrigin($query['osky_origin']);
-
-                if ($user = $this-&gt;userRepository-&gt;find($query['osky_origin'])) {
-                    $originator-&gt;setUser($user);
-                }
-            }
-
-            if (!$originator-&gt;getSource() &amp;&amp; isset($query['osky_source'])) {
-                $originator-&gt;setSource($query['osky_source']);
-            }
-        }
-
-        $user-&gt;setOriginator($originator);
-
-        $session-&gt;remove('user_origination_history');
-    }
-}
-</code></pre>
-
-<p>Now if a logged out user were to visit OpenSky with a parameter named <code>osky_origin</code> in the URL with another users id as the value, the <code>Originator</code> record that gets created for the new member will have a reference to that <code>User</code>. We can then utilize that information do whatever we want. In our case we give the user that got the new <code>User</code> to join a credit and a thank you. The <code>osky_source</code> parameter can be used as an arbitrary reporting variable to help with identifying marketing campaigns.</p>
-
-<p>Keep in mind that this is an example implementation and it omits many details specific to OpenSky for the sake of simplicity. The real implementation we use has dozens of other parameters that can be used to associate records together and assist with reporting. You can add to this implementation and check for custom parameters and standard ones like <code>utm_source</code>, <code>utm_campaign</code>, etc.</p>
 
         </div>
 

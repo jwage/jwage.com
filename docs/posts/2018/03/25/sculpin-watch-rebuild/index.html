@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Watch for changes in Sculpin Source &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+            <meta name="robots" content="index, follow">
+
+        <link href="https://jwage.com/components/bootstrap/css/bootstrap.min.css?6" rel="stylesheet" type="text/css" />
+
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" integrity="sha384-3AB7yXWz4OeoZcPbieVW64vVXEwADiYyAEhwilzWsLw+9FgqpyjjStpPnpBO8o8S" crossorigin="anonymous">
+
+        <link href="https://jwage.com/css/style.css?6" rel="stylesheet" type="text/css" />
+
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+
+        <link rel="stylesheet" href="https://jwage.com/components/highlightjs/styles/railscasts.css?6" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.com/atom.xml" title="jwage.com activity feed" />
+
+        
+            </head>
+    <body>
+
+        <header>
+
+
+            <!-- Fixed navbar -->
+            <nav class="navbar navbar-expand-md fixed-top navbar-light border-bottom" style="background-color: #ffffff; border-top: solid 5px #FF6600;">
+                <a class="navbar-brand" href="https://jwage.com"><img src="https://jwage.com/images/me.jpg" class="rounded-circle mr-3" />jwage.com</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/blog">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/presentations">Presentations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/articles">Articles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/kubota-l210">Kubota L210</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/archive">Archive</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Begin page content -->
+        <main role="main" class="container">
+                <article>
+        <header>
+            <h2>Watch for changes in Sculpin Source <small>post</small></h2>
+        </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
+        <div>
+            <p>I recently rebuilt jwage.com using <a href="https://sculpin.io/">Sculpin</a> and <a href="https://pages.github.com/">GitHub Pages</a>. It was previously hosted on Tumblr and over time I grew frustrated with the lack of control. I wanted a mobile friendly design and I wasn't looking forward to working with HTML &amp; CSS in the Tumblr browser user interface so I decided to give Sculpin a try. I was immediately happy with the choice because it is built using familiar technologies like <a href="https://symfony.com/" target="_blank">Symfony</a> and <a href="https://twig.symfony.com/" target="_blank">Twig</a>.</p>
+
+<p>Here are a few handy utilities I hacked together to help with my development.</p>
+
+<h2 id="build.sh">build.sh</h2>
+
+<p>For easily building the site in the way that GitHub pages expects:</p>
+
+<pre><code class="command">./build.sh dev
+</code></pre>
+
+<p>Or to build it for prod:</p>
+
+<pre><code class="command">./build.sh prod
+</code></pre>
+
+<p>Here is the source:</p>
+
+<pre><code class="bash">#!/bin/bash
+
+vendor/bin/sculpin generate --env=$1
+if [ $? -ne 0 ]; then echo "Could not generate the site"; exit 1; fi
+
+mv docs/CNAME output_$1/CNAME
+rm -rf docs
+mv output_$1 docs
+</code></pre>
+
+<h2 id="publish.sh">publish.sh</h2>
+
+<p>To make it easy to publish and deploy a new version of the site:</p>
+
+<pre><code class="bash">#!/bin/bash
+
+./build.sh prod
+
+git add --all .
+git commit -m "New version of jwage.com"
+git push origin master
+
+# Put the dev version back after deploying prod
+./build.sh dev
+
+</code></pre>
+
+<h2 id="watch.php">watch.php</h2>
+
+<p>For watching changes to your source and automatically triggering <code>build.sh</code>:</p>
+
+<pre><code class="php">&lt;?php
+
+$buildScriptPath = __DIR__.'/build.sh dev';
+
+$startPaths = [
+    __DIR__.'/app/config/*',
+    __DIR__.'/source/*',
+];
+
+$lastTime = time();
+
+while (true) {
+    $files = recursiveGlob($startPaths);
+
+    foreach ($files as $file) {
+        $time = filemtime($file);
+
+        if ($time &gt; $lastTime) {
+            $lastTime = time();
+
+            echo sprintf("%s was changed. Building...\n", $file);
+
+            echo shell_exec($buildScriptPath)."\n";
+
+            file_put_contents(__DIR__.'/docs/changed', time());
+        }
+    }
+}
+
+function recursiveGlob(array $paths)
+{
+    $files = [];
+
+    foreach ($paths as $path) {
+        $files = array_merge($files, glob($path));
+
+        foreach ($files as $file) {
+            if (is_dir($file)) {
+                $dirPath = $file.'/*';
+
+                $dirFiles = recursiveGlob([$dirPath]);
+
+                $files = array_merge($files, $dirFiles);
+            }
+        }
+    }
+
+    return $files;
+}
+</code></pre>
+
+<p>Run this script in the root of your project:</p>
+
+<pre><code class="php">php watch.php
+</code></pre>
+
+<p>Then save a file in your project and it should rebuild automatically:</p>
+
+<pre><code class="shell">/data/jwage.com/source/_posts/2018-03-25-sculpin-watch-rebuild.md was changed. Building...
+Detected new or updated files
+Generating: 100% (249 sources / 0.01 seconds)
+Converting: 100% (272 sources / 0.14 seconds)
+Formatting: 100% (272 sources / 0.03 seconds)
+Processing completed in 0.24 seconds
+</code></pre>
+
+<h2 id="browser-refresh">Browser Refresh</h2>
+
+<p>Everytime <code>watch.php</code> detects a change, it writes an updated timestamp to a file named <code>changed</code> with the current timestamp. Now you can poll this file for changes in your site to automatically refresh the browser. Put this in your layout.</p>
+
+<p></p>
+
+<pre><code class="twig">{% if site.env == 'dev' %}
+    &lt;script type="text/javascript"&gt;
+        var changedUrl = '{{ site.url }}/changed';
+    &lt;/script&gt;
+    &lt;script src="{{ site.url }}/js/watch.js"&gt;&lt;/script&gt;
+{% endif %}
+</code></pre>
+
+<p></p>
+
+<p>Then in <code>source/js/watch.js</code> place the following code:</p>
+
+<pre><code class="javascript">function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i &lt;ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+var lastTimestamp = getCookie('lastTimestamp');
+
+var watchCallback = function(timestamp) {
+    if (lastTimestamp != timestamp) {
+        lastTimestamp = timestamp;
+
+        setCookie('lastTimestamp', lastTimestamp, 1);
+
+        window.location.reload();
+    }
+};
+
+setInterval(function() {
+    $.get(changedUrl, watchCallback);
+}, 500);
+</code></pre>
+
+<p>Maybe eventually I will put this together in to proper code and packaging so that other people can use it more easily. For now, feel free to copy and paste this in to your project.</p>
+
+        </div>
+                    <p class="categories">
+            Categories:
+                        <a href="https://jwage.com/blog/categories/articles">articles</a>                        </p>
+                            <p class="tags">
+            Tags:
+                        <a href="https://jwage.com/blog/tags/php">php</a>,                         <a href="https://jwage.com/blog/tags/sculpin">sculpin</a>,                         <a href="https://jwage.com/blog/tags/symfony">symfony</a>,                         <a href="https://jwage.com/blog/tags/twig">twig</a>                        </p>
+        
+                    <nav class="article">
+                <ul class="pagination">
+                                            <li class="page-item"><a class="page-link previous" href="https://jwage.com/posts/2017/11/29/gmail-translation" title="Gmail trying to translate our e-mails when it should not"><span class="title">Previous: Gmail trying to translate our e-mails when it should not</span></a></li>
+                                                        </ul>
+            </nav>
+            </article>
+
+
+
+        </main>
+
+        <footer>
+            <div class="footer" id="footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-2  col-md-2 col-sm-4 col-xs-6">
+                            <h3>Business</h3>
+
+                            <ul>
+                                <li> <a href="http://theopenskyproject.com" target="_blank">The OpenSky Project</a></li>
+                                <li> <a href="http://www.opensky.com" target="_blank">OpenSky</a></li>
+                                <li> <a href="http://www.storenvy.com" target="_blank">Storenvy</a></li>
+                                <li> <a href="http://www.dotandbo.com" target="_blank">Dot & Bo</a> </li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-2  col-md-2 col-sm-4 col-xs-6">
+                            <h3>Blogs</h3>
+
+                            <ul>
+                                <li><a href="https://engineering.opensky.com/" target="_blank">OpenSky Engineering</a></li>
+                                <li><a href="http://symfony.com/blog/" target="_blank">Symfony Blog</a></li>
+                                <li><a href="http://www.doctrine-project.org/archive.html" target="_blank">Doctrine Blog</a></li>
+                                <li><a href="http://fabien.potencier.org/" target="_blank">Fabien Potencier</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-2  col-md-2 col-sm-4 col-xs-6">
+                            <h3>OSS</h3>
+
+                            <ul>
+                                <li> <a href="https://github.com/jwage" target="_blank">jwage</a></li>
+                                <li> <a href="https://github.com/doctrine" target="_blank">doctrine</a></li>
+                                <li> <a href="https://github.com/symfony" target="_blank">symfony</a> </li>
+                                <li> <a href="https://github.com/opensky" target="_blank">opensky</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-2  col-md-2 col-sm-4 col-xs-6">
+                            <h3>NashPHP</h3>
+
+                            <ul>
+                                <li><a href="https://nashvillephp.org/" target="_blank">Website</a></li>
+                                <li><a href="https://nashvillephp.org/about" target="_blank">About</a></li>
+                                <li><a href="https://www.meetup.com/nashvillephp/" target="_blank">Events</a></li>
+                                <li><a href="https://nashvillephp.org/speakers" target="_blank">Speakers</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-3  col-md-3 col-sm-6 col-xs-12">
+                            <h3>Social</h3>
+
+                            <ul class="social">
+                                <li><a href="https://www.facebook.com/jwage" target="_blank"><i class="fab fa-facebook"></i></a></li>
+                                <li><a href="https://www.twitter.com/jwage" target="_blank"><i class="fab fa-twitter"></i></a></li>
+                                <li><a href="https://www.pinterest.com/jwage" target="_blank"><i class="fab fa-pinterest"></i></a></li>
+                                <li><a href="https://www.youtube.com/jwage" target="_blank"><i class="fab fa-youtube"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!--/.row-->
+                </div>
+                <!--/.container-->
+            </div>
+            <!--/.footer-->
+
+            <div class="footer-bottom">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-7 "><i class="fa fa-copyright"></i> 2018 jwage.com</div>
+                        <div class="col-5 text-right">Built with <i class="fa fa-heart text-danger"></i></div>
+                    </div>
+                </div>
+            </div>
+            <!--/.footer-bottom-->
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js?6"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.com/components/jquery/jquery.min.js?6"><\/script>')</script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://jwage.com/components/bootstrap/js/bootstrap.min.js?6"></script>
+
+        
+                    <script type="text/javascript">
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-288343-6', 'auto');
+                ga('send', 'pageview');
+            </script>
+        
+        <script src="https://jwage.com/components/highlightjs/highlight.pack.js?6"></script>
+        <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+
+        
+            </body>
+</html>

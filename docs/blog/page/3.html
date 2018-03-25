@@ -73,6 +73,259 @@
 
     <article>
         <header>
+            <h2><a href="https://jwage.com/posts/2014/02/15/using-the-symfony-expression-language-for-a-reward">Using the Symfony Expression Language for a Reward Rules Engine</a></h2>
+        </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
+        <div>
+            <p>We recently adopted the <a href="http://symfony.com/doc/current/components/expression_language/index.html" target="_blank">Symfony Expression Language</a> in the rules engine at <a href="http://www.opensky.com" target="_blank">OpenSky</a>. It has brought a new level of flexibility to our system and creating new logic has never been easier.</p>
+
+<p>Installing the expression language in your application is easy with composer. Just add the following to your <code>composer.json</code>:</p>
+
+<pre><code>"symfony/expression-language": "2.5.*@dev"
+</code></pre>
+
+<p>The expression language allows you to perform expressions that get evaluated with raw PHP code and return a single value. It can be any type of value and is not limited to boolean values. Here is a simple example:</p>
+
+<pre><code>use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
+$language = new ExpressionLanguage();
+
+$expression = 'user["isActive"] == true and product["price"] &gt; 20';
+$context = array(
+    'user' =&gt; array(
+        'isActive' =&gt; true
+    ),
+    'product' =&gt; array(
+        'price' =&gt; 30
+    ),
+);
+
+$return = $language-&gt;evaluate($expression, $context);
+
+var_export($return); // true
+</code></pre>
+
+<p>That is a very simple example on how to use the raw expression language. Now I will try to demonstrate how you could model a real implementation using <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a> to persist your rules to a database, the <a href="http://symfony.com/doc/current/components/event_dispatcher/introduction.html" target="_blank">Symfony Event Dispatcher</a> to evaluate your rules and execute actions when your expressions evaluate to true.</p>
+
+<p>To get started create a new <code>Rule</code> class and map it to a database using one of the Doctrine object mappers. For this example we will map it using the MongoDB ODM:</p>
+
+<pre><code>use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+
+/**
+ * @ODM\Document
+ */
+class Rule
+{
+    /**
+     * @ODM\Id
+     */
+    private $id;
+
+    /**
+     * @ODM\Collection
+     */
+    private $eventNames = array();
+
+    /**
+     * @ODM\String
+     */
+    private $expression;
+
+    /**
+     * @ODM\Collection
+     */
+    private $actionEvents = array();
+
+    // ...
+}
+</code></pre>
+
+<p>Now imagine you already have an event named <code>user.add_to_cart</code> being notified in your application. It looks something like this:</p>
+
+<pre><code>use Symfony\Component\EventDispatcher\Event;
+
+class UserAddToCartEvent extends Event
+{
+    const onUserAddToCart = 'user.add_to_cart';
+
+    private $user;
+    private $product;
+
+    // ...
+}
+
+class AddToCartController
+{
+    // ...
+
+    public function addToCartAction($productId)
+    {
+        // ...
+
+        $this-&gt;dispatcher-&gt;dispatch(UserAddToCartEvent::onUserAddToCart, new UserAddToCartEvent($user, $product));
+    }
+}
+</code></pre>
+
+<p>Say you want to give a reward to users who add items to their cart when they have loved more than <code>20</code> items and the price of the product is greater than <code>50</code> dollars. The <code>Rule</code> model we created earlier allows us to define a rule that will be executed when <code>UserAddToCart::onUserAddToCart</code> is dispatched:</p>
+
+<pre><code>$rule = new Rule();
+
+// set the events this rule should be executed on.
+$rule-&gt;setEventNames(array(
+    UserAddToCartEvent::onUserAddToCart
+));
+
+// set the expression to evaluate when the rule is executed.
+// if the user has loved more than 20 items and the price of the product is more than 50 dollars.
+// the expression string will be evaluated by the Symfony expression language.
+$rule-&gt;setExpression('event.getUser().getNumLoves() &gt; 20 and event.getProduct().getPrice() &gt; 50');
+
+// set the action events to dispatch when the expression evaluates to true.
+$rule-&gt;setActionEvents(array(
+    array(
+        'eventName' =&gt; UserCreditRewardEvent::onUserCreditReward,
+        'recipientExpression' =&gt; 'event.getUser()',
+        'attributes' =&gt; array(
+            'amount' =&gt; 50
+        ),
+    )
+));
+
+$dm-&gt;persist($rule);
+$dm-&gt;flush();
+</code></pre>
+
+<p>The above example assumes you have a <code>UserCreditRewardEvent</code> setup and a listener setup to process the event to give the user a credit. Here is what the event would look like:</p>
+
+<pre><code>use Symfony\Component\EventDispatcher\Event;
+
+class UserCreditRewardEvent extends Event
+{
+    const onUserCreditReward = 'user.credit_reward';
+
+    private $user;
+    private $amount;
+
+    // ...
+}
+</code></pre>
+
+<p>And here is what the listener would look like to give the user the credit. This example assumes you already have a <code>CreditManager</code> service with an <code>issueCredit()</code> method you can use to give a user a credit for a dollar amount:</p>
+
+<pre><code>class UserCreditRewardListener
+{
+    private $creditManager;
+
+    // ...
+
+    public function onUserCreditReward(UserCreditRewardEvent $event)
+    {
+        $this-&gt;creditManager-&gt;issueCredit(
+            $event-&gt;getUser(),
+            $event-&gt;getAmount()
+        );
+    }
+}
+</code></pre>
+
+<p>Now to bring it all together we need a <code>RuleSubcriber</code> to lookup the <code>Rule</code> objects from the database when events occur in our application. This class will evaluate the rules and then dispatch the resulting action events when the expressions return true.</p>
+
+<pre><code>use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class RuleSubcriber implements EventSubscriberInterface
+{
+    private $dm;
+    private $expressionLanguage;
+    private $actionEventFactory;
+
+    // ...
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            UserAddToCartEvent::onUserAddToCart =&gt; array('handleEvent', 0),
+        );
+    }
+
+    public function handleEvent(Event $event)
+    {
+        $rules = $this-&gt;findRulesByEventName($event-&gt;getName());
+
+        foreach ($rules as $rule) {
+            if ($this-&gt;evaluateRule($rule, $event)) {
+                $this-&gt;dispatchActionEvents($rule, $event);
+            }
+        }
+    }
+
+    private function findRulesByEventName($eventName)
+    {
+        return $this-&gt;dm-&gt;createQueryBuilder()
+            -&gt;field('eventNames')-&gt;equals($eventName)
+            -&gt;getQuery()
+            -&gt;execute();
+    }
+
+    private function evaluateRule(Rule $rule, Event $event)
+    {
+        return $this-&gt;expressionLanguage-&gt;evaluate($rule-&gt;getExpression(), array(
+            'event' =&gt; $event,
+        ));
+    }
+
+    private function dispatchActionEvents(Rule $rule, Event $event)
+    {
+        foreach ($rule-&gt;getActionEvents() as $action) {
+            $this-&gt;dispatchActionEvent($action, $rule, $event);
+        }
+    }
+
+    private function dispatchActionEvent(array $action, Rule $rule, Event $event)
+    {
+        $recipientUser = $this-&gt;expressionLanguage($action['recipientExpression'], array(
+            'event' =&gt; $event,
+        ));
+
+        $actionEvent = $this-&gt;actionEventFactory-&gt;createActionEvent(
+            $action,
+            $recipientUser,
+            $rule
+        );
+
+        $this-&gt;dispatcher-&gt;dispatch($action['eventName'], $actionEvent);
+    }
+}
+</code></pre>
+
+<p>The <code>ActionEventFactory</code> used in the above <code>RuleSubcriber</code> is a simple service used to create the action events we dispatch for our rules.</p>
+
+<pre><code>class ActionEventFactory
+{
+    public function createActionEvent(array $action, User $user, Rule $rule)
+    {
+        switch ($action['eventName']) {
+            // ...
+
+            case UserCreditRewardEvent::onUserCreditReward:
+                return new UserCreditRewardEvent($user, $action['attributes']['amount']);
+        }
+    }
+}
+</code></pre>
+
+<p>That is it! Now you have the ability to define rules that can be created with a user interface in your application and stored in a database. These rules get evaluated when certain events are dispatched within your application. When those rules evaluate to true you can dispatch other events that can give out credits, give free shipping, send e-mails, or do anything you can possibly imagine. Build up a repository of common actions as events and allow your business people to define new rules and rewards for promotional campaigns without having to involve a software engineer.</p>
+
+        </div>
+
+            </article>
+    <article>
+        <header>
             <h2><a href="https://jwage.com/posts/2014/02/12/tailing-log-files-across-multiple-servers">Tailing Log Files Across Multiple Servers</a></h2>
         </header>
 
@@ -472,181 +725,6 @@ $om-&gt;flush(); // updates the object in the database
 <p><strong><a href="http://github.com/doctrine/orientdb-odm" target="_blank">doctrine/orientdb-odm</a></strong></p>
 
 <p>Doctrine OrientDB ODM provides persistence for PHP objects to OrientDB.</p>
-
-        </div>
-
-            </article>
-    <article>
-        <header>
-            <h2><a href="https://jwage.com/posts/2013/12/23/sending-safari-push-notifications-with-php">Sending Safari Push Notifications with PHP</a></h2>
-        </header>
-
-        <p class="lead">Posted on 2018-03-25 by jwage</p>
-
-        <hr />
-
-        <div>
-            <p>When OSX Mavericks was released, I was excited to see that push notifications were supported within Safari. So now, just like iOS, we can send push notifications to Safari regardless of whether the browser is open or not. This post gives overview of how to get them working from PHP using the <a href="http://github.com/jwage/php-apns" target="_blank">PHP APNS</a> library.</p>
-
-<h3>Registering with Apple and Generating Certificates</h3>
-
-<p>This post assumes you have read <a href="https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html#//apple_ref/doc/uid/TP40013225-CH3-SW1" target="_blank">this</a> article from Apple and have already generated your security certificates.</p>
-
-<h3>PHP APNS Library</h3>
-
-<p>The PHP APNS (Apple Push Notification Service) library makes it extremely easy to get Safari push notifications working on your website. Just install it with composer to get started:</p>
-
-<h3>Installation</h3>
-
-<pre><code>composer require jwage/php-apns
-composer install
-</code></pre>
-
-<h3>Push Package</h3>
-
-<p>Once you have the package installed you can start integrating it with your website. The first thing we need to do is create a base push package for your website. From Apple&rsquo;s website:</p>
-
-<blockquote>
-  <p>When a user is asked for permission to receive push notifications, Safari asks your web server for a package. The package contains data that is used by the notification UI, such as your website name and icon, as well as a cryptographic signature. The signature verifies that your notification hasn’t been intercepted by a man-in-the-middle attack and that it is indeed coming from a trusted source: you.</p>
-</blockquote>
-
-<p>You can find a sample base push package within the PHP APNS library <a href="https://github.com/jwage/php-apns/tree/master/data/safariPushPackage.base" target="_blank">here</a>. Copy this somewhere in your application and customize the icons in the icon.iconset folder and the website.json:</p>
-
-<pre><code>{
-    "websiteName": "WebsiteName",
-    "websitePushID": "web.com.domain",
-    "allowedDomains": ["http://", "https://"],
-    "urlFormatString": "http:///%@",
-    "authenticationToken": "",
-    "webServiceURL": "https:///safari_push_notifications/"
-}
-</code></pre>
-
-<h3>Web Service Endpoints</h3>
-
-<p>Now it is time to setup some endpoints in your web application for Safari to communicate with. You need endpoints to do the following:</p>
-
-<ul><li>Generate a push package for an individual user.</li>
-<li>Register a users device token.</li>
-<li>Deregister a users device token.</li>
-<li>Record log data sent by Safari when errors occur.</li>
-</ul>
-
-<p>Here is a pseudo controller demonstrating what each endpoint needs to do:</p>
-
-<pre><code>&lt;?php
-
-namespace App\Controller;
-
-use JWage\APNS\Certificate;
-use JWage\APNS\Safari\PackageGenerator;
-
-class SafariPushNotificationsController
-{
-    public function packageAction($userId)
-    {
-        // Send push notification package to browser when Safari asks user for permission to send you notifications.
-
-        $certificate = new Certificate(file_get_contents('apns.p12'), 'certpassword');
-        $packageGenerator = new PackageGenerator(
-            $certificate, '/path/to/base/pushPackage/path', 'yourhost.com'
-        );
-
-        // returns JWage\APNS\Safari\Package instance
-        $package = $packageGenerator-&gt;createPushPackageForUser('userid');
-
-        // send $package-&gt;getZipPath() to the browser
-    }
-
-    public function registerAction($userId, $deviceToken)
-    {
-        // store $deviceToken on the $userId so you can use it later to send pushes
-    }
-
-    public function deregisterAction($userId, $deviceToken)
-    {
-        // remove $deviceToken from $userId
-    }
-
-    public function logAction($userId)
-    {
-        // log information sent for debugging purposes
-    }
-}
-</code></pre>
-
-<h3>Requesting Permission</h3>
-
-<p>Requesting permission to send a user notifications in Safari can be done using this little snippet of javascript on your website:</p>
-
-<pre><code>if ('safari' in window &amp;&amp; 'pushNotification' in window.safari) {
-    var checkRemotePermission = function (permissionData) {
-        if (permissionData.permission === 'default') {
-            window.safari.pushNotification.requestPermission(
-                'http://domain.com/safari_push_notifications/',
-                'web.com.domain',
-                {
-                    'userId': 
-                },
-                checkRemotePermission
-            );
-        } else if (permissionData.permission === 'denied') {
-            // do something when permission is denied
-        } else if (permissionData.permission === 'granted') {
-            // do something when permission is granted
-        }
-    };
-
-    // Ensure that the user can receive Safari Push Notifications.
-    var permissionData = window.safari.pushNotification.permission('web.com.domain');
-    checkRemotePermission(permissionData);
-}
-</code></pre>
-
-<p>When a user visits your website with Safari in OSX Mavericks it will hit your web services endpoint, download the push package and ask the user if they want to receive notifications from your website.</p>
-
-<h3>Sending Push Notifications</h3>
-
-<p>Once you have done all of the above, you should be ready to send push notifications. The PHP APNS library makes this extremely easy. Here is an example:</p>
-
-<pre><code>use JWage\APNS\Certificate;
-use JWage\APNS\Client;
-use JWage\APNS\Sender;
-use JWage\APNS\SocketClient;
-
-$certificate = new Certificate(file_get_contents('apns.pem'));
-$socketClient = new SocketClient($certificate, 'gateway.push.apple.com', 2195);
-$client = new Client($socketClient);
-$sender = new Sender($client);
-
-$sender-&gt;send('devicetoken', 'Title of push', 'Body of push', 'http://deeplink.com');
-</code></pre>
-
-<p>You can create an easy to use service in your application for sending push notifications to an instance of <code>User</code>, assuming it implements a <code>getSafariDeviceToken()</code> method:</p>
-
-<pre><code>class SafariPushNotificationSender
-{
-    private $sender;
-
-    public function __construct(Sender $sender)
-    {
-        $this-&gt;sender = $sender;
-    }
-
-    public function sendToUser(User $user, $title, $body, $link)
-    {
-        return $this-&gt;sender-&gt;send($user-&gt;getSafariDeviceToken(), $title, $body, $link);
-    }
-}
-</code></pre>
-
-<p>Now it is as simple as the following:</p>
-
-<pre><code>$safariPushNotificationSender = new SafariPushNotificationSender($sender);
-$safariPushNotificationSender-&gt;sendToUser($user, 'Title of push', 'Body of push', 'http://deeplink.com');
-</code></pre>
-
-<p>I hope this was helpful! If you have any questions please leave them in the comments. Enjoy!</p>
 
         </div>
 
