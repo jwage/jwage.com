@@ -91,7 +91,7 @@ title: Home
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg?{{ site.cacheBuster }}" /> <a href="https://github.com/jwage">https://github.com/jwage</a></li>
-                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg?{{ site.cacheBuster }}" /> <a href="https://github.com/jwage">https://github.com/doctrine</a></li>
+                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg?{{ site.cacheBuster }}" /> <a href="https://github.com/doctrine">https://github.com/doctrine</a></li>
             </ul>
         </div>
     </div>
