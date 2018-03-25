@@ -65,9 +65,9 @@ title: Home
                 Social Media
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><a href="https://twitter.com/jwage" target="_blank"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/twitter-logo.jpg?{{ site.cacheBuster }}" /> https://twitter.com/jwage</a></li>
-                <li class="list-group-item"><a href="https://facebook.com/jwage" target="_blank"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/facebook-logo.jpg?{{ site.cacheBuster }}" /> https://facebook.com/jwage</a></li>
-                <li class="list-group-item"><a href="https://www.instagram.com/jonhwage" target="_blank"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/instagram-logo.jpg?{{ site.cacheBuster }}" /> https://www.instagram.com/jonhwage</a></li>
+                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/twitter-logo.jpg?{{ site.cacheBuster }}" /> <a href="https://twitter.com/jwage" target="_blank">https://twitter.com/jwage</a></li>
+                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/facebook-logo.jpg?{{ site.cacheBuster }}" /><a href="https://facebook.com/jwage" target="_blank">https://facebook.com/jwage</a></li>
+                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/instagram-logo.jpg?{{ site.cacheBuster }}" /><a href="https://www.instagram.com/jonhwage" target="_blank">https://www.instagram.com/jonhwage</a></li>
             </ul>
         </div>
     </div>
@@ -78,8 +78,8 @@ title: Home
                 E-Mail
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><a href="mailto:jwage@opensky.com">jwage@opensky.com</a></li>
-                <li class="list-group-item"><a href="mailto:jwage@opensky.com">jonwage@gmail.com</a></li>
+                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/email-icon.svg?{{ site.cacheBuster }}" /> <a href="mailto:jwage@opensky.com">jwage@opensky.com</a></li>
+                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/email-icon.svg?{{ site.cacheBuster }}" /> <a href="mailto:jwage@opensky.com">jonwage@gmail.com</a></li>
             </ul>
         </div>
     </div>
@@ -87,11 +87,11 @@ title: Home
     <div class="col">
         <div class="card mb-4">
             <div class="card-header">
-                Open Source
+                Open Source Software
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><a href="https://github.com/jwage"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg?{{ site.cacheBuster }}" /> https://github.com/jwage</a></li>
-                <li class="list-group-item"><a href="https://github.com/jwage"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg?{{ site.cacheBuster }}" /> https://github.com/doctrine</a></li>
+                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg?{{ site.cacheBuster }}" /> <a href="https://github.com/jwage">https://github.com/jwage</a></li>
+                <li class="list-group-item"><img style="width: 25px;" class="img-fluid" src="{{ site.url }}/images/github-logo.svg?{{ site.cacheBuster }}" /> <a href="https://github.com/jwage">https://github.com/doctrine</a></li>
             </ul>
         </div>
     </div>
