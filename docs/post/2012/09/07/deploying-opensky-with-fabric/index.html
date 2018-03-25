@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Deploying OpenSky with Fabric &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+            <meta name="robots" content="index, follow">
+
+        <link href="https://jwage.com/components/bootstrap/css/bootstrap.min.css?4" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.com/css/style.css?4" rel="stylesheet" type="text/css" />
+
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+
+        <link rel="stylesheet" href="https://jwage.com/components/highlightjs/styles/railscasts.css?4" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.com/atom.xml" title="jwage.com activity feed" />
+
+        
+            </head>
+    <body>
+
+        <header>
+            <!-- Fixed navbar -->
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                <a class="navbar-brand" href="https://jwage.com"><img src="https://jwage.com/images/me.jpg" class="rounded-circle mr-3" />jwage.com</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/blog">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/articles">Articles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/kubota-l210">Kubota L210</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/archive">Archive</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Begin page content -->
+        <main role="main" class="container">
+                <article>
+        <header>
+            <h2>Deploying OpenSky with Fabric <small>post</small></h2>
+        </header>
+
+        <p class="lead">Posted on 2012-09-07 by jwage</p>
+
+        <hr />
+
+        <div>
+            <p>At <a href="http://opensky.com" target="_blank">OpenSky</a> we use <a href="http://docs.fabfile.org/en/1.4.3/index.html" target="_blank">Fabric</a> to deploy new versions of software to our servers. We deploy dozens of times a day to our testing environments, and do daily deploys to production.</p>
+
+<p>Our production web nodes are split in to two groups, <strong>group1</strong> and <strong>group2</strong>. It is setup that way so we can easily pull out a group of web nodes from the load balancer for maintenance without disrupting the site.</p>
+
+<p>In this post I will take you through a hotfix scenario and the steps we take to deploy to production.</p>
+
+<p><strong>The Scenario</strong></p>
+
+<p>Imagine we just released <strong>v3.0.0</strong> to production and we discover a critical bug that must be hotfixed.</p>
+
+<p>First thing we need to do is create a hotfix branch. We use <a href="https://github.com/nvie/gitflow" target="_blank">gitflow</a> to assist with streamlining this process. I won&rsquo;t talk too much about it here so I will assume you already know what it is.</p>
+
+<p>Create the hotfix:</p>
+
+<pre><code>git flow hotfix start 3.0.1
+</code></pre>
+
+<p>Modify the <strong>opensky/config/version.ini</strong> file and bump the version number:</p>
+
+<pre><code>[parameters]
+opensky.version = 3.0.1
+</code></pre>
+
+<p>Add the changed file, commit it and push up the hotfix:</p>
+
+<pre><code>git add opensky/config/version.ini
+git commit -m"Bump version to 3.0.1"
+git push origin hotfix/3.0.1
+</code></pre>
+
+<p>Another developer who is responsible for fixing the bug will create a new branch based off of <strong>hotfix/3.0.1</strong> where the fix will be made:</p>
+
+<pre><code>git fetch
+git checkout -b fix-the-bug origin/hotfix/3.0.1
+</code></pre>
+
+<p>The developer makes some changes and pushes up the new branch:</p>
+
+<pre><code>git add src/changed/file
+git commit -m"Fixed nasty bug"
+git push origin fix-the-bug
+</code></pre>
+
+<p>We use <a href="http://github.com" target="_blank">GitHub</a> pull requests for all of our code changes to be as transparent as possible and maintain a high level of peer code review. The developer would create a pull request for the <strong>fix-the-bug</strong> branch and ask for a team mate to review. We have a special bot named <strong>@pr-nightmare</strong> that runs our tests against the branch to ensure stability before it is merged. Once the branch gets a +1 from @pr-nightmare the team mate can merge the branch in to <strong>hotfix/3.0.1</strong>.</p>
+
+<p>Once it is merged we are ready to finish the hotfix:</p>
+
+<pre><code>git pull origin hotfix/3.0.1
+git flow hotfix finish 3.0.1
+</code></pre>
+
+<p>The above command will merge <strong>hotfix/3.0.1</strong> in to <strong>production</strong> and <strong>develop</strong> and create a new tag named <strong>v3.0.1</strong> that can be deployed to production.</p>
+
+<p>Now push the finished hotfix up to git:</p>
+
+<pre><code>git push origin develop
+git push origin production
+git push --tags
+</code></pre>
+
+<p>We are all set and ready to go to production with the <strong>v3.0.1</strong> tag using fabric.</p>
+
+<p>First thing we need to do is pull out a group of nodes from the load balancer so that we can deploy <strong>v3.0.1</strong> to it. We will pull out <strong>group1</strong> and leave <strong>group2</strong> live:</p>
+
+<pre><code>fab prod proxy.group2
+</code></pre>
+
+<p>Now <strong>group2</strong> is live and <strong>group1</strong> is not receiving any traffic so we can deploy to it:</p>
+
+<pre><code>fab prod:out deploy:stable
+</code></pre>
+
+<p>The above command automatically determines what the latest stable tag to deploy is. In this case it will deploy <strong>v3.0.1</strong>.</p>
+
+<p>Once that is done we can flip <strong>group1</strong> live and pull out <strong>group2</strong>:</p>
+
+<pre><code>fab prod proxy.flip
+</code></pre>
+
+<p>Now <strong>group1</strong> is live with the hotfix and <strong>group2</strong> is out of rotation. To finish we run the same command as before and deploy the hotfix to <strong>group2</strong> as well:</p>
+
+<pre><code>fab prod:out deploy:stable
+</code></pre>
+
+<p>We can push both groups live again and we are done:</p>
+
+<pre><code>fab prod proxy.all
+</code></pre>
+
+<p>The process could be even more streamlined and we&rsquo;re actively working to remove steps and make it even easier to deploy to production!</p>
+
+        </div>
+                
+                    <nav class="article">
+                <ul>
+                                            <li>Next: <a class="next" href="https://jwage.com/post/2012/09/07/doctrine-dbal-php-database-abstraction-layer" title="Doctrine DBAL: PHP Database Abstraction Layer"><span class="title">Doctrine DBAL: PHP Database Abstraction Layer</span></a></li>
+                                                                <li>Previous: <a class="previous" href="https://jwage.com/post/2012/07/10/testing-query-counts-in-functional-web-tests-with" title="Testing query counts in functional web tests with Symfony2 and PHPUnit"><span class="title">Testing query counts in functional web tests with Symfony2 and PHPUnit</span></a></li>
+                                    </ul>
+            </nav>
+            </article>
+
+
+
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <span class="text-muted"><img src="https://jwage.com/images/me.jpg" class="rounded-circle mr-3" style="width: 25px;" />&copy; 2018 jwage.com</span>
+            </div>
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js?4"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.com/components/jquery/jquery.min.js?4"><\/script>')</script>
+        <script src="https://jwage.com/components/bootstrap/js/bootstrap.min.js?4"></script>
+
+        
+                    <script type="text/javascript">
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-288343-6', 'auto');
+                ga('send', 'pageview');
+            </script>
+        
+        <script src="https://jwage.com/components/highlightjs/highlight.pack.js?4"></script>
+        <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+
+        
+            </body>
+</html>

@@ -7,235 +7,235 @@
     <priority>0.8</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2017/11/29/gmail-translation</loc>
+    <loc>https://jwage.com/post/2017/11/29/gmail-translation</loc>
     <lastmod>2017-11-29T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2014/11/27/when-to-inject-the-container</loc>
+    <loc>https://jwage.com/post/2014/11/27/when-to-inject-the-container</loc>
     <lastmod>2014-11-27T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2014/11/27/fixing-nginx-too-many-open-files-errors</loc>
+    <loc>https://jwage.com/post/2014/11/27/fixing-nginx-too-many-open-files-errors</loc>
     <lastmod>2014-11-27T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2014/10/18/forcing-https-for-all-traffic-with-f5-irules</loc>
+    <loc>https://jwage.com/post/2014/10/18/forcing-https-for-all-traffic-with-f5-irules</loc>
     <lastmod>2014-10-18T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2014/07/22/2014-vacation-books</loc>
+    <loc>https://jwage.com/post/2014/07/22/2014-vacation-books</loc>
     <lastmod>2014-07-22T20:14:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2014/02/15/using-the-symfony-expression-language-for-a-reward</loc>
+    <loc>https://jwage.com/post/2014/02/15/using-the-symfony-expression-language-for-a-reward</loc>
     <lastmod>2014-02-15T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2014/02/12/tailing-log-files-across-multiple-servers</loc>
+    <loc>https://jwage.com/post/2014/02/12/tailing-log-files-across-multiple-servers</loc>
     <lastmod>2014-02-12T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2014/01/18/doctrine-is-not-just-an-orm-for-relational</loc>
+    <loc>https://jwage.com/post/2014/01/18/doctrine-is-not-just-an-orm-for-relational</loc>
     <lastmod>2014-01-18T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2013/12/23/sending-safari-push-notifications-with-php</loc>
+    <loc>https://jwage.com/post/2013/12/23/sending-safari-push-notifications-with-php</loc>
     <lastmod>2013-12-23T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2013/07/16/mongodb-php-mongodate-tricks</loc>
+    <loc>https://jwage.com/post/2013/07/16/mongodb-php-mongodate-tricks</loc>
     <lastmod>2013-07-16T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2013/07/13/quotes-from-the-road-to-serfdom-by-friedrich-hayek</loc>
+    <loc>https://jwage.com/post/2013/07/13/quotes-from-the-road-to-serfdom-by-friedrich-hayek</loc>
     <lastmod>2013-07-13T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2013/07/08/tracking-new-member-origination-with-symfony2</loc>
+    <loc>https://jwage.com/post/2013/07/08/tracking-new-member-origination-with-symfony2</loc>
     <lastmod>2013-07-08T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2013/07/02/building-activity-streams</loc>
+    <loc>https://jwage.com/post/2013/07/02/building-activity-streams</loc>
     <lastmod>2013-07-02T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2013/02/11/sunshinephp-miami</loc>
+    <loc>https://jwage.com/post/2013/02/11/sunshinephp-miami</loc>
     <lastmod>2013-02-11T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2012/09/24/doctrine-common-library</loc>
+    <loc>https://jwage.com/post/2012/09/24/doctrine-common-library</loc>
     <lastmod>2012-09-24T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2012/09/15/writing-a-parser-in-php-with-the-help-of-doctrine</loc>
+    <loc>https://jwage.com/post/2012/09/15/writing-a-parser-in-php-with-the-help-of-doctrine</loc>
     <lastmod>2012-09-15T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2012/09/10/tumblr-code-syntax-highlighting</loc>
+    <loc>https://jwage.com/post/2012/09/10/tumblr-code-syntax-highlighting</loc>
     <lastmod>2012-09-10T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2012/09/10/ruler-a-simple-stateless-production-rules-engine</loc>
+    <loc>https://jwage.com/post/2012/09/10/ruler-a-simple-stateless-production-rules-engine</loc>
     <lastmod>2012-09-10T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2012/09/07/doctrine-dbal-php-database-abstraction-layer</loc>
+    <loc>https://jwage.com/post/2012/09/07/doctrine-dbal-php-database-abstraction-layer</loc>
     <lastmod>2012-09-07T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2012/09/07/deploying-opensky-with-fabric</loc>
+    <loc>https://jwage.com/post/2012/09/07/deploying-opensky-with-fabric</loc>
     <lastmod>2012-09-07T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2012/07/10/testing-query-counts-in-functional-web-tests-with</loc>
+    <loc>https://jwage.com/post/2012/07/10/testing-query-counts-in-functional-web-tests-with</loc>
     <lastmod>2012-07-10T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2012/07/10/asynchronous-events-with-php-and-symfony2</loc>
+    <loc>https://jwage.com/post/2012/07/10/asynchronous-events-with-php-and-symfony2</loc>
     <lastmod>2012-07-10T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2012/02/22/logging-mongodb-explains-in-symfony2</loc>
+    <loc>https://jwage.com/post/2012/02/22/logging-mongodb-explains-in-symfony2</loc>
     <lastmod>2012-02-22T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2011/10/29/a-cool-script-for-running-phpunit-tests-in</loc>
+    <loc>https://jwage.com/post/2011/10/29/a-cool-script-for-running-phpunit-tests-in</loc>
     <lastmod>2011-10-29T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2011/06/10/something-to-always-think-about</loc>
+    <loc>https://jwage.com/post/2011/06/10/something-to-always-think-about</loc>
     <lastmod>2011-06-10T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2011/03/16/mongodb-tailable-cursors</loc>
+    <loc>https://jwage.com/post/2011/03/16/mongodb-tailable-cursors</loc>
     <lastmod>2011-03-16T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2011/02/28/tips-on-being-successful-in-open-source</loc>
+    <loc>https://jwage.com/post/2011/02/28/tips-on-being-successful-in-open-source</loc>
     <lastmod>2011-02-28T00:00:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/08/25/blending-the-doctrine-orm-and-mongodb-odm</loc>
+    <loc>https://jwage.com/post/2010/08/25/blending-the-doctrine-orm-and-mongodb-odm</loc>
     <lastmod>2010-08-25T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/08/19/new-doctrine-mongodb-odm-documentation</loc>
+    <loc>https://jwage.com/post/2010/08/19/new-doctrine-mongodb-odm-documentation</loc>
     <lastmod>2010-08-19T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/08/02/doctrine-annotations-library</loc>
+    <loc>https://jwage.com/post/2010/08/02/doctrine-annotations-library</loc>
     <lastmod>2010-08-02T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/07/31/array-dereferencing-in-php-trunk</loc>
+    <loc>https://jwage.com/post/2010/07/31/array-dereferencing-in-php-trunk</loc>
     <lastmod>2010-07-31T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/07/30/doctrine-mongodb-odm-schema-migrations</loc>
+    <loc>https://jwage.com/post/2010/07/30/doctrine-mongodb-odm-schema-migrations</loc>
     <lastmod>2010-07-30T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/07/28/setting-entitydocument-references-without-hitting</loc>
+    <loc>https://jwage.com/post/2010/07/28/setting-entitydocument-references-without-hitting</loc>
     <lastmod>2010-07-28T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/07/28/inheritance-and-mapped-super-classes-in-doctrine</loc>
+    <loc>https://jwage.com/post/2010/07/28/inheritance-and-mapped-super-classes-in-doctrine</loc>
     <lastmod>2010-07-28T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/07/27/using-yql-to-get-geo-location-information-for-an</loc>
+    <loc>https://jwage.com/post/2010/07/27/using-yql-to-get-geo-location-information-for-an</loc>
     <lastmod>2010-07-27T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/07/27/storing-files-with-mongodb-gridfs</loc>
+    <loc>https://jwage.com/post/2010/07/27/storing-files-with-mongodb-gridfs</loc>
     <lastmod>2010-07-27T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/07/27/multiple-levels-of-embedded-documents-in-mongodb</loc>
+    <loc>https://jwage.com/post/2010/07/27/multiple-levels-of-embedded-documents-in-mongodb</loc>
     <lastmod>2010-07-27T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/07/26/executing-sql-after-loading-your-data-fixtures-in</loc>
+    <loc>https://jwage.com/post/2010/07/26/executing-sql-after-loading-your-data-fixtures-in</loc>
     <lastmod>2010-07-26T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
     <url>
-    <loc>https://jwage.com/posts/2010/07/26/doctrine-mongodb-object-document-mapper-in</loc>
+    <loc>https://jwage.com/post/2010/07/26/doctrine-mongodb-object-document-mapper-in</loc>
     <lastmod>2010-07-26T00:00:00-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>

@@ -2,7 +2,7 @@ sculpin_content_types:
     posts:
         type: path
         path: _posts
-        permalink: posts/:year/:month/:day/:filename/
+        permalink: post/:year/:month/:day/:filename/
         taxonomies:
             - tags
             - categories

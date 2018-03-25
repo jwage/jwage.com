@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Logging MongoDB Explains in Symfony2 &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+            <meta name="robots" content="index, follow">
+
+        <link href="https://jwage.com/components/bootstrap/css/bootstrap.min.css?4" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.com/css/style.css?4" rel="stylesheet" type="text/css" />
+
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+
+        <link rel="stylesheet" href="https://jwage.com/components/highlightjs/styles/railscasts.css?4" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.com/atom.xml" title="jwage.com activity feed" />
+
+        
+            </head>
+    <body>
+
+        <header>
+            <!-- Fixed navbar -->
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                <a class="navbar-brand" href="https://jwage.com"><img src="https://jwage.com/images/me.jpg" class="rounded-circle mr-3" />jwage.com</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/blog">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/articles">Articles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/kubota-l210">Kubota L210</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/archive">Archive</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Begin page content -->
+        <main role="main" class="container">
+                <article>
+        <header>
+            <h2>Logging MongoDB Explains in Symfony2 <small>post</small></h2>
+        </header>
+
+        <p class="lead">Posted on 2012-02-22 by jwage</p>
+
+        <hr />
+
+        <div>
+            <p>At <a href="http://opensky.com" target="_blank">OpenSky.com</a> we use <a href="http://mongodb.org" target="_blank">MongoDB</a> as one of our primary data stores. We use the slow query log in the <a href="http://www.mongodb.org/display/DOCS/Database+Profiler" target="_blank">profiling tools</a> to identify to slow queries but sometimes it is hard to tell exactly where in our application it originated from. Thanks to the flexibility of <a href="http://doctrine-project.org" target="_blank">Doctrine</a> and <a href="http://symfony.com" target="_blank">Symfony2</a> we can easily listen to a few events and log the information without modifying any application code.</p>
+
+<p>First lets write a simple listener class:</p>
+
+<pre><code>namespace Application\Bundle\MainBundle\ODM\MongoDB\Explainer;
+
+use Doctrine\MongoDB\Event\EventArgs;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+class ExplainerListener
+{
+    private $container;
+    private $lastQuery;
+    private $explains = array();
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this-&gt;container = $container;
+    }
+
+    public function collectionPreFind(EventArgs $args)
+    {
+        $this-&gt;lastQuery = $args-&gt;getData();
+    }
+
+    public function collectionPostFind(EventArgs $args)
+    {
+        $e = new \Exception();
+        $collection = $args-&gt;getInvoker();
+        $cursor = $args-&gt;getData();
+        $explain = $cursor-&gt;explain();
+        $this-&gt;explains[] = array(
+            'explain' =&gt; $explain,
+            'query' =&gt; $this-&gt;lastQuery,
+            'database' =&gt; $collection-&gt;getDatabase()-&gt;getName(),
+            'collection' =&gt; $collection-&gt;getName(),
+            'traceAsString' =&gt; $e-&gt;getTraceAsString()
+        );
+    }
+
+    private function getCollection()
+    {
+        $databaseName = $this-&gt;container-&gt;getParameter('doctrine.odm.mongodb.default_configuration.default_database');
+        return $this-&gt;container-&gt;get('doctrine.odm.mongodb.document_manager')
+            -&gt;getConnection()
+            -&gt;selectCollection($databaseName, 'query_explains');
+    }
+
+    public function __destruct()
+    {
+        $this-&gt;getCollection()-&gt;batchInsert($this-&gt;explains);
+    }
+}
+</code></pre>
+
+<p>This class will listen on the <code>Doctrine\MongoDB\Collection#find()</code> <code>pre</code> and <code>post</code> event and capture the explain of the query.</p>
+
+<p>Next just configure the listener we wrote above in the DIC:</p>
+
+<pre><code>&lt;?xml version="1.0" encoding="utf-8" ?&gt;
+&lt;container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services <a href="http://symfony.com/schema/dic/services/services-1.0.xsd" target="_blank">http://symfony.com/schema/dic/services/services-1.0.xsd</a>"&gt;
+
+    &lt;services&gt;
+        &lt;service id="odm.explainer" class="Application\Bundle\MainBundle\ODM\MongoDB\Explainer\ExplainerListener"&gt;
+            &lt;tag name="doctrine.odm.mongodb.default_event_listener" event="collectionPreFind" method="collectionPreFind" /&gt;
+            &lt;tag name="doctrine.odm.mongodb.default_event_listener" event="collectionPostFind" method="collectionPostFind" /&gt;
+            &lt;argument type="service" id="service_container" /&gt;
+        &lt;/service&gt;
+    &lt;/services&gt;
+&lt;/container&gt;
+</code></pre>
+
+<p>Now all your queries will be logged in to a mongodb collection named query_explains. If you take a look in the collection after triggering a few queries in your application you will see documents that look like the following:</p>
+
+<pre><code>{
+    "_id" : ObjectId("4f4480d4acee41cd6800001b"),
+    "explain" : {
+        "cursor" : "ForwardCappedCursor",
+        "nscanned" : 0,
+        "nscannedObjects" : 0,
+        "n" : 0,
+        "millis" : 0,
+        "nYields" : 0,
+        "nChunkSkips" : 0,
+        "isMultiKey" : false,
+        "indexOnly" : false,
+        "indexBounds" : [ ],
+        "allPlans" : [
+            {
+                "cursor" : "ForwardCappedCursor",
+                "indexBounds" : [ ]
+            }
+        ]
+    },
+    "query" : [ ],
+    "database" : "database_name",
+    "collection" : "collection_name",
+    "traceAsString" : "..."
+}
+</code></pre>
+
+<p>The traceAsString field is a string representation of the trace that led up to the query so you can easily identify what triggered the query in your application.</p>
+
+        </div>
+                
+                    <nav class="article">
+                <ul>
+                                            <li>Next: <a class="next" href="https://jwage.com/post/2012/07/10/asynchronous-events-with-php-and-symfony2" title="Asynchronous Events with PHP and Symfony2"><span class="title">Asynchronous Events with PHP and Symfony2</span></a></li>
+                                                                <li>Previous: <a class="previous" href="https://jwage.com/post/2011/10/29/a-cool-script-for-running-phpunit-tests-in" title="A cool script for running PHPUnit tests in parallel processes"><span class="title">A cool script for running PHPUnit tests in parallel processes</span></a></li>
+                                    </ul>
+            </nav>
+            </article>
+
+
+
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <span class="text-muted"><img src="https://jwage.com/images/me.jpg" class="rounded-circle mr-3" style="width: 25px;" />&copy; 2018 jwage.com</span>
+            </div>
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js?4"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.com/components/jquery/jquery.min.js?4"><\/script>')</script>
+        <script src="https://jwage.com/components/bootstrap/js/bootstrap.min.js?4"></script>
+
+        
+                    <script type="text/javascript">
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-288343-6', 'auto');
+                ga('send', 'pageview');
+            </script>
+        
+        <script src="https://jwage.com/components/highlightjs/highlight.pack.js?4"></script>
+        <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+
+        
+            </body>
+</html>
