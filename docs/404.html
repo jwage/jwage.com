@@ -138,8 +138,8 @@
             currentPath = currentPath + '/';
         }
 
-        if (redirects.hasOwnProperty(window.location.pathname)) {
-            window.location.href = redirects[window.location.pathname];
+        if (redirects.hasOwnProperty(currentPath)) {
+            window.location.href = redirects[currentPath];
         }
     </script>
 
