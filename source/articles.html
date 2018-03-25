@@ -13,10 +13,13 @@ pagination:
 
 <p class="lead">Articles about PHP, Symfony, Doctrine and other technology related topics.</p>
 
-{% for post in page.pagination.items %}
-    {% if page.category in post.categories %}
-        <article>
-            <div><a href="{{ site.url }}{{ post.url }}">{{ post.title }}</a></div>
-        </article>
-    {% endif %}
-{% endfor %}
+<ul>
+    {% for post in page.pagination.items %}
+        {% if page.category in post.categories %}
+            <li>
+                <div><a href="{{ site.url }}{{ post.url }}">{{ post.title }}</a></div>
+                <small>Posted on {{ post.date|date('Y-m-d') }}</small>
+            </li>
+        {% endif %}
+    {% endfor %}
+</ul>

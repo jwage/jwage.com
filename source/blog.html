@@ -15,9 +15,15 @@ use:
         <header>
             <h2><a href="{{ site.url }}{{ post.url }}">{{ post.title }}</a></h2>
         </header>
+
+        <p class="lead">Posted on {{ page.date|date('Y-m-d') }} by jwage</p>
+
+        <hr />
+
         <div>
             {{ post.blocks.content|raw }}
         </div>
+
         {% if post.meta.tags %}
             <p class="tags">
             Tags:
@@ -30,8 +36,10 @@ use:
 {% endfor %}
 
 {% if page.pagination.previous_page or page.pagination.next_page %}
-    <nav>
-        {% if page.pagination.previous_page %}<a href="{{ site.url }}{{ page.pagination.previous_page.url }}">Newer Posts</a>{% endif %}<br />
-        {% if page.pagination.next_page %}<a href="{{ site.url }}{{ page.pagination.next_page.url }}">Older Posts</a>{% endif %}<br />
+    <nav class="mt-4">
+        <ul class="pagination">
+            {% if page.pagination.previous_page %}<li class="page-item"><a class="page-link" href="{{ site.url }}{{ page.pagination.previous_page.url }}">Newer Posts</a></li>{% endif %}<br />
+            {% if page.pagination.next_page %}<li class="page-item"><a class="page-link" href="{{ site.url }}{{ page.pagination.next_page.url }}">Older Posts</a></li>{% endif %}
+        </ul>
     </nav>
 {% endif %}

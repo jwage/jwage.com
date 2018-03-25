@@ -75,6 +75,11 @@
         <header>
             <h2><a href="https://jwage.com/posts/2010/07/28/inheritance-and-mapped-super-classes-in-doctrine">Inheritance and Mapped Super Classes in Doctrine</a></h2>
         </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
         <div>
             <p><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/inheritance-mapping/en#single-collection-inheritance" target="_blank">Single Collection Inheritance</a> in the <a href="http://www.doctrine-project.org/projects/mongodb_odm" target="_blank">Doctrine MongoDB ODM</a> allows you to map multiple classes in an inheritance hierarchy to a single collection in <a href="http://www.mongodb.org" target="_blank">MongoDB</a>. An example might be in a CMS where you have several different content types like the base Node, Page and BlogPost which all extends an abstract ContentType class.</p>
 
@@ -248,11 +253,17 @@ $dm-&gt;flush();
 </code></pre>
 
         </div>
+
             </article>
     <article>
         <header>
             <h2><a href="https://jwage.com/posts/2010/07/27/using-yql-to-get-geo-location-information-for-an">Using YQL to get geo location information for an IP address</a></h2>
         </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
         <div>
             <p>The <a href="http://developer.yahoo.com/yql/" target="_blank">Yahoo! YQL API</a> has the ability to provide geo location information for IP addresses. Using this in PHP is dead simple. Here is a barebones example demonstrating how you can use PHP and YQL for this:</p>
 
@@ -391,11 +402,17 @@ using the locator API:</p>
 </code></pre>
 
         </div>
+
             </article>
     <article>
         <header>
             <h2><a href="https://jwage.com/posts/2010/07/27/storing-files-with-mongodb-gridfs">Storing Files with MongoDB GridFS</a></h2>
         </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
         <div>
             <p>The <a href="http://www.php.net/mongo" target="_blank">PHP MongoDB</a> extension provides a nice and convenient way to store files in chunks of data with the <a href="http://us.php.net/manual/en/class.mongogridfs.php" target="_blank">MongoDB GridFS</a>. It uses two database collections, one to store the metadata for the file, and another to store the contents of the file. The contents are stored in chunks to avoid going over the maximum allowed size of a MongoDB document.</p>
 
@@ -538,11 +555,13 @@ echo $image-&gt;getFile()-&gt;getBytes();
 </code></pre>
 
         </div>
+
             </article>
 
-    <nav>
-        <a href="https://jwage.com/blog/page/11.html">Newer Posts</a><br />
-        <a href="https://jwage.com/blog/page/13.html">Older Posts</a><br />
+    <nav class="mt-4">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="https://jwage.com/blog/page/11.html">Newer Posts</a></li><br />
+            <li class="page-item"><a class="page-link" href="https://jwage.com/blog/page/13.html">Older Posts</a></li>        </ul>
     </nav>
                     </main>
 

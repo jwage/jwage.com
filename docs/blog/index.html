@@ -75,6 +75,11 @@
         <header>
             <h2><a href="https://jwage.com/posts/2017/11/29/gmail-translation">Gmail trying to translate our e-mails when it should not</a></h2>
         </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
         <div>
             <p>Recently at <a href="https://www.opensky.com" target="_blank">OpenSky</a> we migrated our e-mail service provider to Oracle Responsys and since then we&rsquo;ve had issues with Gmail trying to translate our e-mails from random languages. Over the last month it has tried to translate from the following languages:</p>
 
@@ -148,11 +153,17 @@
 <p><a href="https://cdn1.ykso.co/image/cdn_image/5a1ed856782800481b035f65.png?publicId=9e10659&amp;filterName=original&amp;cacheBuster=1467148600" target="_blank"><img src="https://cdn1.ykso.co/image/cdn_image/5a1ed856782800481b035f65.png?publicId=9e10659&amp;filterName=original&amp;cacheBuster=1467148600" width="100%"/></a></p>
 
         </div>
+
             </article>
     <article>
         <header>
             <h2><a href="https://jwage.com/posts/2014/11/27/when-to-inject-the-container">When to Inject the Container</a></h2>
         </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
         <div>
             <p>Deciding when to inject the container in Symfony is a frequent topic of discussion. Many would have you believe that you should NEVER inject the container because it breaks the &ldquo;rules&rdquo; and is an anti-pattern. This is not always true and, just like most things, it should not be applied blindly to everything you do. This post aims to demonstrate cases where injecting the container makes sense.</p>
 
@@ -296,11 +307,17 @@ abstract class LazyService extends ContainerAware
 <p>That is it! I hope this post was helpful in realizing when to inject the container and not blindly follow design theory. Happy Thanksgiving!</p>
 
         </div>
+
             </article>
     <article>
         <header>
             <h2><a href="https://jwage.com/posts/2014/11/27/fixing-nginx-too-many-open-files-errors">Fixing nginx &quot;Too many open files&quot; errors</a></h2>
         </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
         <div>
             <p>At <a href="https://www.opensky.com" target="_blank">OpenSky</a>, we recently migrated to the <a href="http://instartlogic.com/" target="_blank">InstartLogic CDN</a>. One of the features they provide is the ability to resize images by appending <code>?iresize=width:500,height:500</code> to your image URLs.</p>
 
@@ -314,11 +331,13 @@ abstract class LazyService extends ContainerAware
 <p>After this change our backend PHP servers have a lighter load and the first request for an image through the CDN is much faster.</p>
 
         </div>
+
             </article>
 
-    <nav>
-        <br />
-        <a href="https://jwage.com/blog/page/2.html">Older Posts</a><br />
+    <nav class="mt-4">
+        <ul class="pagination">
+            <br />
+            <li class="page-item"><a class="page-link" href="https://jwage.com/blog/page/2.html">Older Posts</a></li>        </ul>
     </nav>
                     </main>
 

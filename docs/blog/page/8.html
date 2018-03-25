@@ -75,6 +75,11 @@
         <header>
             <h2><a href="https://jwage.com/posts/2012/07/10/asynchronous-events-with-php-and-symfony2">Asynchronous Events with PHP and Symfony2</a></h2>
         </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
         <div>
             <p><a href="http://symfony.com" target="_blank">Symfony2</a> is a great framework. I use it at <a href="https://opensky.com" target="_blank">OpenSky</a> daily and have contributed a little bit of code to it related to the <a href="http://doctrine-project.org" target="_blank">Doctrine</a> integration.</p>
 
@@ -153,11 +158,17 @@
 <p>In order for you to implement the above example you will need some kind of message queue and middle ware. If you don&rsquo;t have that you could very easily stash the calls to notifyAsync() and issue the events as async ajax requests when the response renders in the browser or implement some other kind of event persistence and a console command that runs as a daemon constantly processing the events. It is possible to build out a smaller scale version of the example above that is easy to upgrade later.</p>
 
         </div>
+
             </article>
     <article>
         <header>
             <h2><a href="https://jwage.com/posts/2012/02/22/logging-mongodb-explains-in-symfony2">Logging MongoDB Explains in Symfony2</a></h2>
         </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
         <div>
             <p>At <a href="http://opensky.com" target="_blank">OpenSky.com</a> we use <a href="http://mongodb.org" target="_blank">MongoDB</a> as one of our primary data stores. We use the slow query log in the <a href="http://www.mongodb.org/display/DOCS/Database+Profiler" target="_blank">profiling tools</a> to identify to slow queries but sometimes it is hard to tell exactly where in our application it originated from. Thanks to the flexibility of <a href="http://doctrine-project.org" target="_blank">Doctrine</a> and <a href="http://symfony.com" target="_blank">Symfony2</a> we can easily listen to a few events and log the information without modifying any application code.</p>
 
@@ -265,11 +276,17 @@ class ExplainerListener
 <p>The traceAsString field is a string representation of the trace that led up to the query so you can easily identify what triggered the query in your application.</p>
 
         </div>
+
             </article>
     <article>
         <header>
             <h2><a href="https://jwage.com/posts/2011/10/29/a-cool-script-for-running-phpunit-tests-in">A cool script for running PHPUnit tests in parallel processes</a></h2>
         </header>
+
+        <p class="lead">Posted on 2018-03-25 by jwage</p>
+
+        <hr />
+
         <div>
             <p>At <a href="http://opensky.com" target="_blank">OpenSky</a> we&rsquo;re exploring options for getting better build times. We came across this script found <a href="http://pebblesinthesand.wordpress.com/2008/05/22/a-srcipt-for-running-processes-in-parallel-in-bash/" target="_blank">here</a> for executing commands and running the processes in parallel.</p>
 
@@ -388,11 +405,13 @@ class MyTest
 <p>One caveat is we have to figure out a way for each test run inside parallel to use a different configuration, database, etc. so that the tests do not walk on each other and are isolated.</p>
 
         </div>
+
             </article>
 
-    <nav>
-        <a href="https://jwage.com/blog/page/7.html">Newer Posts</a><br />
-        <a href="https://jwage.com/blog/page/9.html">Older Posts</a><br />
+    <nav class="mt-4">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="https://jwage.com/blog/page/7.html">Newer Posts</a></li><br />
+            <li class="page-item"><a class="page-link" href="https://jwage.com/blog/page/9.html">Older Posts</a></li>        </ul>
     </nav>
                     </main>
 
