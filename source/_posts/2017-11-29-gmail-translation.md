@@ -16,9 +16,9 @@ title: Gmail trying to translate our e-mails when it should not
 <li>Vietnamese</li>
 </ul><p>We have tried to find someone at gmail support to help but we haven&rsquo;t had any success. If we did have something in our HTML or e-mail service provider that was making gmail think our emails are in another language, I would think it would be the same language consistently. I&rsquo;ve seen gmail try to translate the same e-mail to multiple different languages. This feels like a bug in gmail causing false positives.</p>
 
-<p>Here is another Responsys customer that is experiencing the same thing <a href="https://litmus.com/community/discussions/7028-gmail-mis-translating-our-english-only-emails-into-other-languages" target="_blank">https://litmus.com/community/discussions/7028-gmail-mis-translating-our-english-only-emails-into-other-languages</a>.</p>
+<p>Here is another Responsys customer that is experiencing the same thing <a href="https://litmus.com/community/discussions/7028-gmail-mis-translating-our-english-only-emails-into-other-languages" target="_blank">here</a>.</p>
 
-<p>Here is a post on the gmail help forum about the issue <a href="https://productforums.google.com/forum/?utm_medium=email&amp;utm_source=footer#!msg/gmail/Tfxb9iu-xgk/NMzTCe_SCgAJ" target="_blank">https://productforums.google.com/forum/?utm_medium=email&amp;utm_source=footer#!msg/gmail/Tfxb9iu-xgk/NMzTCe_SCgAJ</a></p>
+<p>Here is a post on the gmail help forum about the <a href="https://productforums.google.com/forum/?utm_medium=email&amp;utm_source=footer#!msg/gmail/Tfxb9iu-xgk/NMzTCe_SCgAJ" target="_blank">issue</a></p>
 
 <p>Here is a screenshot of an e-mail coming from one gmail user going to another gmail user. This rules out the problem being anything at all related to our e-mail service provider. I am confident that Gmail language detection is broken:</p>
 
