@@ -64,7 +64,7 @@ foreach ($paths as $path) {
         $date[0], $date[1], $date[2], implode('-', $e)
     );
 
-    $redirects[$path] = $redirect;
+    $redirects[$path.'/'] = $redirect;
 }
 
 echo json_encode($redirects, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
