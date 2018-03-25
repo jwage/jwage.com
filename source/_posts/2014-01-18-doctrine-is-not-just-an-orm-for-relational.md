@@ -1,5 +1,6 @@
 ---
 title: Doctrine is not just an ORM for Relational Databases
+categories: [articles]
 ---
 <p>In April of 2010 the <a href="https://github.com/doctrine/mongodb-odm/commit/92582ffe5facffa4d2379f176dbee539918db962" target="_blank">first commit</a> for the Doctrine MongoDB ODM project was made. I was experimenting with MongoDB at the time and I wanted to see how difficult it would be to build a version of Doctrine for MongoDB.</p>
 

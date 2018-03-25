@@ -1,5 +1,6 @@
 ---
 title: Inheritance and Mapped Super Classes in Doctrine
+categories: [articles]
 ---
 <p><a href="http://www.doctrine-project.org/projects/mongodb_odm/1.0/docs/reference/inheritance-mapping/en#single-collection-inheritance" target="_blank">Single Collection Inheritance</a> in the <a href="http://www.doctrine-project.org/projects/mongodb_odm" target="_blank">Doctrine MongoDB ODM</a> allows you to map multiple classes in an inheritance hierarchy to a single collection in <a href="http://www.mongodb.org" target="_blank">MongoDB</a>. An example might be in a CMS where you have several different content types like the base Node, Page and BlogPost which all extends an abstract ContentType class.</p>
 

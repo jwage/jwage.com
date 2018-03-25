@@ -1,0 +1,20 @@
+---
+layout: default
+title: Articles
+generator: [posts_category_index, pagination]
+pagination:
+        max_per_page: 10000
+pagination:
+        provider: page.category_posts
+
+---
+
+<h1 class="display-4">Articles</h1>
+
+{% for post in page.pagination.items %}
+    {% if page.category in post.categories %}
+        <article>
+            <div><a href="{{ site.url }}{{ post.url }}">{{ post.title }}</a></div>
+        </article>
+    {% endif %}
+{% endfor %}

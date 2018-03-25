@@ -1,5 +1,6 @@
 ---
 title: Tracking New Member Origination with Symfony2
+categories: [articles]
 ---
 <blockquote>
   <p><strong>NOTE</strong>

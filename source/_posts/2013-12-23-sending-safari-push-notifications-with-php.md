@@ -1,5 +1,6 @@
 ---
 title: Sending Safari Push Notifications with PHP
+categories: [articles]
 ---
 <p>When OSX Mavericks was released, I was excited to see that push notifications were supported within Safari. So now, just like iOS, we can send push notifications to Safari regardless of whether the browser is open or not. This post gives overview of how to get them working from PHP using the <a href="http://github.com/jwage/php-apns" target="_blank">PHP APNS</a> library.</p>
 

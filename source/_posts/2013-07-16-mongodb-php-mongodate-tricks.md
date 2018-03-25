@@ -1,5 +1,6 @@
 ---
 title: MongoDB PHP MongoDate Tricks
+categories: [articles]
 ---
 <p>Here are a few tricks I&rsquo;ve learned working with MongoDB and PHP.</p>
 

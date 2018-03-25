@@ -1,5 +1,6 @@
 ---
 title: Using the Symfony Expression Language for a Reward Rules Engine
+categories: [articles]
 ---
 <p>We recently adopted the <a href="http://symfony.com/doc/current/components/expression_language/index.html" target="_blank">Symfony Expression Language</a> in the rules engine at <a href="http://www.opensky.com" target="_blank">OpenSky</a>. It has brought a new level of flexibility to our system and creating new logic has never been easier.</p>
 

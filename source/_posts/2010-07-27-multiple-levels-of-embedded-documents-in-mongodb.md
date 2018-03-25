@@ -1,5 +1,6 @@
 ---
 title: Multiple levels of Embedded Documents in MongoDB
+categories: [articles]
 ---
 <p>One of the greatest things about <a href="http://www.mongodb.org" target="_blank">MongoDB</a> is the fact that it is schema-less. It makes for a very flexible domain model persistence layer. For example it is possible to have multiple levels of embedded documents. A useful example might be where you have many profiles and each profile has many addresses. In the <a href="http://www.doctrine-project.org" target="_blank">Doctrine</a> MongoDB <a href="http://www.doctrine-project.org/projects/odm" target="_blank">ODM</a> mapping this is trivial.</p>
 

@@ -1,5 +1,6 @@
 ---
 title: Doctrine DBAL: PHP Database Abstraction Layer
+categories: [articles]
 ---
 <p>Most people think ORM when they hear the name <a href="http://doctrine-project.org" target="_blank">Doctrine</a>, but what most people don&rsquo;t know, or forget, is that Doctrine is built on top of a very powerful Database Abstraction Layer that has been under development for over a decade. It&rsquo;s history can be traced back to 1999 in a library named Metabase which was forked to create PEAR MDB, then MDB2, Zend_DB and finally Doctrine1. In Doctrine2 the DBAL was completely decoupled from the ORM, components re-written for PHP 5.3 and made a standalone library.</p>
 

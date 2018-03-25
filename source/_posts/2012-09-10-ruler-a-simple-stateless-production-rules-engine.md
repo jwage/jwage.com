@@ -1,5 +1,6 @@
 ---
 title: Ruler: A simple stateless production rules engine for PHP 5.3+
+categories: [articles]
 ---
 <p><strong>What is ruler?</strong></p>
 

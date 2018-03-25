@@ -1,5 +1,6 @@
 ---
 title: MongoDB Tailable Cursors
+categories: [articles]
 ---
 <p>Tailable cursors are a cool feature of MongoDB. It allows you to setup scripts that run forever and are constantly processing new data that gets inserted to the collection. You need a capped collection in order to tail a cursor so just create a new collection and make sure it is capped to a size you can specify:</p>
 

@@ -1,5 +1,6 @@
 ---
 title: Storing Files with MongoDB GridFS
+categories: [articles]
 ---
 <p>The <a href="http://www.php.net/mongo" target="_blank">PHP MongoDB</a> extension provides a nice and convenient way to store files in chunks of data with the <a href="http://us.php.net/manual/en/class.mongogridfs.php" target="_blank">MongoDB GridFS</a>. It uses two database collections, one to store the metadata for the file, and another to store the contents of the file. The contents are stored in chunks to avoid going over the maximum allowed size of a MongoDB document.</p>
 

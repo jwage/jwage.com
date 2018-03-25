@@ -1,5 +1,6 @@
 ---
 title: Blending the Doctrine ORM and MongoDB ODM
+categories: [articles]
 ---
 <p>Since the start of the <a href="http://www.doctrine-project.org/projects/mongodb_odm" target="_blank">Doctrine MongoDB Object Document Mapper</a> project people have asked how it can be integrated with the <a href="http://www.doctrine-project.org/projects/orm" target="_blank">ORM</a>. This blog post demonstrates how you can integrate the two transparently, maintaining a clean domain model.</p>
 

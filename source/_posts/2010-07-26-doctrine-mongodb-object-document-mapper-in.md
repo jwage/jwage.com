@@ -1,5 +1,6 @@
 ---
 title: Doctrine MongoDB Object Document Mapper in Symfony2
+categories: [articles]
 ---
 <h1>MongoDB</h1>
 

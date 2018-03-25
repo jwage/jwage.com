@@ -1,5 +1,6 @@
 ---
 title: A cool script for running PHPUnit tests in parallel processes
+categories: [articles]
 ---
 <p>At <a href="http://opensky.com" target="_blank">OpenSky</a> we&rsquo;re exploring options for getting better build times. We came across this script found <a href="http://pebblesinthesand.wordpress.com/2008/05/22/a-srcipt-for-running-processes-in-parallel-in-bash/" target="_blank">here</a> for executing commands and running the processes in parallel.</p>
 
@@ -79,7 +80,7 @@ do
     else
         CMD="$COMMAND $INS" #append args
     fi
-    echo "Running $CMD" 
+    echo "Running $CMD"
 
     $CMD &amp;
     # DEFINE COMMAND END

@@ -1,5 +1,6 @@
 ---
 title: Asynchronous Events with PHP and Symfony2
+categories: [articles]
 ---
 <p><a href="http://symfony.com" target="_blank">Symfony2</a> is a great framework. I use it at <a href="https://opensky.com" target="_blank">OpenSky</a> daily and have contributed a little bit of code to it related to the <a href="http://doctrine-project.org" target="_blank">Doctrine</a> integration.</p>
 

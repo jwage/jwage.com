@@ -1,5 +1,6 @@
 ---
 title: Building Activity Streams using Symfony2, Doctrine2 and MongoDB
+categories: [articles]
 ---
 <blockquote>
   <p><strong>NOTE</strong>

@@ -1,5 +1,6 @@
 ---
 title: Doctrine Annotations Library
+categories: [articles]
 ---
 <p>The Doctrine Annotations library was born from a need in the Doctrine2 ORM to allow the mapping information to be specified inside the doc-blocks of classes, properties and methods. The library is independent and can be used in your own libraries to implement doc block annotations.</p>
 

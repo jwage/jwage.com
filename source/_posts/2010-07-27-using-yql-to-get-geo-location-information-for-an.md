@@ -1,5 +1,6 @@
 ---
 title: Using YQL to get geo location information for an IP address
+categories: [articles]
 ---
 <p>The <a href="http://developer.yahoo.com/yql/" target="_blank">Yahoo! YQL API</a> has the ability to provide geo location information for IP addresses. Using this in PHP is dead simple. Here is a barebones example demonstrating how you can use PHP and YQL for this:</p>
 

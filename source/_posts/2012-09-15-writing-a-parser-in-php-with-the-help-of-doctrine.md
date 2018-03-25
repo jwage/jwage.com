@@ -1,5 +1,6 @@
 ---
 title: Writing a parser in PHP with the help of Doctrine
+categories: [articles]
 ---
 <p>In the <a href="http://doctrine-project.org" target="_blank">Doctrine</a> project we have a SQL-like language called <a href="http://doctrine-orm.readthedocs.org/en/2.0.x/reference/dql-doctrine-query-language.html" target="_blank">DQL</a> for the ORM. In Doctrine1 the DQL language was not implemented with a true parser but in Doctrine2 the language was completely re-written with a true lexer parser. This lexer parser not only powers DQL but it also powers the <a href="http://jwage.com/post/30490186668/doctrine-annotations-library" target="_blank">Annotations</a> library in the <a href="http://www.doctrine-project.org/projects/common.html" target="_blank">Common</a> library.</p>
 
@@ -152,7 +153,7 @@ class Lexer extends \Doctrine\Common\Lexer
 
         // Recognizing numeric values
         if (is_numeric($value)) {
-            return (strpos($value, '.') !== false || stripos($value, 'e') !== false) 
+            return (strpos($value, '.') !== false || stripos($value, 'e') !== false)
                     ? self::T_FLOAT : self::T_INTEGER;
         }
 

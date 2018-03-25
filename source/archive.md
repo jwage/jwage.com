@@ -7,7 +7,7 @@ use:
 
 ---
 {% set year = '0' %}
-<h2>Posts Archive</h2>
+<h1 class="display-4">Archive</h1>
 {% for post in page.pagination.items %}
 {% set this_year %}{{ post.date | date("Y") }}{% endset %}
 {% if year != this_year %}

@@ -1,5 +1,6 @@
 ---
 title: Tips on Being Successful in Open Source
+categories: [articles]
 ---
 <p>This morning I got an e-mail from someone asking for some pointers on how to build a successul open source project. It&rsquo;s a difficult question to answer. In the end I think it comes down to a lot of things, but mainly it is being consistent and active. I responded to him with some of my thoughts and when I was done I practically had a blog post so I decided flesh it out a little more and post it here.</p>
 

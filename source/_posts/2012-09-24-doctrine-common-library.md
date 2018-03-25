@@ -1,5 +1,6 @@
 ---
 title: Doctrine Common Library
+categories: [articles]
 ---
 <p><a href="http://doctrine-project.org" target="_blank">Doctrine</a> started as a library where all the internal components were coupled together. But as things have evolved the components have been decoupled and shared between the projects. This change also makes it possible for other people to use these pieces of Doctrine even if they don&rsquo;t use the ORM or any other project.</p>
 

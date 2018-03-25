@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MongoDB Tailable Cursors &mdash; jwage.com &mdash; I am Jonathan H. Wage</title>
+
+        <meta charset="utf-8">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+            <meta name="robots" content="index, follow">
+
+        <link href="https://jwage.com/components/bootstrap/css/bootstrap.min.css?2" rel="stylesheet" type="text/css" />
+        <link href="https://jwage.com/css/style.css?2" rel="stylesheet" type="text/css" />
+
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+
+        <link rel="stylesheet" href="https://jwage.com/components/highlightjs/styles/github.css?2" />
+        <link rel="alternate" type="application/atom+xml" href="https://jwage.com/atom.xml" title="jwage.com activity feed" />
+
+        
+            </head>
+    <body>
+
+        <header>
+            <!-- Fixed navbar -->
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                <a class="navbar-brand" href="https://jwage.com"><img src="https://jwage.com/images/me.jpg" class="rounded-circle mr-3" />jwage.com</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/blog">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/articles">Articles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/kubota-l210">Kubota L210</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://jwage.com/archive">Archive</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Begin page content -->
+        <main role="main" class="container">
+                <article>
+        <header>
+            <h2>MongoDB Tailable Cursors <small>post</small></h2>
+        </header>
+        <div>
+            <p>Tailable cursors are a cool feature of MongoDB. It allows you to setup scripts that run forever and are constantly processing new data that gets inserted to the collection. You need a capped collection in order to tail a cursor so just create a new collection and make sure it is capped to a size you can specify:</p>
+
+<pre><code>&gt; db.createCollection("my_collection", {capped:true, size:100000})
+</code></pre>
+
+<p>Now you can tail a cursor in your favorite language. I have a few examples of the same script in PHP, Ruby, Python and Perl!</p>
+
+<h2>PHP</h2>
+
+<pre><code>$mongo = new Mongo();
+$db = $mongo-&gt;selectDB('my_db')
+$coll = $db-&gt;selectCollection('my_collection');
+$cursor = $coll-&gt;find()-&gt;tailable(true);
+while (true) {
+    if ($cursor-&gt;hasNext()) {
+        $doc = $cursor-&gt;getNext();
+        print_r($doc);
+    } else {
+        sleep(1);
+    }
+}
+</code></pre>
+
+<h2>Ruby</h2>
+
+<pre><code>db   = Mongo::Connection.new().db('my_db')
+coll = db.collection('my_collection')
+cursor = Mongo::Cursor.new(coll, :tailable =&gt; true)
+loop do
+  if doc = cursor.next_document
+    puts doc
+  else
+    sleep 1
+  end
+end
+</code></pre>
+
+<h2>Python</h2>
+
+<p>By <a href="http://wombatnation.com" target="_blank">Robert Stewart</a>:</p>
+
+<pre><code>from pymongo import Connection
+import time
+
+db = Connection().my_db
+coll = db.my_collection
+cursor = coll.find(tailable=True)
+while cursor.alive:
+    try:
+        doc = cursor.next()
+        print doc
+    except StopIteration:
+        time.sleep(1)
+</code></pre>
+
+<h2>Perl</h2>
+
+<p>By <a href="http://tong.ijenko.net/" target="_BLANK">Max</a></p>
+
+<pre><code>use 5.010;
+
+use strict;
+use warnings;
+use MongoDB;
+
+my $db = MongoDB::Connection-&gt;new;
+my $coll = $db-&gt;my_db-&gt;my_collection;
+my $cursor = $coll-&gt;find-&gt;tailable(1);
+for (;;)
+{
+    if (defined(my $doc = $cursor-&gt;next))
+    {
+        say $doc;
+    }
+    else
+    {
+        sleep 1;
+    }
+}
+</code></pre>
+
+<p>If you want to provide the same example in another language please add it in the comments and I&rsquo;d be glad to include it here!</p>
+
+        </div>
+                    <p class="categories">
+            Categories:
+                        <a href="https://jwage.com/blog/categories/articles">articles</a>                        </p>
+                
+                    <nav class="article">
+                <ul>
+                                            <li>Next: <a class="next" href="https://jwage.com/posts/2011/06/10/something-to-always-think-about" title="Something to always think about"><span class="title">Something to always think about</span></a></li>
+                                                                <li>Previous: <a class="previous" href="https://jwage.com/posts/2011/02/28/tips-on-being-successful-in-open-source" title="Tips on Being Successful in Open Source"><span class="title">Tips on Being Successful in Open Source</span></a></li>
+                                    </ul>
+            </nav>
+            </article>
+
+
+
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <span class="text-muted">&copy; 2018 jwage.com</span>
+            </div>
+        </footer>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js?2"></script>
+        <script>window.jQuery || document.write('<script src="https://jwage.com/components/jquery/jquery.min.js?2"><\/script>')</script>
+        <script src="https://jwage.com/components/bootstrap/js/bootstrap.min.js?2"></script>
+
+        
+                    <script type="text/javascript">
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-288343-6', 'auto');
+                ga('send', 'pageview');
+            </script>
+        
+        <script src="https://jwage.com/components/highlightjs/highlight.pack.js?2"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
+        
+            </body>
+</html>

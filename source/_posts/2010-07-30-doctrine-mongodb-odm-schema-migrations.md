@@ -1,5 +1,6 @@
 ---
 title: Doctrine MongoDB ODM Schema Migrations
+categories: [articles]
 ---
 <p><a href="http://www.mongodb.org" target="_blank">MongoDB</a> is a schema-less database so as your domain model changes in Doctrine, you&rsquo;ll have newer documents with different fields than older documents. Since we don&rsquo;t have a way to rename a field internally in MongoDB, <a href="http://jira.mongodb.org/browse/SERVER-394" target="_blank">yet</a>, the only other option is to fetch all the documents and rename it in your application and update the document. This could take a really long time depending on how big your database is and will require downtime.</p>
 

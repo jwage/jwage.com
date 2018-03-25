@@ -3,6 +3,8 @@ layout: default
 title: Kubota L210
 ---
 
+<h1 class="display-4">Kubota L210</h1>
+
 <div class="row">
     <div class="col">
         <div class="card">
@@ -102,6 +104,8 @@ title: Kubota L210
         </div>
     </div>
 </div>
+
+<h2 class="display-4">Tilling Garden Bed</h2>
 
 <div class="row">
   <div class="embed-responsive embed-responsive-16by9">
